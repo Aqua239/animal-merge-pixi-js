@@ -4,21 +4,24 @@
 
 ---
 
-## 1. Quy chuẩn Commit Git
-Cú pháp commit bắt buộc phải bằng Tiếng Anh
+## 1. Quy chuẩn nhánh và commit (Branch & Commit)
+* **Tất cả đều viết bằng tiếng anh**
 
-**Cấu trúc:**
-`git commit -m "<loại>: <tiêu_đề_tiếng_anh>"`
+* **Quy tắc tên nhánh (Branch name):**
+Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn` (ví dụ: `feat/drop-mechanic`)
 
-**Các loại commit hợp lệ:**
-* `feat`: Thêm tính năng mới (ví dụ: logic rớt thú, âm thanh).
-* `fix`: Sửa lỗi (bug).
-* `refactor`: Tối ưu hóa code nhưng không làm thay đổi logic hoạt động.
-* `chore`: Cập nhật cấu hình, thư viện, hoặc các tác vụ không liên quan đến code game.
-* `assets`: Dành riêng cho việc thêm, sửa, hoặc xóa các tài nguyên game như  hình ảnh (sprite/texture), âm thanh, hoặc animation.
-* `doc`: Dành cho việc cập nhật tài liệu như README.md,...
+* **Quy tắc Commit**
+`git commit -m "<loại>: <mô_tả_công_việc>"`
 
-**Ví dụ thực tế:**
+* **Các loại commit hợp lệ:**
+  * `feat`: Thêm tính năng mới (ví dụ: logic rớt thú, âm thanh).
+  * `fix`: Sửa lỗi (bug).
+  * `refactor`: Tối ưu hóa code nhưng không làm thay đổi logic hoạt động.
+  * `chore`: Cập nhật cấu hình, thư viện, hoặc các tác vụ không liên quan đến code game.
+  * `assets`: Dành riêng cho việc thêm, sửa, hoặc xóa các tài nguyên game như hình ảnh (Sprite/texture), âm thanh, hoặc animation.
+  * `doc`: Dành cho việc cập nhật tài liệu như README.md,...
+
+* **Ví dụ thực tế:**
 > `git commit -m "feat: add circle physics body"`
 
 ## 2. Quy tắc viết code (Vanilla JS & PixiJS)
@@ -34,4 +37,3 @@ Cú pháp commit bắt buộc phải bằng Tiếng Anh
   function dropAnimals() {
       // Code
   }
-
