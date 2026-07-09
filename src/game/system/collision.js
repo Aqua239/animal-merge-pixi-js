@@ -1,5 +1,9 @@
 export class collision {
 
+    constructor() {
+        this.restitution = 0.3;
+    }
+
     // (circleCollider, circleCollider) -> Boolean, has Collision: true
     detectCollisionCircletoCircle(colliderA, colliderB) {
         let dx = colliderA.x - colliderB.x;
@@ -9,24 +13,26 @@ export class collision {
         return distance <= radiusSum * radiusSum;
     }
 
-    //(circleCollider, x, width) -> Boolean, has Collision: true
-    detectCollisionCircleOnLeftRight(collider, x, width) {
+    //(circleCollider, x, width) -> void
+    detectAndHandleCollisionCircleOnLeftRight(collider, x, width) {
         if (collider.x - collider.radius <= x) {
-            return true;
+            collider.vx = Math.abs(collider.vx) * this.restitution;
+            collider.x = x + collider.radius;
         }
         if (collider.x + collider.radius >= x + width) {
-            return true;
+            collider.vx = -Math.abs(collider.vx) * this.restitution;
+            collider.x = x + width - collider.radius;
         }
-        return false;
     }
 
-    detectCollisionCircleInBottom(collider, y, height) {
+    detectAndHandleCollisionCircleInBottom(collider, y, height) {
         if (collider.y + collider.radius >= y + height) {
-            return true;
+            collider.vy = -Math.abs(collider.vy) * this.restitution;
+            collider.y = y + height - collider.radius;
         }
-        return false;
     }
 
+    //Check collision of circle with top to gameover
     detectCollisionCircleOverTop(collider, y) {
         if (collider.y - collider.radius <= y) {
             return true;
@@ -34,30 +40,32 @@ export class collision {
         return false;
     }
 
-    //(circleCollider, box(x,y,width,height)) -> Boolean, has Collision: true
-    detectCollisionCircleToBox(collider, box) {
-        console.log("detectCollisionCircleToBox: " + collider.x + ", " + collider.y + ", " + collider.radius);
-        console.log("Box: x: " + box.x + ", y: " + box.y + ", width: " + box.width + ", height: " + box.height);
-        return this.detectCollisionCircleOnLeftRight(collider, box.x, box.width) ||
-            this.detectCollisionCircleInBottom(collider, box.y, box.height);
+    //(circleCollider, box(x,y,width,height))
+    detectAndHandleCollisionCircleToBox(collider, box) {
+        this.detectAndHandleCollisionCircleOnLeftRight(collider, box.x, box.width);
+        this.detectAndHandleCollisionCircleInBottom(collider, box.y, box.height);
     }
 
     // (circleCollider, circleCollider) -> void
     resolveCollisionCircletoCircle(colliderA, colliderB) {
-        // let vCollision = { x: colliderB.x - colliderA.x, y: colliderB.y - colliderA.y };
-        // let distance = Math.sqrt(vCollision.x * vCollision.x + vCollision.y * vCollision.y);
-        // let vCollisionNorm = { x: vCollision.x / distance, y: vCollision.y / distance };
-        // let vRelativeVelocity = { x: colliderA.vx - colliderB.vx, y: colliderA.vy - colliderB.vy };
-        // let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
-        // if (speed < 0) {
-        //     return;
-        // }
+        let vCollision = { x: colliderB.x - colliderA.x, y: colliderB.y - colliderA.y };
+        let distance = Math.sqrt(vCollision.x * vCollision.x + vCollision.y * vCollision.y);
+        let vCollisionNorm = { x: vCollision.x / distance, y: vCollision.y / distance };
+        let vRelativeVelocity = { x: colliderA.vx - colliderB.vx, y: colliderA.vy - colliderB.vy };
+        let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
+        if (speed < 0) {
+            return;
+        }
 
-        // //update
-        // let impulse = (2 * speed) / (colliderA.computeMass() + colliderB.computeMass());
-        // colliderA.vx -= (impulse * colliderB.computeMass() * vCollisionNorm.x);
-        // colliderA.vy -= (impulse * colliderB.computeMass() * vCollisionNorm.y);
-        // colliderB.vx += (impulse * colliderA.computeMass() * vCollisionNorm.x);
-        // colliderB.vy += (impulse * colliderA.computeMass() * vCollisionNorm.y);
+        speed *= this.restitution;
+
+        //update
+        let impulse = (2 * speed) / (colliderA.computeMass() + colliderB.computeMass());
+        colliderA.vx -= (impulse * colliderB.computeMass() * vCollisionNorm.x);
+        colliderA.vy -= (impulse * colliderB.computeMass() * vCollisionNorm.y);
+        colliderB.vx += (impulse * colliderA.computeMass() * vCollisionNorm.x);
+        colliderB.vy += (impulse * colliderA.computeMass() * vCollisionNorm.y);
     }
+
+
 }
