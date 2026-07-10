@@ -40,7 +40,7 @@ Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn` (ví dụ: `feat/drop-mec
   }
 ```
 ## 4. Quy tắc viết Pull Request
-* **Tiêu đề:** Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn`
+* **Tiêu đề:** Cú pháp: `loại-công-việc: mô-tả-ngắn-gọn`
 * **Mô tả:**
   ```markdown
   ## Overview
