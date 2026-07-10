@@ -30,6 +30,10 @@ class Animal extends circleCollider{
         return this.level === otherAnimal.level;
     }
 
-    destroy(){}
+    destroy(){
+        if(this.sprite){
+            this.sprite.destroy();
+        }
+    }
 }
 
