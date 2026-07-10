@@ -48,6 +48,7 @@ export class collision {
 
     // (circleCollider, circleCollider) -> void
     resolveCollisionCircletoCircle(colliderA, colliderB) {
+        // console.log("Resolving collision between circle A and circle B");
         let vCollision = { x: colliderB.x - colliderA.x, y: colliderB.y - colliderA.y };
         let distance = Math.sqrt(vCollision.x * vCollision.x + vCollision.y * vCollision.y);
         let vCollisionNorm = { x: vCollision.x / distance, y: vCollision.y / distance };
@@ -57,6 +58,9 @@ export class collision {
             return;
         }
 
+        console.log("Tính toán xong vecto")
+        console.log("colliderA.x: " + colliderA.x + ", colliderA.y: " + colliderA.y);
+        console.log("colliderB.x: " + colliderB.x + ", colliderB.y: " + colliderB.y);
         speed *= this.restitution;
 
         //update
