@@ -15,6 +15,9 @@ export class GameManager{
         this.currentAnimal = null;
         this.nextAnimal = null;
         this.animalPool = [];
+
+        this.listenEvent();
+        this.start();
     }
 
     start(){
@@ -25,6 +28,7 @@ export class GameManager{
 
         this.app.ticker.add(this.update.bind(this));
 
+        this.listenEvent();
         this.initSpawn(100,50,50,50);
     }
 
@@ -62,13 +66,13 @@ export class GameManager{
         if(this.nextAnimal === null){
             this.isSpawner = true;
             let randomLevel = Math.floor(Math.random() * 3) + 1;
-            this.nextAnimal = this.spawner(xSpawnNext, ySpawnNext, randomLevel);
+            this.nextAnimal = this.spawnAnimal(xSpawnNext, ySpawnNext, randomLevel);
         }
 
         if(this.currentAnimal === null){
             this.isSpawner = true;
             let randomLevel = Math.floor(Math.random() * 3) + 1;
-            this.currentAnimal = this.spawner(xSpawnCurrent, ySpawnCurrent, randomLevel);
+            this.currentAnimal = this.spawnAnimal(xSpawnCurrent, ySpawnCurrent, randomLevel);
             this.isDrop = true;
         }
     }
@@ -86,7 +90,7 @@ export class GameManager{
         if(this.nextAnimal === null || this.nextAnimal === this.currentAnimal){
             this.isSpawner = true;
             let randomLevel = Math.floor(Math.random() * 3) + 1;
-            this.nextAnimal = this.spawner(xSpawn, ySpawn, randomLevel);
+            this.nextAnimal = this.spawnAnimal(xSpawn, ySpawn, randomLevel);
         }
     }
 
@@ -96,5 +100,45 @@ export class GameManager{
         let newAnimal = new Animal(level, xSpawn, ySpawn);
         this.app.stage.addChild(newAnimal);
         return newAnimal;
+    }
+
+    listenEvent(){
+        this.app.stage.eventMode = "static";
+        this.app.stage.hitArea = this.app.screen;
+
+        this.app.stage.on("pointermove", (event) => {
+            if(!this.canInteractWithCurrentAnimal()) return;
+
+            this.currentAnimal.x = event.global.x;
+        });
+
+        this.app.stage.on("pointerdown", () => {
+            if(!this.canInteractWithCurrentAnimal()) return;
+
+            this.dropAnimal();
+        });
+    }
+
+    canInteractWithCurrentAnimal(){
+        return (this.isGameRunning &&
+            !this.isGamePause &&
+            !this.isGameOver &&
+            this.isDrop &&
+            this.currentAnimal !== null
+        );
+    }
+
+    dropAnimal(){
+        if(!this.canInteractWithCurrentAnimal()) return;
+
+        this.isDrop = false;
+        this.animalPool.push(this.currentAnimal);
+        this.currentAnimal = null;
+
+        setTimeout(() => {
+            if(this.isGameRunning && !this.isGameOver){
+                this.stateAnimalForScene(100,50);
+            }
+        }, 1000);
     }
 }
