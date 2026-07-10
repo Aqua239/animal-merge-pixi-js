@@ -1,12 +1,14 @@
 import { ANIMAL_LEVEL } from "../../constant";
-import { Sprite, Assets, Rectangle, Texture } from 'pixi.js';
-import { circleCollider } from "../system/circleCollider";
+import { Sprite, Assets, Rectangle, Texture, Container } from 'pixi.js';
 
-class Animal extends circleCollider{
+export class Animal extends Container{
     constructor(level, xSpawn, ySpawn){
         const config = ANIMAL_LEVEL[level];
-        super(xSpawn, ySpawn, config.radius);
+        super();
+        this.x = xSpawn;
+        this.y = ySpawn;
         this.level = level;
+        this.radius = config.radius;
         this.vx = config.vx;
         this.vy = config.vy;
         this.score = config.score;
