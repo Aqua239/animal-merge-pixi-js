@@ -22,9 +22,17 @@ export class GameManager{
         this.app.ticker.add(this.update.bind(this));
     }
 
-    pause(){}
+    pause(){
+        if(this.isGamePause) return;
+        this.isGamePause = true;
+        this.isGameOver = false;
+        this.isGameRunning = false;
+    }
 
-    resume(){}
+    resume(){
+        if(!this.isGamePause) return;
+        this.isGamePause = false;
+    }
 
     gameover(){
         if(this.isGameOver) return;
