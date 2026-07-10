@@ -1,0 +1,217 @@
+{
+    "TextureAtlas": {
+        "-imagePath": "round_nodetailsOutline.png",
+        "SubTexture": [
+            {
+                "-name": "bear.png",
+                "-x": "547",
+                "-y": "545",
+                "-width": "136",
+                "-height": "137"
+            },
+            {
+                "-name": "buffalo.png",
+                "-x": "0",
+                "-y": "551",
+                "-width": "137",
+                "-height": "137"
+            },
+            {
+                "-name": "chick.png",
+                "-x": "140",
+                "-y": "0",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "chicken.png",
+                "-x": "683",
+                "-y": "409",
+                "-width": "136",
+                "-height": "136"
+            },
+            {
+                "-name": "cow.png",
+                "-x": "137",
+                "-y": "415",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "crocodile.png",
+                "-x": "277",
+                "-y": "0",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "dog.png",
+                "-x": "274",
+                "-y": "544",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "duck.png",
+                "-x": "277",
+                "-y": "136",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "elephant.png",
+                "-x": "411",
+                "-y": "272",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "frog.png",
+                "-x": "547",
+                "-y": "408",
+                "-width": "136",
+                "-height": "137"
+            },
+            {
+                "-name": "giraffe.png",
+                "-x": "414",
+                "-y": "0",
+                "-width": "136",
+                "-height": "137"
+            },
+            {
+                "-name": "goat.png",
+                "-x": "411",
+                "-y": "680",
+                "-width": "136",
+                "-height": "137"
+            },
+            {
+                "-name": "gorilla.png",
+                "-x": "274",
+                "-y": "680",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "hippo.png",
+                "-x": "550",
+                "-y": "0",
+                "-width": "136",
+                "-height": "136"
+            },
+            {
+                "-name": "horse.png",
+                "-x": "0",
+                "-y": "415",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "monkey.png",
+                "-x": "683",
+                "-y": "273",
+                "-width": "136",
+                "-height": "136"
+            },
+            {
+                "-name": "moose.png",
+                "-x": "0",
+                "-y": "279",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "narwhal.png",
+                "-x": "0",
+                "-y": "0",
+                "-width": "140",
+                "-height": "140"
+            },
+            {
+                "-name": "owl.png",
+                "-x": "547",
+                "-y": "682",
+                "-width": "136",
+                "-height": "136"
+            },
+            {
+                "-name": "panda.png",
+                "-x": "274",
+                "-y": "408",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "parrot.png",
+                "-x": "274",
+                "-y": "272",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "penguin.png",
+                "-x": "140",
+                "-y": "136",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "pig.png",
+                "-x": "411",
+                "-y": "408",
+                "-width": "136",
+                "-height": "136"
+            },
+            {
+                "-name": "rabbit.png",
+                "-x": "137",
+                "-y": "551",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "rhino.png",
+                "-x": "548",
+                "-y": "137",
+                "-width": "136",
+                "-height": "136"
+            },
+            {
+                "-name": "sloth.png",
+                "-x": "137",
+                "-y": "279",
+                "-width": "137",
+                "-height": "136"
+            },
+            {
+                "-name": "snake.png",
+                "-x": "411",
+                "-y": "544",
+                "-width": "136",
+                "-height": "136"
+            },
+            {
+                "-name": "walrus.png",
+                "-x": "683",
+                "-y": "545",
+                "-width": "136",
+                "-height": "136"
+            },
+            {
+                "-name": "whale.png",
+                "-x": "0",
+                "-y": "140",
+                "-width": "140",
+                "-height": "139"
+            },
+            {
+                "-name": "zebra.png",
+                "-x": "683",
+                "-y": "681",
+                "-width": "136",
+                "-height": "136"
+            }
+        ]
+    }
+}
