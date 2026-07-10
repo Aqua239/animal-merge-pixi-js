@@ -26,7 +26,9 @@ class Animal extends circleCollider{
         this.sprite.y = ySpawn;
     }
 
-    checkTwoCircleSameId(){}
+    checkTwoCircleSameId(otherAnimal){
+        return this.level === otherAnimal.level;
+    }
 
     destroy(){}
 }
