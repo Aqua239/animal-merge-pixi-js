@@ -1,10 +1,12 @@
-export class collision {
+import { CircleCollider } from "../system/circleCollider.js";
+
+export class Collision {
 
     constructor() {
-        this.restitution = 0.3;
+        this.restitution = 0.7;
     }
 
-    // (circleCollider, circleCollider) -> Boolean, has Collision: true
+    // (CircleCollider, CircleCollider) -> Boolean, has Collision: true
     detectCollisionCircletoCircle(colliderA, colliderB) {
         let dx = colliderA.x - colliderB.x;
         let dy = colliderA.y - colliderB.y;
@@ -47,29 +49,98 @@ export class collision {
     }
 
     // (circleCollider, circleCollider) -> void
-    resolveCollisionCircletoCircle(colliderA, colliderB) {
-        // console.log("Resolving collision between circle A and circle B");
-        let vCollision = { x: colliderB.x - colliderA.x, y: colliderB.y - colliderA.y };
-        let distance = Math.sqrt(vCollision.x * vCollision.x + vCollision.y * vCollision.y);
-        let vCollisionNorm = { x: vCollision.x / distance, y: vCollision.y / distance };
-        let vRelativeVelocity = { x: colliderA.vx - colliderB.vx, y: colliderA.vy - colliderB.vy };
-        let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
-        if (speed < 0) {
-            return;
+    resolveCollisionCircletoCircleByPush(colliderA, colliderB) {
+        const vCollision = {
+            x: colliderB.x - colliderA.x,
+            y: colliderB.y - colliderA.y,
+        };
+
+        let distance = Math.sqrt(
+            vCollision.x * vCollision.x + vCollision.y * vCollision.y
+        );
+
+        let vCollisionNorm;
+        //fix divide by 0
+        if (distance === 0) {
+            vCollisionNorm = { x: 1, y: 0 };
+            distance = 1;
+        } else {
+            vCollisionNorm = {
+                x: vCollision.x / distance,
+                y: vCollision.y / distance,
+            };
         }
 
-        console.log("Tính toán xong vecto")
-        console.log("colliderA.x: " + colliderA.x + ", colliderA.y: " + colliderA.y);
-        console.log("colliderB.x: " + colliderB.x + ", colliderB.y: " + colliderB.y);
-        speed *= this.restitution;
+        //Update positions to resolve penetration
+        this.resolvePenetration(colliderA, colliderB, vCollisionNorm, distance);
 
-        //update
-        let impulse = (2 * speed) / (colliderA.computeMass() + colliderB.computeMass());
-        colliderA.vx -= (impulse * colliderB.computeMass() * vCollisionNorm.x);
-        colliderA.vy -= (impulse * colliderB.computeMass() * vCollisionNorm.y);
-        colliderB.vx += (impulse * colliderA.computeMass() * vCollisionNorm.x);
-        colliderB.vy += (impulse * colliderA.computeMass() * vCollisionNorm.y);
+        this.updateVelocity(colliderA, colliderB, vCollisionNorm);
     }
 
+    //Handle collision between 2 colliders by merge
+    resolveCollisionCircletoCircleByMerge(colliderA, colliderB) {
+        let newRadius = colliderA.radius + colliderB.radius;
+        let newCircle = new CircleCollider(
+            (colliderA.x + colliderB.x) / 2,
+            (colliderA.y + colliderB.y) / 2,
+            newRadius
+        );
 
+        const m1 = colliderA.computeMass();
+        const m2 = colliderB.computeMass();
+
+        const newVx = (m1 * colliderA.vx + m2 * colliderB.vx) / (m1 + m2);
+
+        const newVy = (m1 * colliderA.vy + m2 * colliderB.vy) / (m1 + m2);
+
+        newCircle.vx = newVx;
+        newCircle.vy = newVy;
+
+        return newCircle;
+
+    }
+
+    //Handle penetration issue between 2 colliders
+    resolvePenetration(colliderA, colliderB, normal, distance) {
+        const penetration = colliderA.radius + colliderB.radius - distance;
+        if (penetration <= 0) return;
+
+        const invMassA = 1 / colliderA.computeMass();
+        const invMassB = 1 / colliderB.computeMass();
+
+        const correction = penetration / (invMassA + invMassB);
+
+        colliderA.x -= correction * invMassA * normal.x;
+        colliderA.y -= correction * invMassA * normal.y;
+
+        colliderB.x += correction * invMassB * normal.x;
+        colliderB.y += correction * invMassB * normal.y;
+    }
+
+    //Update vecto vx,vy of collider based on gravity and friction
+    updateVelocity(colliderA, colliderB, normal) {
+        const invMassA = 1 / colliderA.computeMass();
+        const invMassB = 1 / colliderB.computeMass();
+
+        const rv = this.getRelativeVelocity(colliderA, colliderB);
+
+        const speed = rv.x * normal.x + rv.y * normal.y;
+
+        if (speed > 0) return;
+
+        const j = (-(1 + this.restitution) * speed) / (invMassA + invMassB);
+
+        colliderA.vx -= j * normal.x * invMassA;
+        colliderA.vy -= j * normal.y * invMassA;
+
+        colliderB.vx += j * normal.x * invMassB;
+        colliderB.vy += j * normal.y * invMassB;
+    }
+
+    getRelativeVelocity(colliderA, colliderB) {
+        return {
+            x: colliderB.vx - colliderA.vx,
+            y: colliderB.vy - colliderA.vy,
+        };
+    }
 }

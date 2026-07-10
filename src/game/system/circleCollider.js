@@ -1,6 +1,6 @@
-import { collider } from "./collider.js";
+import { Collider } from "./collider.js";
 
-export class circleCollider extends collider {
+export class CircleCollider extends Collider {
     constructor(x, y, radius) {
         super(x, y);
         this.radius = radius;

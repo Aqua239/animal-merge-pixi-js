@@ -15,7 +15,7 @@ import { Application, Container, Graphics } from "pixi.js";
     const B = {
         x: 15,
         y: 15,
-        width: 300,
+        width: 600,
         height: 400,
     };
 
@@ -51,8 +51,8 @@ import { Application, Container, Graphics } from "pixi.js";
     }
 
     // spawn 2 circles
-    spawnCircle(30, 20, 40, 0x0000ff);
-    spawnCircle(60, 60, 40, 0xff0000);
+    spawnCircle(100, 100, 20, 0x0000ff, 100, 60);
+    spawnCircle(260, 180, 20, 0xff0000, -80, -20);
 
     // spawn new circle every 5s
     setInterval(() => {
@@ -95,7 +95,15 @@ import { Application, Container, Graphics } from "pixi.js";
                     const C = circles[j].collider;
 
                     if (collisionSystem.detectCollisionCircletoCircle(A, C)) {
-                        collisionSystem.resolveCollisionCircletoCircleByPush(A, C);
+                        let collisionResponse = collisionSystem.resolveCollisionCircletoCircleByMerge(A, C);
+                        console.log("vx: ", collisionResponse.vx, "vy: ", collisionResponse.vy);
+                        circleContainer.removeChild(circles[j].graphics);
+                        circles.splice(j, 1);
+                        j--;
+                        circleContainer.removeChild(circles[i].graphics);
+                        circles.splice(i, 1);
+                        i--;
+                        spawnCircle(collisionResponse.x, collisionResponse.y, collisionResponse.radius, Math.random() * 0xffffff);
                     }
                 }
             }

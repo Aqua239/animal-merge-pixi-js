@@ -1,4 +1,4 @@
-class physics {
+class Physics {
 
     constructor() {
         this.circleColliders = [];

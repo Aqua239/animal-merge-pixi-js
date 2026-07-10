@@ -1,4 +1,4 @@
-export class collider {
+export class Collider {
     constructor(x, y) {
         this.x = x;
         this.y = y;
