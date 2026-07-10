@@ -1,4 +1,4 @@
-class GameManager{
+export class GameManager{
     constructor(app){
         this.app = app;
 
@@ -13,15 +13,32 @@ class GameManager{
         this.animalPool = [];
     }
 
-    start(){}
+    start(){
+        if(this.isGameRunning) return;
+        this.isGameRunning = true;
+        this.isGamePause = false;
+        this.isGameOver = false;
+
+        this.app.ticker.add(this.update.bind(this));
+    }
 
     pause(){}
 
     resume(){}
 
-    gameover(){}
+    gameover(){
+        if(this.isGameOver) return;
+        this.isGameOver = true;
+        this.isGamePause = false;
+        this.isGameRunning = false;
+    }
 
-    reset(){}
+    reset(){
+        this.score = 0;
+        this.currentAnimal = null;
+        this.nextAnimal = null;
+        this.animalPool = [];
+    }
 
     update(){}
 }
