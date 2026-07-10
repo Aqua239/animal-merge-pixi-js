@@ -4,9 +4,10 @@
 
 ---
 
-## 1. Quy chuẩn nhánh và commit (Branch & Commit)
-* **Tất cả đều viết bằng tiếng anh**
+## 1. Viết bằng tiếng anh
+* **Tất cả liên quan đến code, commit, pull request phải viết bằng tiếng anh**
 
+## 2. Quy chuẩn nhánh và commit (Branch & Commit)
 * **Quy tắc tên nhánh (Branch name):**
 Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn` (ví dụ: `feat/drop-mechanic`)
 
@@ -24,7 +25,7 @@ Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn` (ví dụ: `feat/drop-mec
 * **Ví dụ thực tế:**
 > `git commit -m "feat: add circle physics body"`
 
-## 2. Quy tắc viết code (Vanilla JS & PixiJS)
+## 3. Quy tắc viết code (Vanilla JS & PixiJS)
 * **Khai báo biến:** Luôn dùng `const` cho hằng số và `let` cho biến thay đổi. Tuyệt đối không dùng `var`.
 * **Quy tắc đặt tên (Naming convention):**
   * Tên biến và hàm dùng `camelCase`: `animalSprite`, `dropAnimal()`.
@@ -37,3 +38,13 @@ Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn` (ví dụ: `feat/drop-mec
   function dropAnimals() {
       // Code
   }
+```
+## 4. Quy tắc viết Pull Request
+* **Tiêu đề:** Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn`
+* **Mô tả:**
+  ```markdown
+  ## Overview
+    - Mô tả chung, sau đó mô tả chi tiết các việc đã làm
+  ## Motivation and Context
+    - Lý do thực hiện thay đổi này
+  ```
