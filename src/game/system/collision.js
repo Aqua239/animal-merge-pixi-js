@@ -7,7 +7,7 @@ export class Collision {
     }
 
     // (CircleCollider, CircleCollider) -> Boolean, has Collision: true
-    detectCollisionCircletoCircle(colliderA, colliderB) {
+    detectCollisionCircleToCircle(colliderA, colliderB) {
         let dx = colliderA.x - colliderB.x;
         let dy = colliderA.y - colliderB.y;
         let distance = dx * dx + dy * dy;
@@ -49,7 +49,7 @@ export class Collision {
     }
 
     // (circleCollider, circleCollider) -> void
-    resolveCollisionCircletoCircleByPush(colliderA, colliderB) {
+    resolveCollisionCircleToCircleByPush(colliderA, colliderB) {
         const vCollision = {
             x: colliderB.x - colliderA.x,
             y: colliderB.y - colliderA.y,
@@ -78,7 +78,7 @@ export class Collision {
     }
 
     //Handle collision between 2 colliders by merge
-    resolveCollisionCircletoCircleByMerge(colliderA, colliderB) {
+    resolveCollisionCircleToCircleByMerge(colliderA, colliderB) {
         let newRadius = colliderA.radius + colliderB.radius;
         let newCircle = new CircleCollider(
             (colliderA.x + colliderB.x) / 2,
