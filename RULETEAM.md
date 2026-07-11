@@ -1,6 +1,6 @@
 # Nội quy làm việc nhóm (Contributing Guidelines)
 
-Để dự án `animal-merge-pixi-js` phát triển mượt mà và không bị xung đột code (conflict), toàn bộ thành viên vui lòng tuân thủ các quy tắc dưới đây.
+Để dự án `animal-merge-pixi-js` phát triển mượt mà và ít bị xung đột code (conflict), toàn bộ thành viên vui lòng tuân thủ các quy tắc dưới đây.
 
 ---
 
@@ -9,7 +9,7 @@
 
 ## 2. Quy chuẩn nhánh và commit (Branch & Commit)
 * **Quy tắc tên nhánh (Branch name):**
-Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn` (ví dụ: `feat/drop-mechanic`)
+Cú pháp: `<loại-công-việc>/<mô-tả-ngắn-gọn>` (ví dụ: `feat/drop-mechanic`)
 
 * **Quy tắc Commit**
 `git commit -m "<loại>: <mô_tả_công_việc>"`
@@ -40,7 +40,8 @@ Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn` (ví dụ: `feat/drop-mec
   }
 ```
 ## 4. Quy tắc viết Pull Request
-* **Tiêu đề:** Cú pháp: `loại-công-việc: mô-tả-ngắn-gọn`
+* **Yêu cầu:** Mỗi một pull request nên thể hiện một chức năng "đủ lớn" (không gộp nhiều chức năng lại)
+* **Tiêu đề:** Cú pháp: `<loại-công-việc>: <mô-tả-ngắn-gọn> <#số github cung cấp>`
 * **Mô tả:**
   ```markdown
   ## Overview
@@ -48,3 +49,4 @@ Cú pháp: `loại-công-việc/mô-tả-ngắn-gọn` (ví dụ: `feat/drop-mec
   ## Motivation and Context
     - Lý do thực hiện thay đổi này
   ```
+  
