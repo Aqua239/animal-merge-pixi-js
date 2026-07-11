@@ -1,4 +1,5 @@
 import { Collider } from "./collider.js";
+import { PhysicsConfig } from "./physicConfig.js";
 
 export class CircleCollider extends Collider {
     constructor(x, y, radius) {
@@ -7,7 +8,7 @@ export class CircleCollider extends Collider {
     }
 
     update(timestep) {
-        const g = 9.81;
+        const g = PhysicsConfig.gravity;
         this.vy += g * timestep;
         super.update(timestep);
     }

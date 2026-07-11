@@ -1,9 +1,10 @@
 import { CircleCollider } from "../system/circleCollider.js";
+import { PhysicsConfig } from "../system/physicConfig.js";
 
 export class Collision {
 
     constructor() {
-        this.restitution = 0.7;
+        this.restitution = PhysicsConfig.restitution;
     }
 
     // (CircleCollider, CircleCollider) -> Boolean, has Collision: true
