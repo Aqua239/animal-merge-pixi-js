@@ -29,7 +29,7 @@ export class GameManager{
         this.app.ticker.add(this.update.bind(this));
 
         this.listenEvent();
-        this.initSpawn(100,50,50,50);
+        this.initSpawn(550,50,50,50);
     }
 
     pause(){
@@ -66,13 +66,13 @@ export class GameManager{
         if(this.nextAnimal === null){
             this.isSpawner = true;
             let randomLevel = Math.floor(Math.random() * 3) + 1;
-            this.nextAnimal = this.spawnAnimal(xSpawnNext, ySpawnNext, randomLevel);
+            this.nextAnimal = this.spawnAnimal(xSpawnNext, ySpawnNext, randomLevel, true);
         }
 
         if(this.currentAnimal === null){
             this.isSpawner = true;
             let randomLevel = Math.floor(Math.random() * 3) + 1;
-            this.currentAnimal = this.spawnAnimal(xSpawnCurrent, ySpawnCurrent, randomLevel);
+            this.currentAnimal = this.spawnAnimal(xSpawnCurrent, ySpawnCurrent, randomLevel, false);
             this.isDrop = true;
         }
     }
@@ -83,6 +83,7 @@ export class GameManager{
             if(this.currentAnimal){
                 this.currentAnimal.x = 50;
                 this.currentAnimal.y = 50;
+                this.currentAnimal.convertFromNextToCurrent();
                 this.isDrop = true;
             }
         }
@@ -90,14 +91,14 @@ export class GameManager{
         if(this.nextAnimal === null || this.nextAnimal === this.currentAnimal){
             this.isSpawner = true;
             let randomLevel = Math.floor(Math.random() * 3) + 1;
-            this.nextAnimal = this.spawnAnimal(xSpawn, ySpawn, randomLevel);
+            this.nextAnimal = this.spawnAnimal(xSpawn, ySpawn, randomLevel, true);
         }
     }
 
-    spawnAnimal(xSpawn, ySpawn, level){
+    spawnAnimal(xSpawn, ySpawn, level, isNextAnimal){
         if(!this.isSpawner) return;
         this.isSpawner = false;
-        let newAnimal = new Animal(level, xSpawn, ySpawn);
+        let newAnimal = new Animal(level, xSpawn, ySpawn, isNextAnimal);
         this.app.stage.addChild(newAnimal);
         return newAnimal;
     }
@@ -137,7 +138,7 @@ export class GameManager{
 
         setTimeout(() => {
             if(this.isGameRunning && !this.isGameOver){
-                this.stateAnimalForScene(100,50);
+                this.stateAnimalForScene(550,50);
             }
         }, 1000);
     }
