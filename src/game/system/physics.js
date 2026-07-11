@@ -22,7 +22,7 @@ export class Physics {
     handleCollisionsCircleToCircle(circleColliderA, circleColliderB) {
         if (!this.systemCollision.detectCollisionCircleToCircle(circleColliderA, circleColliderB)) return;
 
-        if (circleColliderA.radius === circleColliderB.radius) {
+        if (circleColliderA.radius == circleColliderB.radius) {
             return this.systemCollision.resolveCollisionCircleToCircleByMerge(circleColliderA, circleColliderB);
         } else {
             this.systemCollision.resolveCollisionCircleToCircleByPush(circleColliderA, circleColliderB);
@@ -41,25 +41,25 @@ export class Physics {
 
     //Additional methods
     handleCollisionsAllCircles() {
-        for (let i = 0; i < this.circleColliders.length; i++) {
-            for (let j = i + 1; j < this.circleColliders.length; j++) {
-                const circleColliderA = this.circleColliders[i];
-                const circleColliderB = this.circleColliders[j];
+        // for (let i = 0; i < this.circleColliders.length; i++) {
+        //     for (let j = i + 1; j < this.circleColliders.length; j++) {
+        //         const circleColliderA = this.circleColliders[i];
+        //         const circleColliderB = this.circleColliders[j];
 
-                if (!this.systemCollision.detectCollisionCircleToCircle(circleColliderA, circleColliderB)) continue;
+        //         if (!this.systemCollision.detectCollisionCircleToCircle(circleColliderA, circleColliderB)) continue;
 
-                if (circleColliderA.radius === circleColliderB.radius) {
-                    let newCircle = this.systemCollision.resolveCollisionCircleToCircleByMerge(circleColliderA, circleColliderB);
-                    this.circleColliders.splice(j, 1);
-                    this.circleColliders.splice(i, 1);
-                    i--;
-                    j--;
-                    this.circleColliders.push(newCircle);
-                } else {
-                    this.systemCollision.resolveCollisionCircleToCircleByPush(circleColliderA, circleColliderB);
-                }
-            }
-        }
+        //         if (circleColliderA.radius == circleColliderB.radius) {
+        //             let newCircle = this.systemCollision.resolveCollisionCircleToCircleByMerge(circleColliderA, circleColliderB);
+        //             this.circleColliders.splice(j, 1);
+        //             this.circleColliders.splice(i, 1);
+        //             i--;
+        //             j--;
+        //             this.circleColliders.push(newCircle);
+        //         } else {
+        //             this.systemCollision.resolveCollisionCircleToCircleByPush(circleColliderA, circleColliderB);
+        //         }
+        //     }
+        // }
     }
 
     handleCollisionsAllCirclesToTop(y) {
