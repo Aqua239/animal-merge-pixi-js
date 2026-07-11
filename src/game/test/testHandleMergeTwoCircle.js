@@ -1,0 +1,120 @@
+import { CircleCollider } from "../system/circleCollider.js";
+import { Collision } from "../system/collision.js";
+
+import { Application, Container, Graphics } from "pixi.js";
+
+(async () => {
+    const app = new Application();
+
+    await app.init({ resizeTo: window });
+    document.body.appendChild(app.canvas);
+
+    const collisionSystem = new Collision();
+
+    // Box
+    const B = {
+        x: 15,
+        y: 15,
+        width: 600,
+        height: 400,
+    };
+
+    const boxGraphics = new Graphics()
+        .rect(B.x, B.y, B.width, B.height)
+        .fill({ color: 0xffffff, alpha: 0.5 });
+
+    app.stage.addChild(boxGraphics);
+
+    const circleContainer = new Container();
+    app.stage.addChild(circleContainer);
+
+    // Data all cirles
+    const circles = [];
+
+    function spawnCircle(x, y, radius, color, vx = 0, vy = 0) {
+        const collider = new CircleCollider(x, y, radius);
+        collider.vx = vx;
+        collider.vy = vy;
+
+        const graphics = new Graphics()
+            .circle(0, 0, radius)
+            .fill({ color, alpha: 0.5 });
+
+        graphics.position.set(x, y);
+
+        circleContainer.addChild(graphics);
+
+        circles.push({
+            collider,
+            graphics,
+        });
+    }
+
+    // spawn 2 circles
+    spawnCircle(100, 100, 20, 0x0000ff, 100, 60);
+    spawnCircle(260, 180, 20, 0xff0000, -80, -20);
+
+    // spawn new circle every 5s
+    setInterval(() => {
+        const x = 40 + Math.random() * 80;
+
+        spawnCircle(
+            x,
+            30,
+            20 + Math.random() * 20,
+            Math.random() * 0xffffff,
+            50 + Math.random() * 100,
+            50 + Math.random() * 100
+        );
+    }, 5000);
+
+    app.ticker.add((time) => {
+        const dt = 0.1 * time.deltaTime;
+
+        // Update all colliders
+        for (const obj of circles) {
+            obj.collider.update(dt);
+        }
+
+        // Detect and handle collisions
+        const solverIterations = 5;
+
+        for (let iter = 0; iter < solverIterations; iter++) {
+            // Box
+            for (const obj of circles) {
+                collisionSystem.detectAndHandleCollisionCircleToBox(
+                    obj.collider,
+                    B
+                );
+            }
+
+            // Ciccle to Circle
+            for (let i = 0; i < circles.length; i++) {
+                for (let j = i + 1; j < circles.length; j++) {
+                    const A = circles[i].collider;
+                    const C = circles[j].collider;
+
+                    if (collisionSystem.detectCollisionCircletoCircle(A, C)) {
+                        let collisionResponse = collisionSystem.resolveCollisionCircletoCircleByMerge(A, C);
+                        console.log("vx: ", collisionResponse.vx, "vy: ", collisionResponse.vy);
+                        circleContainer.removeChild(circles[j].graphics);
+                        circles.splice(j, 1);
+                        j--;
+                        circleContainer.removeChild(circles[i].graphics);
+                        circles.splice(i, 1);
+                        i--;
+                        spawnCircle(collisionResponse.x, collisionResponse.y, collisionResponse.radius, Math.random() * 0xffffff);
+                    }
+                }
+            }
+        }
+
+        // Update graphics position
+        for (const obj of circles) {
+            obj.graphics.position.set(
+                obj.collider.x,
+                obj.collider.y
+            );
+        }
+    });
+})();
