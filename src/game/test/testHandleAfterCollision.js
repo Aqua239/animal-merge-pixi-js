@@ -94,8 +94,8 @@ import { Application, Container, Graphics } from "pixi.js";
                     const A = circles[i].collider;
                     const C = circles[j].collider;
 
-                    if (collisionSystem.detectCollisionCircletoCircle(A, C)) {
-                        collisionSystem.resolveCollisionCircletoCircleByPush(A, C);
+                    if (collisionSystem.detectCollisionCircleToCircle(A, C)) {
+                        collisionSystem.resolveCollisionCircleToCircleByPush(A, C);
                     }
                 }
             }
