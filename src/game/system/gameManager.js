@@ -1,4 +1,6 @@
 import { Animal } from "../entities/animal";
+import { PhysicsConfig } from "../system/physicConfig";
+import { Physics } from "./physics";
 
 export class GameManager{
     constructor(app){
@@ -17,7 +19,7 @@ export class GameManager{
         this.animalPool = [];
 
         this.physics = new Physics();
-        this.physics.box = {x: 100, y: 100, width: 500, height: 650};
+        this.physics.box = {x: 100, y: 100, width: 500, height: 450};
 
         this.listenEvent();
         this.start();
@@ -30,7 +32,6 @@ export class GameManager{
         this.isGameOver = false;
 
         this.app.ticker.add(this.update.bind(this));
-        this.app.ticker.add(this.boundUpdate.bind(this));
         this.initSpawn(550,50,50,50);
     }
 
@@ -62,6 +63,19 @@ export class GameManager{
 
     update(ticker){
         if(!this.isGameRunning || this.isGameOver || this.isGamePause) return;
+
+        const timestep = PhysicsConfig.timeStep * ticker.deltaTime;
+        this.physics.update(timestep);
+
+        for(let i = 0; i < this.animalPool.length; i++){
+            for(let j = i + 1; j < this.animalPool.length; j++){
+                if(this.animalPool[i].isMerging || this.animalPool[j].isMerging) continue;
+                this.handleAnimalCollisions(
+                    this.animalPool[i],
+                    this.animalPool[j]
+                );
+            }
+        }
 
         for(let animal of this.animalPool){
             animal.setSpriteFollowCollider();
@@ -151,7 +165,11 @@ export class GameManager{
         if(!this.canInteractWithCurrentAnimal()) return;
 
         this.isDrop = false;
+        this.currentAnimal.convertPhysicMode();
+
         this.animalPool.push(this.currentAnimal);
+        this.addAnimalToPhysicState(this.currentAnimal);
+
         this.currentAnimal = null;
 
         setTimeout(() => {
@@ -159,5 +177,16 @@ export class GameManager{
                 this.stateAnimalForScene(550,50);
             }
         }, 1000);
+    }
+
+    handleAnimalCollisions(animal1, animal2){
+        const mergedCollider =
+            this.physics.handleCollisionsCircleToCircle(
+                animal1.collider,
+                animal2.collider
+            );
+
+        if (!mergedCollider) return;
+        console.log("va chạm");
     }
 }
