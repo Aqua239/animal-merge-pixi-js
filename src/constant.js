@@ -106,4 +106,7 @@ export const GAME_CONFIG = {
     SCREEN_HEIGHT: 1920,
     ORIGIN_X: 0,
     ORIGIN_Y: 0,
+    GAME_AREA_WIDTH: 1080,
+    CEILING_Y: 670,
+    FLOOR_Y: 1750,
 }

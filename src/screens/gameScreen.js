@@ -16,8 +16,31 @@ export default class GameScreen extends BaseScreen {
         this.drawMergeTree();
     }
 
+    drawBoundaries(){
+        const marginX = 0;
+        const floorThickness = 15;
+        const floorColor = 0x2C365A;
+        const floor = new Graphics();
+        floor.rect(
+            marginX,
+            GAME_CONFIG.FLOOR_Y,
+            GAME_CONFIG.GAME_AREA_WIDTH,
+            floorThickness
+        ).fill(floorColor);
 
-    drawBoundaries(){};
+        const dashLine = new Graphics();
+        const dangerDashLength = 30;
+        const dangerDashGap = 15;
+
+        for(let i = marginX; i < GAME_CONFIG.GAME_AREA_WIDTH - marginX; i +=dangerDashLength) {
+            dashLine.moveTo(i, GAME_CONFIG.CEILING_Y)
+                    .lineTo(i + dangerDashGap, GAME_CONFIG.CEILING_Y)
+                    .stroke({ width: 6, color: 0x2C365A });
+        }
+
+        this.container.addChild(floor);
+        this.container.addChild(dashLine);
+    };
 
     drawNextAnimalBackground(){};
 
