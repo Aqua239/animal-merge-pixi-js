@@ -16,6 +16,9 @@ export class GameManager{
         this.nextAnimal = null;
         this.animalPool = [];
 
+        this.physics = new Physics();
+        this.physics.box = {x: 100, y: 100, width: 500, height: 650};
+
         this.listenEvent();
         this.start();
     }
@@ -27,8 +30,7 @@ export class GameManager{
         this.isGameOver = false;
 
         this.app.ticker.add(this.update.bind(this));
-
-        this.listenEvent();
+        this.app.ticker.add(this.boundUpdate.bind(this));
         this.initSpawn(550,50,50,50);
     }
 
@@ -60,6 +62,10 @@ export class GameManager{
 
     update(ticker){
         if(!this.isGameRunning || this.isGameOver || this.isGamePause) return;
+
+        for(let animal of this.animalPool){
+            animal.setSpriteFollowCollider();
+        }
     }
 
     initSpawn(xSpawnNext, ySpawnNext, xSpawnCurrent, ySpawnCurrent){
@@ -127,6 +133,18 @@ export class GameManager{
             this.isDrop &&
             this.currentAnimal !== null
         );
+    }
+
+    addAnimalToPhysicState(animal){
+        let checkStateAnimal = this.physics.circleColliders.includes(animal.collider)
+        if(checkStateAnimal) return;
+
+        this.physics.circleColliders.push(animal.collider);
+    }
+
+    removeAnimalToPhysicState(animal){
+        let indexAnimal = this.physics.circleColliders.indexOf(animal.collider);
+        this.physics.circleColliders.splice(indexAnimal, 1);
     }
 
     dropAnimal(){
