@@ -1,9 +1,23 @@
-import { Container } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
+import { GAME_CONFIG } from "../constant";
 
 export default class BaseScreen {
-    constructor() {
+    constructor(backgroundColor = GAME_CONFIG.COLOR_BACKGROUND) {
         this.container = new Container();
         this.container.visible = false;
+
+        this.drawBackground(backgroundColor);
+    }
+
+    drawBackground(color) {
+        this.background = new Graphics();
+        this.background.rect(
+            GAME_CONFIG.ORIGIN_X,
+            GAME_CONFIG.ORIGIN_Y,
+            GAME_CONFIG.SCREEN_WIDTH,
+            GAME_CONFIG.SCREEN_HEIGHT
+        ).fill(color);
+        this.container.addChild(this.background);
     }
 
     show() {

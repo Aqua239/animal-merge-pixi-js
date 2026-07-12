@@ -4,28 +4,12 @@ import { GAME_CONFIG } from "../constant";
 
 export default class LoadingScreen extends BaseScreen {
     constructor() {
-        super();
+        super(GAME_CONFIG.COLOR_BACKGROUND);
 
         this.progressBarFill = null;
 
-        this.drawBackground();
         this.drawGameName();
         this.drawProgressBar();
-    }
-
-    drawBackground() {
-        const background = new Graphics();
-
-        background.beginFill(GAME_CONFIG.COLOR_BACKGROUND);
-        background.drawRect(
-            GAME_CONFIG.ORIGIN_X,
-            GAME_CONFIG.ORIGIN_Y,
-            GAME_CONFIG.SCREEN_WIDTH,
-            GAME_CONFIG.SCREEN_HEIGHT
-        );
-        background.endFill();
-
-        this.container.addChild(background);
     }
 
     drawGameName() {
