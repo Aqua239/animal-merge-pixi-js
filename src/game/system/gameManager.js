@@ -1,3 +1,4 @@
+import { ANIMAL_LEVEL } from "../../constant";
 import { Animal } from "../entities/animal";
 import { PhysicsConfig } from "../system/physicConfig";
 import { Physics } from "./physics";
@@ -161,6 +162,11 @@ export class GameManager{
         this.physics.circleColliders.splice(indexAnimal, 1);
     }
 
+    removeAnimalFromPool(animal){
+        let indexAnimal = this.animalPool.indexOf(animal);
+        this.animalPool.splice(indexAnimal, 1);
+    }
+
     dropAnimal(){
         if(!this.canInteractWithCurrentAnimal()) return;
 
@@ -187,6 +193,37 @@ export class GameManager{
             );
 
         if (!mergedCollider) return;
-        console.log("va chạm");
+        this.mergeAnimals(animal1, animal2, mergedCollider);
+    }
+
+    mergeAnimals(animal1, animal2, mergedCollider){
+        const nextConfig = ANIMAL_LEVEL[animal1.level + 1];
+        if(!nextConfig) return;
+
+        animal1.isMerging = true;
+        animal2.isMerging = true;
+
+        this.removeAnimalToPhysicState(animal1);
+        this.removeAnimalToPhysicState(animal2);
+        this.removeAnimalFromPool(animal1);
+        this.removeAnimalFromPool(animal2);
+
+        this.score += animal1.score;
+
+        mergedCollider.radius = nextConfig.radius;
+        const mergedAnimal = new Animal(
+            animal1.level + 1,
+            mergedCollider.x,
+            mergedCollider.y,
+            false
+        );
+
+        mergedAnimal.attachCollider(mergedCollider);
+
+        this.app.stage.addChild(mergedAnimal);
+        this.animalPool.push(mergedAnimal);
+        this.addAnimalToPhysicState(mergedAnimal);
+        animal1.destroy();
+        animal2.destroy();
     }
 }

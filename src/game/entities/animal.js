@@ -68,6 +68,16 @@ export class Animal extends Container{
         this.collider.y = this.y;
     }
 
+    //function used when the Physics system creates a new collider after a merge
+    attachCollider(collider) {
+        this.collider = collider;
+        this.radius = collider.radius;
+        this.isPhysicsActive = true;
+
+        this.updateSpriteSize();
+        this.setSpriteFollowCollider();
+    }
+
     //function used while moving an object before dropping it
     setColliderFollowSprite(x, y){
         if(this.isPhysicsActive) return;
