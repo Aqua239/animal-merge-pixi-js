@@ -1,5 +1,6 @@
 import { ANIMAL_LEVEL } from "../../constant";
 import { Sprite, Assets, Rectangle, Texture, Container } from 'pixi.js';
+import { CircleCollider } from "../system/circleCollider";
 
 export class Animal extends Container{
     constructor(level, xSpawn, ySpawn, isNextAnimal){
@@ -9,9 +10,15 @@ export class Animal extends Container{
         this.y = ySpawn;
         this.level = level;
         this.radius = isNextAnimal ? 25 : config.radius;
-        this.vx = config.vx;
-        this.vy = config.vy;
         this.score = config.score;
+
+        this.isNextAnimal = isNextAnimal;
+        this.isPhysicsActive = false;
+        this.isMerging = false;
+
+        this.collider = new CircleCollider(xSpawn, ySpawn, this.radius);
+        this.collider.vx = config.vx;
+        this.collider.vy = config.vy;
 
         const baseTexture = Assets.get(config.textureName);
         const frame = new Rectangle(
@@ -27,21 +34,54 @@ export class Animal extends Container{
         });
         this.sprite = new Sprite(texture);
         this.sprite.anchor.set(0.5);
+        this.updateSpriteSize();
+
+        this.addChild(this.sprite);
+    }
+
+    updateSpriteSize(){
         const diameter = this.radius * 2;
         this.sprite.width = diameter;
         this.sprite.height = diameter;
+
         this.sprite.x = 0;
         this.sprite.y = 0;
-        this.addChild(this.sprite);
     }
 
     convertFromNextToCurrent(){
         const config = ANIMAL_LEVEL[this.level];
+        this.isNextAnimal = false;
         this.radius = config.radius;
 
-        const diameter = this.radius * 2;
-        this.sprite.width = diameter;
-        this.sprite.height = diameter;
+        this.collider.radius = this.radius;
+        this.collider.x = this.x;
+        this.collider.y = this.y;
+        this.collider.vx = 0;
+        this.collider.vy = 0;
+
+        this.updateSpriteSize();
+    }
+
+    convertPhysicMode(){
+        this.isPhysicsActive = true;
+        this.collider.x = this.x;
+        this.collider.y = this.y;
+    }
+
+    //function used while moving an object before dropping it
+    setColliderFollowSprite(x, y){
+        if(this.isPhysicsActive) return;
+
+        this.x = x;
+        this.y = y;
+        this.collider.x = x;
+        this.collider.y = y;
+    }
+
+    //function used after the object has been released and is moving via physics
+    setSpriteFollowCollider(){
+        this.x = this.collider.x;
+        this.y = this.collider.y;
     }
 
     checkTwoCircleSameId(otherAnimal){
@@ -49,9 +89,9 @@ export class Animal extends Container{
     }
 
     destroy(){
-        if(this.sprite){
-            this.sprite.destroy();
-        }
+        super.destroy({
+            children: true,
+        });
     }
 }
 
