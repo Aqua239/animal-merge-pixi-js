@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, Texture } from "pixi.js";
+import { Container, Graphics, Text } from "pixi.js";
 import BaseScreen from "./baseScreen";
 import { GAME_CONFIG } from "../constant";
 import { BaseButton } from "../UI/baseButton";
@@ -97,7 +97,7 @@ export default class GameScreen extends BaseScreen {
 
     drawSettingsButton(){
         const settingButton = new BaseButton({
-            textureName: Texture.WHITE,
+            textureName: "setting_button",
             x: 130,
             y: 150,
             width: 80,
