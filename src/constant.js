@@ -102,6 +102,7 @@ export const ANIMAL_LEVEL = {
 
 export const GAME_CONFIG = {
     COLOR_BACKGROUND: 0xEEE8DF, //cream-colored
+    FONT_FAMILY: 'Arial',
     SCREEN_WIDTH: 1080,
     SCREEN_HEIGHT: 1920,
     ORIGIN_X: 0,

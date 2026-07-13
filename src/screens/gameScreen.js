@@ -1,4 +1,4 @@
-import { Graphics, Text, Texture } from "pixi.js";
+import { Container, Graphics, Text, Texture } from "pixi.js";
 import BaseScreen from "./baseScreen";
 import { GAME_CONFIG } from "../constant";
 
@@ -56,7 +56,43 @@ export default class GameScreen extends BaseScreen {
         this.container.addChild(backgroundCircle);
     };
 
-    drawScores(){};
+    drawScores(){
+        const screenCenterX = GAME_CONFIG.SCREEN_WIDTH / 2;
+        const scoreStyle = {fontFamily: GAME_CONFIG.FONT_FAMILY, fontSize: 50, fill: 0x2C365A, fontWeight: 'bold'};
+        const labelStyle = {fontFamily: GAME_CONFIG.FONT_FAMILY, fontSize: 50, fill: 0x2C365A, fontWeight: 'bold'};
+
+        //High Score
+        this.highScoreContainer = new Container();
+
+        const highScoreLabel = new Text({text: 'BEST', style: labelStyle});
+        highScoreLabel.x = 0;
+        highScoreLabel.y = 0;
+
+        this.highScoreText = new Text({text: '9999', style: scoreStyle});
+        this.highScoreText.x = highScoreLabel.width + 20;
+        this.highScoreText.y = 0;
+
+        this.highScoreContainer.addChild(highScoreLabel, this.highScoreText);
+        this.highScoreContainer.x = screenCenterX - (this.highScoreContainer.width / 2);
+        this.highScoreContainer.y = 150 - scoreStyle.fontSize;
+
+        //Current Score
+        this.currentScoreContainer = new Container();
+
+        const currentScoreLabel = new Text({text: 'SCORE', style: labelStyle});
+        currentScoreLabel.x = 0;
+        currentScoreLabel.y = 0;
+
+        this.currentScoreText = new Text({text: '0', style: scoreStyle});
+        this.currentScoreText.x = currentScoreLabel.width + 20;
+        this.currentScoreText.y = 0;
+
+        this.currentScoreContainer.addChild(currentScoreLabel, this.currentScoreText);
+        this.currentScoreContainer.x = screenCenterX - (this.currentScoreContainer.width / 2);
+        this.currentScoreContainer.y = 150;
+
+        this.container.addChild(this.highScoreContainer, this.currentScoreContainer);
+    };
 
     drawSettingsButton(){};
 
