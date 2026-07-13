@@ -44,5 +44,10 @@ export class SupportItem extends Container{
         }
     }
 
-    reduceQuantity(){}
+    reduceQuantity(){
+        if (this.quantity <= 0) return false;
+
+        this.quantity--;
+        return true;
+    }
 }
