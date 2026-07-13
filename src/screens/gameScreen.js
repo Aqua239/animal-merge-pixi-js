@@ -42,7 +42,19 @@ export default class GameScreen extends BaseScreen {
         this.container.addChild(dashLine);
     };
 
-    drawNextAnimalBackground(){};
+    drawNextAnimalBackground(){
+        const radius = 80;
+        const backgroundCircle = new Graphics();
+
+        backgroundCircle.circle(
+            GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
+            GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
+            radius
+        ).fill(0x2C365A);
+        backgroundCircle.stroke({ width: 10, color: 0xC4BCB0});
+
+        this.container.addChild(backgroundCircle);
+    };
 
     drawScores(){};
 
