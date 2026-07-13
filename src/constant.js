@@ -1,8 +1,6 @@
 export const ANIMAL_LEVEL = {
     1: {
         radius: 15,
-        vx: 0,
-        vy: 10,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 547,
         ySprite: 408,
@@ -11,9 +9,7 @@ export const ANIMAL_LEVEL = {
         score: 1
     },
     2: {
-        radius: 30,
-        vx: 0,
-        vy: 15,
+        radius: 20,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 140,
         ySprite: 0,
@@ -22,9 +18,7 @@ export const ANIMAL_LEVEL = {
         score: 2
     },
     3: {
-        radius: 45,
-        vx: 0,
-        vy: 20,
+        radius: 25,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 683,
         ySprite: 409,
@@ -33,9 +27,7 @@ export const ANIMAL_LEVEL = {
         score: 3
     },
     4: {
-        radius: 60,
-        vx: 0,
-        vy: 25,
+        radius: 30,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 274,
         ySprite: 272,
@@ -44,9 +36,7 @@ export const ANIMAL_LEVEL = {
         score: 4
     },
     5: {
-        radius: 75,
-        vx: 0,
-        vy: 30,
+        radius: 35,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 550,
         ySprite: 0,
@@ -55,9 +45,7 @@ export const ANIMAL_LEVEL = {
         score: 5
     },
     6: {
-        radius: 90,
-        vx: 0,
-        vy: 35,
+        radius: 40,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 137,
         ySprite: 551,
@@ -66,9 +54,7 @@ export const ANIMAL_LEVEL = {
         score: 6
     },
     7: {
-        radius: 105,
-        vx: 0,
-        vy: 40,
+        radius: 45,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 411,
         ySprite: 408,
@@ -77,9 +63,7 @@ export const ANIMAL_LEVEL = {
         score: 7
     },
     8: {
-        radius: 120,
-        vx: 0,
-        vy: 45,
+        radius: 50,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 137,
         ySprite: 415,
@@ -88,9 +72,7 @@ export const ANIMAL_LEVEL = {
         score: 8
     },
     9: {
-        radius: 135,
-        vx: 0,
-        vy: 50,
+        radius: 55,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 411,
         ySprite: 680,
@@ -99,9 +81,7 @@ export const ANIMAL_LEVEL = {
         score: 9
     },
     10: {
-        radius: 150,
-        vx: 0,
-        vy: 55,
+        radius: 60,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 274,
         ySprite: 680,
@@ -110,9 +90,7 @@ export const ANIMAL_LEVEL = {
         score: 10
     },
     11: {
-        radius: 165,
-        vx: 0,
-        vy: 60,
+        radius: 65,
         textureName: "/assets/images/animals_spritesheet.png",
         xSprite: 0,
         ySprite: 140,

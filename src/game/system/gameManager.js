@@ -1,4 +1,7 @@
+import { ANIMAL_LEVEL } from "../../constant";
 import { Animal } from "../entities/animal";
+import { PhysicsConfig } from "../system/physicConfig";
+import { Physics } from "./physics";
 
 export class GameManager{
     constructor(app){
@@ -9,12 +12,17 @@ export class GameManager{
         this.isGamePause = false;
 
         this.score = 0;
+        this.topCollisionTime = 0;
         this.isSpawner = false;
         this.isDrop = false;
+        this.isChangeTopCollisionTime = false;
 
         this.currentAnimal = null;
         this.nextAnimal = null;
         this.animalPool = [];
+
+        this.physics = new Physics();
+        this.physics.box = {x: 100, y: 100, width: 500, height: 450};
 
         this.listenEvent();
         this.start();
@@ -27,8 +35,6 @@ export class GameManager{
         this.isGameOver = false;
 
         this.app.ticker.add(this.update.bind(this));
-
-        this.listenEvent();
         this.initSpawn(550,50,50,50);
     }
 
@@ -60,6 +66,25 @@ export class GameManager{
 
     update(ticker){
         if(!this.isGameRunning || this.isGameOver || this.isGamePause) return;
+
+        const timestep = PhysicsConfig.timeStep * ticker.deltaTime;
+        this.physics.update(timestep);
+
+        for(let i = 0; i < this.animalPool.length; i++){
+            for(let j = i + 1; j < this.animalPool.length; j++){
+                if(this.animalPool[i].isMerging || this.animalPool[j].isMerging) continue;
+                this.handleAnimalCollisions(
+                    this.animalPool[i],
+                    this.animalPool[j]
+                );
+            }
+        }
+
+        this.checkAnimaltoTop(ticker.lastTime);
+
+        for(let animal of this.animalPool){
+            animal.setSpriteFollowCollider();
+        }
     }
 
     initSpawn(xSpawnNext, ySpawnNext, xSpawnCurrent, ySpawnCurrent){
@@ -129,11 +154,32 @@ export class GameManager{
         );
     }
 
+    addAnimalToPhysicState(animal){
+        let checkStateAnimal = this.physics.circleColliders.includes(animal.collider)
+        if(checkStateAnimal) return;
+
+        this.physics.circleColliders.push(animal.collider);
+    }
+
+    removeAnimalToPhysicState(animal){
+        let indexAnimal = this.physics.circleColliders.indexOf(animal.collider);
+        this.physics.circleColliders.splice(indexAnimal, 1);
+    }
+
+    removeAnimalFromPool(animal){
+        let indexAnimal = this.animalPool.indexOf(animal);
+        this.animalPool.splice(indexAnimal, 1);
+    }
+
     dropAnimal(){
         if(!this.canInteractWithCurrentAnimal()) return;
 
         this.isDrop = false;
+        this.currentAnimal.convertPhysicMode();
+
         this.animalPool.push(this.currentAnimal);
+        this.addAnimalToPhysicState(this.currentAnimal);
+
         this.currentAnimal = null;
 
         setTimeout(() => {
@@ -141,5 +187,63 @@ export class GameManager{
                 this.stateAnimalForScene(550,50);
             }
         }, 1000);
+    }
+
+    handleAnimalCollisions(animal1, animal2){
+        const mergedCollider =
+            this.physics.handleCollisionsCircleToCircle(
+                animal1.collider,
+                animal2.collider
+            );
+
+        if (!mergedCollider) return;
+        this.mergeAnimals(animal1, animal2, mergedCollider);
+    }
+
+    mergeAnimals(animal1, animal2, mergedCollider){
+        const nextConfig = ANIMAL_LEVEL[animal1.level + 1];
+        if(!nextConfig) return;
+
+        animal1.isMerging = true;
+        animal2.isMerging = true;
+
+        this.removeAnimalToPhysicState(animal1);
+        this.removeAnimalToPhysicState(animal2);
+        this.removeAnimalFromPool(animal1);
+        this.removeAnimalFromPool(animal2);
+
+        this.score += animal1.score;
+
+        mergedCollider.radius = nextConfig.radius;
+        const mergedAnimal = new Animal(
+            animal1.level + 1,
+            mergedCollider.x,
+            mergedCollider.y,
+            false
+        );
+
+        mergedAnimal.attachCollider(mergedCollider);
+
+        this.app.stage.addChild(mergedAnimal);
+        this.animalPool.push(mergedAnimal);
+        this.addAnimalToPhysicState(mergedAnimal);
+        animal1.destroy();
+        animal2.destroy();
+    }
+
+    checkAnimaltoTop(deltaTime){
+        if(this.physics.handleCollisionsAllCirclesToTop(530)){
+            if(!this.isChangeTopCollisionTime){
+                this.topCollisionTime = deltaTime;
+                this.isChangeTopCollisionTime = true;
+            }else{
+                if(deltaTime - this.topCollisionTime >= 5000){
+                    this.gameover();
+                }
+            }
+        }else{
+            this.topCollisionTime = 0;
+            this.isChangeTopCollisionTime = false;
+        }
     }
 }
