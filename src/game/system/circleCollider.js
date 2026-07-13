@@ -12,15 +12,18 @@ export class CircleCollider extends Collider {
     update(timestep) {
         const g = PhysicsConfig.gravity;
         this.vy += g * timestep;
+
+        this.angularVelocity *= Math.exp(-PhysicsConfig.angularDamping * timestep);
+
+        if (Math.abs(this.angularVelocity) < PhysicsConfig.angularStopThreshold) {
+            this.angularVelocity = 0;
+        }
+
         this.angle += this.angularVelocity * timestep;
         super.update(timestep);
     }
 
     computeMass() {
         return Math.PI * this.radius * this.radius;
-    }
-
-    computeInertia() {
-        return 0.5 * this.computeMass() * this.radius * this.radius;
     }
 }

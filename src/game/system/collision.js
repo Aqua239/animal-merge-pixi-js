@@ -5,6 +5,22 @@ export class Collision {
 
     constructor() {
         this.restitution = PhysicsConfig.restitution;
+        this.colliderIds = new WeakMap();
+        this.nextColliderId = 1;
+        this.activeContactPairs = new Set();
+        this.seenContactPairs = new Set();
+    }
+
+    beginFrame() {
+        this.seenContactPairs.clear();
+    }
+
+    endFrame() {
+        for (const pairKey of this.activeContactPairs) {
+            if (!this.seenContactPairs.has(pairKey)) {
+                this.activeContactPairs.delete(pairKey);
+            }
+        }
     }
 
     // (CircleCollider, CircleCollider) -> Boolean, has Collision: true
@@ -51,23 +67,24 @@ export class Collision {
 
     // (circleCollider, circleCollider) -> void
     resolveCollisionCircleToCircleByPush(colliderA, colliderB) {
+        const pairKey = this.getPairKey(colliderA, colliderB);
+        this.seenContactPairs.add(pairKey);
+
         const { normal: vCollisionNorm, distance } = this.computeCollisionNormalAndDistance(colliderA, colliderB);
 
-        //Update positions to resolve penetration
         this.resolvePenetration(colliderA, colliderB, vCollisionNorm, distance);
-        const contactPoint = this.computeContactPoint(colliderA, colliderB, vCollisionNorm);
         const impulseResult = this.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm);
 
         if (impulseResult === undefined) return;
 
-        const { j, impulse } = impulseResult;
+        const { impulse } = impulseResult;
 
         this.applyImpulse(colliderA, colliderB, impulse);
-        const frictionImpulse = this.computeFrictionImpulse(colliderA, colliderB, vCollisionNorm, j);
-        // this.applyImpulse(colliderA, colliderB, frictionImpulse);
 
-        this.updateAngularVelocity(colliderA, colliderB, frictionImpulse, contactPoint);
-        console.log("Angular Velocity A:", colliderA.angularVelocity, "Angular Velocity B:", colliderB.angularVelocity);
+        if (!this.activeContactPairs.has(pairKey)) {
+            this.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
+            this.activeContactPairs.add(pairKey);
+        }
 
     }
 
@@ -121,6 +138,21 @@ export class Collision {
         return { normal: vCollisionNorm, distance: distance };
     }
 
+    getPairKey(colliderA, colliderB) {
+        const idA = this.getColliderId(colliderA);
+        const idB = this.getColliderId(colliderB);
+
+        return idA < idB ? `${idA}:${idB}` : `${idB}:${idA}`;
+    }
+
+    getColliderId(collider) {
+        if (!this.colliderIds.has(collider)) {
+            this.colliderIds.set(collider, this.nextColliderId++);
+        }
+
+        return this.colliderIds.get(collider);
+    }
+
     //Handle penetration issue between 2 colliders
     resolvePenetration(colliderA, colliderB, normal, distance) {
         const penetration = colliderA.radius + colliderB.radius - distance;
@@ -155,7 +187,7 @@ export class Collision {
             y: j * normal.y,
         };
 
-        return { j, impulse };
+        return { impulse };
     }
 
     //Update vecto vx,vy of collider based on gravity and friction
@@ -180,125 +212,29 @@ export class Collision {
         };
     }
 
-    //rotation helpers
-    computeRotationalVelocity(collider, contactPoint) {
-        const r = this.computeLeverArm(collider, contactPoint);
-
-        const rotationalVelocity = {
-            x: -collider.angularVelocity * r.y,
-            y: collider.angularVelocity * r.x,
+    updateAngularVelocity(colliderA, colliderB, normal) {
+        const tangent = {
+            x: -normal.y,
+            y: normal.x,
         };
-        return rotationalVelocity;
-    }
 
-    computeContactPoint(colliderA, colliderB, normal) {
-        const dx = colliderB.x - colliderA.x;
-        const dy = colliderB.y - colliderA.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const tangentSpeed =
+            (colliderB.vx - colliderA.vx) * tangent.x +
+            (colliderB.vy - colliderA.vy) * tangent.y;
 
-        if (distance === 0) {
-            return { x: colliderA.x, y: colliderA.y };
+        if (Math.abs(tangentSpeed) < PhysicsConfig.spinThreshold) {
+            return;
         }
 
-        const depth = colliderA.radius + colliderB.radius - distance;
-        const contactDistance = colliderA.radius - (depth / 2);
-
-        return {
-            x: colliderA.x + normal.x * contactDistance,
-            y: colliderA.y + normal.y * contactDistance
-        };
-    }
-
-    computeLeverArm(collider, contactPoint) {
-
-        return {
-            x: contactPoint.x - collider.x,
-            y: contactPoint.y - collider.y,
-        };
-    }
-
-    computeFrictionImpulse(colliderA, colliderB, normal, normalImpulse) {
-        const contactPoint = this.computeContactPoint(colliderA, colliderB, normal);
-
-        const rotA = this.computeRotationalVelocity(colliderA, contactPoint);
-        const rotB = this.computeRotationalVelocity(colliderB, contactPoint);
-
-        const velA = {
-            x: colliderA.vx + rotA.x,
-            y: colliderA.vy + rotA.y,
-        };
-
-        const velB = {
-            x: colliderB.vx + rotB.x,
-            y: colliderB.vy + rotB.y,
-        };
-
-        const rv = {
-            x: velB.x - velA.x,
-            y: velB.y - velA.y,
-        };
-
-        const speed = rv.x * normal.x + rv.y * normal.y;
-
-        let tangent = {
-            x: rv.x - speed * normal.x,
-            y: rv.y - speed * normal.y,
-        };
-
-        const len = Math.hypot(tangent.x, tangent.y);
-
-        if (len < 1e-6)
-            return { x: 0, y: 0 };
-
-        tangent.x /= len;
-        tangent.y /= len;
-
-        const vt = rv.x * tangent.x + rv.y * tangent.y;
-
-        const invMassA = 1 / colliderA.computeMass();
-        const invMassB = 1 / colliderB.computeMass();
-
-        let jt = -vt / (invMassA + invMassB);
-
-        const mu = 0.3;
-
-        jt = Math.max(
-            -mu * normalImpulse,
-            Math.min(jt, mu * normalImpulse)
+        const spinDelta = Math.max(
+            -PhysicsConfig.maxAngularVelocity,
+            Math.min(PhysicsConfig.maxAngularVelocity, tangentSpeed * PhysicsConfig.spinFactor)
         );
 
-        const frictionImpulse = { x: jt * tangent.x, y: jt * tangent.y };
+        colliderA.angularVelocity -= spinDelta;
+        colliderB.angularVelocity += spinDelta;
 
-        return frictionImpulse;
-    }
-
-    updateAngularVelocity(colliderA, colliderB, impulse, contactPoint) {
-        if (!impulse) return;
-
-        // Lever arm from the center to the contact point
-        const rA = {
-            x: contactPoint.x - colliderA.x,
-            y: contactPoint.y - colliderA.y,
-        };
-
-        const rB = {
-            x: contactPoint.x - colliderB.x,
-            y: contactPoint.y - colliderB.y,
-        };
-
-        // Torque = r × J
-        const torqueA = rA.x * impulse.y - rA.y * impulse.x;
-
-        const torqueB = rB.x * impulse.y - rB.y * impulse.x;
-
-        // Moment of inertia
-        const inertiaA = colliderA.computeInertia();
-        const inertiaB = colliderB.computeInertia();
-
-        // Δω = τ / I
-        colliderA.angularVelocity += torqueA / inertiaA;
-
-        // B get -impluse
-        colliderB.angularVelocity -= torqueB / inertiaB;
+        colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
+        colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
     }
 }

@@ -80,6 +80,8 @@ import { Application, Container, Graphics } from "pixi.js";
     app.ticker.add((time) => {
         const dt = 0.1 * time.deltaTime;
 
+        collisionSystem.beginFrame();
+
         // Update all colliders
         for (const obj of circles) {
             obj.collider.update(dt);
@@ -109,6 +111,8 @@ import { Application, Container, Graphics } from "pixi.js";
                 }
             }
         }
+
+        collisionSystem.endFrame();
 
         // Update graphics position
         for (const obj of circles) {
