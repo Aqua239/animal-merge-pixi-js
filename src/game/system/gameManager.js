@@ -16,6 +16,7 @@ export class GameManager{
         this.isSpawner = false;
         this.isDrop = false;
         this.isChangeTopCollisionTime = false;
+        this.isRemoveAnimal = false;
 
         this.currentAnimal = null;
         this.nextAnimal = null;
@@ -150,11 +151,17 @@ export class GameManager{
         animal.cursor = "pointer";
         animal.on("pointerdown", (event) => {
             event.stopPropagation();
+            if(!this.isRemoveAnimal) return;
 
             this.removeAnimalToPhysicState(animal);
             this.removeAnimalFromPool(animal);
             animal.destroy();
+            this.isRemoveAnimal = false;
         })
+    }
+
+    setStateRemoveAnimal(){
+        this.isRemoveAnimal ? this.isRemoveAnimal = false : this.isRemoveAnimal = true;
     }
 
     canInteractWithCurrentAnimal(){
