@@ -93,10 +93,7 @@ import { Application, Container, Graphics } from "pixi.js";
         for (let iter = 0; iter < solverIterations; iter++) {
             // Box
             for (const obj of circles) {
-                collisionSystem.detectAndHandleCollisionCircleToBox(
-                    obj.collider,
-                    B
-                );
+                collisionSystem.detectAndHandleCollisionCircleToBox(obj.collider, B);
             }
 
             // Ciccle to Circle
