@@ -4,7 +4,7 @@ import { GAME_CONFIG } from "../constant";
 
 export default class GameScreen extends BaseScreen {
     constructor() {
-        super(GAME_CONFIG.COLOR_BACKGROUND);
+        super(GAME_CONFIG.BACKGROUND_COLOR);
 
         this.currentScoreText = null;
         this.highScoreText = null;
@@ -19,7 +19,7 @@ export default class GameScreen extends BaseScreen {
     drawBoundaries(){
         const marginX = 0;
         const floorThickness = 15;
-        const floorColor = 0x2C365A;
+        const floorColor = GAME_CONFIG.FOREGROUND_COLOR;
         const floor = new Graphics();
         floor.rect(
             marginX,
@@ -35,7 +35,7 @@ export default class GameScreen extends BaseScreen {
         for(let i = marginX; i < GAME_CONFIG.GAME_AREA_WIDTH - marginX; i +=dangerDashLength) {
             dashLine.moveTo(i, GAME_CONFIG.CEILING_Y)
                     .lineTo(i + dangerDashGap, GAME_CONFIG.CEILING_Y)
-                    .stroke({ width: 6, color: 0x2C365A });
+                    .stroke({width: 6, color: GAME_CONFIG.FOREGROUND_COLOR});
         }
 
         this.container.addChild(floor);
@@ -50,16 +50,16 @@ export default class GameScreen extends BaseScreen {
             GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
             GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
             radius
-        ).fill(0x2C365A);
-        backgroundCircle.stroke({ width: 10, color: 0xC4BCB0});
+        ).fill(GAME_CONFIG.FOREGROUND_COLOR);
+        backgroundCircle.stroke({width: 10, color: 0xC4BCB0});
 
         this.container.addChild(backgroundCircle);
     };
 
     drawScores(){
         const screenCenterX = GAME_CONFIG.SCREEN_WIDTH / 2;
-        const scoreStyle = {fontFamily: GAME_CONFIG.FONT_FAMILY, fontSize: 50, fill: 0x2C365A, fontWeight: 'bold'};
-        const labelStyle = {fontFamily: GAME_CONFIG.FONT_FAMILY, fontSize: 50, fill: 0x2C365A, fontWeight: 'bold'};
+        const scoreStyle = {fontFamily: GAME_CONFIG.FONT_FAMILY, fontSize: 50, fill: GAME_CONFIG.TEXT_COLOR, fontWeight: 'bold'};
+        const labelStyle = {fontFamily: GAME_CONFIG.FONT_FAMILY, fontSize: 50, fill: GAME_CONFIG.TEXT_COLOR, fontWeight: 'bold'};
 
         //High Score
         this.highScoreContainer = new Container();

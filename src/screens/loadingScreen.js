@@ -4,7 +4,7 @@ import { GAME_CONFIG } from "../constant";
 
 export default class LoadingScreen extends BaseScreen {
     constructor() {
-        super(GAME_CONFIG.COLOR_BACKGROUND);
+        super(GAME_CONFIG.BACKGROUND_COLOR);
 
         this.progressBarFill = null;
 
@@ -16,7 +16,7 @@ export default class LoadingScreen extends BaseScreen {
         const style = {
             fontFamily: "Arial",
             fontSize: 100,
-            fill: 0x2c365a,
+            fill: GAME_CONFIG.TEXT_COLOR,
             fontWeight: "bold",
             dropShadow: false,
             dropShadowColor: "#FFFFFF",
