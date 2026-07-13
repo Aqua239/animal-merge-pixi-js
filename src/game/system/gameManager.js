@@ -12,8 +12,10 @@ export class GameManager{
         this.isGamePause = false;
 
         this.score = 0;
+        this.topCollisionTime = 0;
         this.isSpawner = false;
         this.isDrop = false;
+        this.isChangeTopCollisionTime = false;
 
         this.currentAnimal = null;
         this.nextAnimal = null;
@@ -77,6 +79,8 @@ export class GameManager{
                 );
             }
         }
+
+        this.checkAnimaltoTop(ticker.lastTime);
 
         for(let animal of this.animalPool){
             animal.setSpriteFollowCollider();
@@ -225,5 +229,21 @@ export class GameManager{
         this.addAnimalToPhysicState(mergedAnimal);
         animal1.destroy();
         animal2.destroy();
+    }
+
+    checkAnimaltoTop(deltaTime){
+        if(this.physics.handleCollisionsAllCirclesToTop(530)){
+            if(!this.isChangeTopCollisionTime){
+                this.topCollisionTime = deltaTime;
+                this.isChangeTopCollisionTime = true;
+            }else{
+                if(deltaTime - this.topCollisionTime >= 5000){
+                    this.gameover();
+                }
+            }
+        }else{
+            this.topCollisionTime = 0;
+            this.isChangeTopCollisionTime = false;
+        }
     }
 }
