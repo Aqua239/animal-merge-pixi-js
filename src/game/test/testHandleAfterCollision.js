@@ -36,9 +36,18 @@ import { Application, Container, Graphics } from "pixi.js";
         collider.vx = vx;
         collider.vy = vy;
 
-        const graphics = new Graphics()
+        const circleView = new Graphics()
             .circle(0, 0, radius)
             .fill({ color, alpha: 0.5 });
+
+        const angleLine = new Graphics()
+            .moveTo(0, 0)
+            .lineTo(radius, 0)
+            .stroke({ width: 3, color: 0xffffff, alpha: 1 });
+
+        const graphics = new Container();
+        graphics.addChild(circleView);
+        graphics.addChild(angleLine);
 
         graphics.position.set(x, y);
 
@@ -107,6 +116,7 @@ import { Application, Container, Graphics } from "pixi.js";
                 obj.collider.x,
                 obj.collider.y
             );
+            obj.graphics.rotation = obj.collider.angle;
         }
     });
 })();
