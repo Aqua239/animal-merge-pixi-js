@@ -1,6 +1,6 @@
 import { Container, Sprite } from "pixi.js";
 
-class SupportItem extends Container{
+export class SupportItem extends Container{
     constructor({
         texture,
         quantity = 0,
@@ -23,14 +23,26 @@ class SupportItem extends Container{
             if(!this.isActive){
                 this.activate();
             }else{
-                this.deactive();
+                this.deactivate();
             }
         });
     }
 
-    activate(){}
+    activate(){
+        if(this.quantity <= 0) return;
 
-    deactive(){}
+        this.isActive = true;
+        if (this.onUse) {
+            this.onUse(this);
+        }
+    }
+
+    deactivate(){
+        this.isActive = false;
+        if (this.onUse) {
+            this.onUse(this);
+        }
+    }
 
     reduceQuantity(){}
 }
