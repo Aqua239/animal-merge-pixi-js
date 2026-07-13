@@ -1,6 +1,7 @@
 import { Container, Graphics, Text, Texture } from "pixi.js";
 import BaseScreen from "./baseScreen";
 import { GAME_CONFIG } from "../constant";
+import { BaseButton } from "../UI/baseButton";
 
 export default class GameScreen extends BaseScreen {
     constructor() {
@@ -94,7 +95,19 @@ export default class GameScreen extends BaseScreen {
         this.container.addChild(this.highScoreContainer, this.currentScoreContainer);
     };
 
-    drawSettingsButton(){};
+    drawSettingsButton(){
+        const settingButton = new BaseButton({
+            textureName: Texture.WHITE,
+            x: 130,
+            y: 150,
+            width: 80,
+            height: 80,
+            onClick: () => {
+                //Show Overlay Setting
+            }
+        })
+        this.container.addChild(settingButton);
+    };
 
     drawMergeTree(){};
 }
