@@ -132,18 +132,33 @@ export class GameManager{
     listenEvent(){
         this.app.stage.eventMode = "static";
         this.app.stage.hitArea = this.app.screen;
+        const box = this.physics.box;
 
         this.app.stage.on("pointermove", (event) => {
             if(!this.canInteractWithCurrentAnimal()) return;
+            if(this.detectCursorInBox(event, box)){
+                let animalPosition = Math.max(
+                    box.x + this.currentAnimal.radius,
+                    Math.min(event.global.x, box.x + box.width - this.currentAnimal.radius)
+                );
 
-            this.currentAnimal.x = event.global.x;
+                this.currentAnimal.x = animalPosition;
+            }
         });
 
-        this.app.stage.on("pointerdown", () => {
+        this.app.stage.on("pointerdown", (event) => {
             if(!this.canInteractWithCurrentAnimal()) return;
-
-            this.dropAnimal();
+            if(this.detectCursorInBox(event, box)){
+                this.dropAnimal();
+            }
         });
+    }
+
+    detectCursorInBox(event, box){
+        return box.x <= event.global.x &&
+            event.global.x <= box.x + box.width &&
+            box.y <= event.global.y &&
+            event.global.y <= box.y + box.height
     }
 
     handleAnimalEvent(animal){
