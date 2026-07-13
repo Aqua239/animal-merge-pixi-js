@@ -136,7 +136,7 @@ export class GameManager{
 
         this.app.stage.on("pointermove", (event) => {
             if(!this.canInteractWithCurrentAnimal()) return;
-            if(this.detectCursorInBox(event, box)){
+            if(this.detectCursorInBox(event, box) && !this.isRemoveAnimal){
                 let animalPosition = Math.max(
                     box.x + this.currentAnimal.radius,
                     Math.min(event.global.x, box.x + box.width - this.currentAnimal.radius)
@@ -148,7 +148,7 @@ export class GameManager{
 
         this.app.stage.on("pointerdown", (event) => {
             if(!this.canInteractWithCurrentAnimal()) return;
-            if(this.detectCursorInBox(event, box)){
+            if(this.detectCursorInBox(event, box) && !this.isRemoveAnimal){
                 this.dropAnimal();
             }
         });
@@ -178,6 +178,7 @@ export class GameManager{
 
     setStateRemoveAnimal(){
         this.isRemoveAnimal ? this.isRemoveAnimal = false : this.isRemoveAnimal = true;
+        this.currentAnimal.visible = !this.isRemoveAnimal;
 
         for(let animal of this.animalPool){
             this.updateAnimalCursor(animal);
