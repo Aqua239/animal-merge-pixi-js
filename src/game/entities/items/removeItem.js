@@ -9,5 +9,9 @@ export class RemoveItem extends SupportItem{
         this.sprite.height = height;
     }
 
-    use(){}
+    use(){
+        if (!this.isActive) return;
+        this.reduceQuantity();
+        this.deactivate();
+    }
 }
