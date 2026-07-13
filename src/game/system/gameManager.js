@@ -145,6 +145,18 @@ export class GameManager{
         });
     }
 
+    handleAnimalEvent(animal){
+        animal.eventMode = "static";
+        animal.cursor = "pointer";
+        animal.on("pointerdown", (event) => {
+            event.stopPropagation();
+
+            this.removeAnimalToPhysicState(animal);
+            this.removeAnimalFromPool(animal);
+            animal.destroy();
+        })
+    }
+
     canInteractWithCurrentAnimal(){
         return (this.isGameRunning &&
             !this.isGamePause &&
@@ -179,7 +191,7 @@ export class GameManager{
 
         this.animalPool.push(this.currentAnimal);
         this.addAnimalToPhysicState(this.currentAnimal);
-
+        this.handleAnimalEvent(this.currentAnimal);
         this.currentAnimal = null;
 
         setTimeout(() => {
@@ -227,6 +239,7 @@ export class GameManager{
         this.app.stage.addChild(mergedAnimal);
         this.animalPool.push(mergedAnimal);
         this.addAnimalToPhysicState(mergedAnimal);
+        this.handleAnimalEvent(mergedAnimal);
         animal1.destroy();
         animal2.destroy();
     }
