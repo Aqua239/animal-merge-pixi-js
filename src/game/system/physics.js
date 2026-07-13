@@ -1,5 +1,6 @@
 import { CircleCollider } from './circleCollider.js';
 import { Collision } from './collision.js';
+import { PhysicsConfig } from "../system/physicConfig.js";
 
 export class Physics {
 
@@ -36,7 +37,7 @@ export class Physics {
     handleCollisionsCircleToCircle(circleColliderA, circleColliderB) {
         if (!this.systemCollision.detectCollisionCircleToCircle(circleColliderA, circleColliderB)) return;
 
-        if (circleColliderA.radius == circleColliderB.radius) {
+        if (circleColliderA.radius == circleColliderB.radius && circleColliderA.radius < PhysicsConfig.maxRadius) {
             return this.systemCollision.resolveCollisionCircleToCircleByMerge(circleColliderA, circleColliderB);
         } else {
             this.systemCollision.resolveCollisionCircleToCircleByPush(circleColliderA, circleColliderB);

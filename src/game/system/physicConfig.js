@@ -1,3 +1,5 @@
+import { ANIMAL_LEVEL } from "../../constant";
+
 export const PhysicsConfig = {
     gravity: 9.81,
     restitution: 0.5,
@@ -6,5 +8,6 @@ export const PhysicsConfig = {
     spinThreshold: 0.18,
     spinFactor: 0.04,
     maxAngularVelocity: 2.5,
-    timeStep: 1 / 60
+    timeStep: 1 / 60,
+    maxRadius: ANIMAL_LEVEL[ANIMAL_LEVEL.length - 1].radius,
 };
