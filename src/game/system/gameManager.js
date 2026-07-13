@@ -148,20 +148,31 @@ export class GameManager{
 
     handleAnimalEvent(animal){
         animal.eventMode = "static";
-        animal.cursor = "pointer";
+        this.updateAnimalCursor(animal);
+
         animal.on("pointerdown", (event) => {
-            event.stopPropagation();
             if(!this.isRemoveAnimal) return;
 
+            event.stopPropagation();
             this.removeAnimalToPhysicState(animal);
             this.removeAnimalFromPool(animal);
             animal.destroy();
-            this.isRemoveAnimal = false;
+            this.setStateRemoveAnimal();
         })
     }
 
     setStateRemoveAnimal(){
         this.isRemoveAnimal ? this.isRemoveAnimal = false : this.isRemoveAnimal = true;
+
+        for(let animal of this.animalPool){
+            this.updateAnimalCursor(animal);
+        }
+    }
+
+    updateAnimalCursor(animal) {
+        animal.cursor = this.isRemoveAnimal
+            ? "pointer"
+            : "default";
     }
 
     canInteractWithCurrentAnimal(){
