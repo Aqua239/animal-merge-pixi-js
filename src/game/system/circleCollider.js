@@ -1,6 +1,5 @@
 import { Collider } from "./collider.js";
-import { PhysicsConfig } from "./physicConfig.js";
-import { ANIMAL_LEVEL } from "../../constant";
+import { ANIMAL_LEVEL, PhysicsConfig } from "../../constant";
 
 export class CircleCollider extends Collider {
     constructor(x, y, radius) {
