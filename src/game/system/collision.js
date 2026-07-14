@@ -1,6 +1,5 @@
 import { CircleCollider } from "../system/circleCollider.js";
-import { PhysicsConfig } from "../system/physicConfig.js";
-
+import { PhysicsConfig, ANIMAL_LEVEL } from "../../constant.js";
 export class Collision {
 
     constructor() {
@@ -85,13 +84,12 @@ export class Collision {
             this.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
             this.activeContactPairs.add(pairKey);
         }
-
     }
 
 
     //Handle collision between 2 colliders by merge
     resolveCollisionCircleToCircleByMerge(colliderA, colliderB) {
-        let newRadius = colliderA.radius + colliderB.radius;
+        let newRadius = this.computeNewRadiusByLevel(colliderA, colliderB);
         let newCircle = new CircleCollider(
             (colliderA.x + colliderB.x) / 2,
             (colliderA.y + colliderB.y) / 2,
@@ -110,6 +108,13 @@ export class Collision {
 
         return newCircle;
 
+    }
+
+    computeNewRadiusByLevel(colliderA, colliderB) {
+        if (colliderA.radius !== colliderB.radius) return;
+        const levelA = colliderA.getLevel();
+        let newradius = ANIMAL_LEVEL[levelA + 1].radius;
+        return newradius;
     }
 
     //compute normal, distance

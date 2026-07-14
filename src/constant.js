@@ -100,6 +100,26 @@ export const ANIMAL_LEVEL = {
     }
 }
 
+const levelKeys = Object.keys(ANIMAL_LEVEL);
+const maxLevelKey = Math.max(...levelKeys);
+const PixelPerMeter = 100; // 1 meter = 100 pixels
+
+export const PhysicsConfig = {
+    initialVelocityX: 0,
+    initialVelocityY: 0,
+    linearDamping: 0.5,
+    stopVthreshold: 5,
+    gravity: 9.81 * PixelPerMeter,
+    restitution: 0.3,
+    angularDamping: 2.5,
+    angularStopThreshold: 1,
+    spinThreshold: 0.18,
+    spinFactor: 0.04,
+    maxAngularVelocity: 2.5,
+    timeStep: 1 / 1000,
+    maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,
+};
+
 export const GAME_CONFIG = {
     BACKGROUND_COLOR: 0xEEE8DF, //cream-colored
     FOREGROUND_COLOR: 0x2C365A,

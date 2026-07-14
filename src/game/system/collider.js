@@ -1,10 +1,10 @@
+import { PhysicsConfig } from "../../constant.js";
 export class Collider {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.vx = 0;
-        this.vy = 0;
-
+        this.vx = PhysicsConfig.initialVelocityX;
+        this.vy = PhysicsConfig.initialVelocityY;
     }
 
     update(timestep) {

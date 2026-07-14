@@ -1,5 +1,6 @@
 import { CircleCollider } from "../system/circleCollider.js";
 import { Collision } from "../system/collision.js";
+import { PhysicsConfig } from "../../constant.js";
 
 import { Application, Container, Graphics } from "pixi.js";
 
@@ -31,10 +32,8 @@ import { Application, Container, Graphics } from "pixi.js";
     // Data all cirles
     const circles = [];
 
-    function spawnCircle(x, y, radius, color, vx = 0, vy = 0) {
+    function spawnCircle(x, y, radius, color) {
         const collider = new CircleCollider(x, y, radius);
-        collider.vx = vx;
-        collider.vy = vy;
 
         const circleView = new Graphics()
             .circle(0, 0, radius)
@@ -78,7 +77,7 @@ import { Application, Container, Graphics } from "pixi.js";
     }, 5000);
 
     app.ticker.add((time) => {
-        const dt = 0.1 * time.deltaTime;
+        const dt = PhysicsConfig.timeStep * time.deltaMS;
 
         collisionSystem.beginFrame();
 

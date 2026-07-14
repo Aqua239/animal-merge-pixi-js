@@ -1,5 +1,6 @@
 import { Application, Container, Graphics } from "pixi.js";
 
+import { PhysicsConfig } from "../../constant.js";
 import { Physics } from "../system/physics.js";
 import { CircleCollider } from "../system/circleCollider.js";
 
@@ -95,7 +96,7 @@ import { CircleCollider } from "../system/circleCollider.js";
     }
 
     app.ticker.add((time) => {
-        const dt = 0.1 * time.deltaTime;
+        const dt = PhysicsConfig.timeStep * time.deltaTime;
 
         update(dt);
     });
