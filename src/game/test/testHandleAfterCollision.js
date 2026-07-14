@@ -59,12 +59,12 @@ import { Application, Container, Graphics } from "pixi.js";
     }
 
     // spawn 2 circles
-    spawnCircle(30, 20, 40, 0x0000ff);
-    spawnCircle(60, 60, 40, 0xff0000);
+    spawnCircle(30, 20, 30, 0x0000ff);
+    spawnCircle(60, 60, 30, 0xff0000);
 
     // spawn new circle every 5s
     setInterval(() => {
-        const x = 40 + Math.random() * 80;
+        const x = 60 + Math.random() * 120;
 
         spawnCircle(
             x,
@@ -77,7 +77,9 @@ import { Application, Container, Graphics } from "pixi.js";
     }, 5000);
 
     app.ticker.add((time) => {
-        const dt = PhysicsConfig.timeStep * time.deltaMS;
+        let dt = PhysicsConfig.timeStep * time.deltaMS;
+
+
 
         collisionSystem.beginFrame();
 
@@ -109,7 +111,6 @@ import { Application, Container, Graphics } from "pixi.js";
         }
 
         collisionSystem.endFrame();
-
         // Update graphics position
         for (const obj of circles) {
             obj.graphics.position.set(
