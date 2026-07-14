@@ -95,6 +95,20 @@ export default class GameScreen extends BaseScreen {
         this.container.addChild(this.highScoreContainer, this.currentScoreContainer);
     };
 
+    updateCurrentScore(newScore) {
+        this.currentScoreText.text = newScore.toString();
+
+        const screenCenterX = GAME_CONFIG.SCREEN_WIDTH / 2;
+        this.currentScoreContainer.x = screenCenterX - (this.currentScoreContainer.width / 2);
+    }
+
+    updateHighScore(newHighScore) {
+        this.highScoreText.text = newHighScore.toString();
+
+        const screenCenterX = GAME_CONFIG.SCREEN_WIDTH / 2;
+        this.highScoreContainer.x = screenCenterX - (this.highScoreContainer.width / 2);
+    }
+
     drawSettingsButton(){
         const settingButton = new BaseButton({
             textureName: "setting_button",
