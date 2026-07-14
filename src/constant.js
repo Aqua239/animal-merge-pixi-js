@@ -106,16 +106,21 @@ const PixelPerMeter = 100; // 1 meter = 100 pixels
 
 export const PhysicsConfig = {
     initialVelocityX: 0,
-    initialVelocityY: 0,
-    linearDamping: 0.5,
-    stopVthreshold: 5,
+    initialVelocityY: 100,
+    linearDamping: 0.2,
+    stopVthreshold: 10,
     gravity: 9.81 * PixelPerMeter,
-    restitution: 0.3,
-    angularDamping: 2.5,
-    angularStopThreshold: 1,
+    restitution: 0.5,
+
+    angularDamping: 2,
+    angularStopThreshold: 1.5,
+
     spinThreshold: 0.18,
-    spinFactor: 0.04,
-    maxAngularVelocity: 2.5,
+    spinFactor: 0.1,
+
+    maxAngularVelocity: 3.5,
+    FRICTION: 0.05,
+
     timeStep: 1 / 1000,
     maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,
 };
