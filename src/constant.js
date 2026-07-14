@@ -102,18 +102,21 @@ export const ANIMAL_LEVEL = {
 
 const levelKeys = Object.keys(ANIMAL_LEVEL);
 const maxLevelKey = Math.max(...levelKeys);
+const PixelPerMeter = 100; // 1 meter = 100 pixels
 
 export const PhysicsConfig = {
     initialVelocityX: 0,
-    initialVelocityY: 50,
-    gravity: 9.81,
-    restitution: 0.5,
-    angularDamping: 1.2,
-    angularStopThreshold: 0.02,
+    initialVelocityY: 0,
+    linearDamping: 0.5,
+    stopVthreshold: 5,
+    gravity: 9.81 * PixelPerMeter,
+    restitution: 0.3,
+    angularDamping: 2.5,
+    angularStopThreshold: 1,
     spinThreshold: 0.18,
     spinFactor: 0.04,
     maxAngularVelocity: 2.5,
-    timeStep: 0.1,
+    timeStep: 1 / 1000,
     maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,
 };
 

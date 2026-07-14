@@ -12,6 +12,15 @@ export class CircleCollider extends Collider {
     update(timestep) {
         const g = PhysicsConfig.gravity;
         this.vy += g * timestep;
+        this.vx *= Math.exp(-PhysicsConfig.linearDamping * timestep);
+
+        if (Math.abs(this.vx) < PhysicsConfig.stopVthreshold) {
+            this.vx = 0;
+        }
+
+        if (Math.abs(this.vy) < PhysicsConfig.stopVthreshold) {
+            this.vy = 0;
+        }
 
         this.angularVelocity *= Math.exp(-PhysicsConfig.angularDamping * timestep);
 
