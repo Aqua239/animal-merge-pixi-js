@@ -3,6 +3,7 @@ import { DEFAULT_GAME_DATA, STORAGE_KEY } from "./data";
 class GameStore{
     constructor(){
         this.data = this.load();
+        this.save();
     }
 
     load(){
@@ -15,7 +16,9 @@ class GameStore{
         return this.mergeWithDefault(savedData);
     }
 
-    save(){}
+    save(){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+    }
 
     mergeWithDefault(savedData){
         return{
