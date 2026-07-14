@@ -6,9 +6,10 @@ import { RemoveItem } from "./entities/items/removeItem";
 import GameOverPopup from "../overlays/gameOverPopup";
 
 export class GameManager{
-    constructor({app, gameContainer}){
+    constructor({app, gameContainer, gameScreen}){
         this.app = app;
         this.gameContainer = gameContainer;
+        this.gameScreen = gameScreen;
 
         this.isGameOver = false;
         this.isGameRunning = false;
@@ -357,6 +358,7 @@ export class GameManager{
         this.removeAnimalFromPool(animal2);
 
         this.score += animal1.score;
+        this.gameScreen.updateCurrentScore(this.score);
 
         mergedCollider.radius = nextConfig.radius;
         const mergedAnimal = new Animal(
