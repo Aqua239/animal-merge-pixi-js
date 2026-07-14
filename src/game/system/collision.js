@@ -104,7 +104,6 @@ export class Collision {
         }
     }
 
-
     //Handle collision between 2 colliders by merge
     resolveCollisionCircleToCircleByMerge(colliderA, colliderB) {
         let newRadius = this.computeNewRadiusByLevel(colliderA, colliderB);
@@ -250,8 +249,8 @@ export class Collision {
             Math.min(PhysicsConfig.maxAngularVelocity, tangentSpeed * PhysicsConfig.spinFactor)
         );
 
-        colliderA.angularVelocity -= spinDelta;
-        colliderB.angularVelocity += spinDelta;
+        colliderA.angularVelocity = -spinDelta;
+        colliderB.angularVelocity = spinDelta;
 
         colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
         colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
