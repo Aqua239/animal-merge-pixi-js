@@ -50,3 +50,5 @@ class GameStore{
         console.log(this.getData());
     }
 }
+
+export const gameStore = new GameStore();
