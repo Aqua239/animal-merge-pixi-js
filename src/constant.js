@@ -99,3 +99,11 @@ export const ANIMAL_LEVEL = {
         score: 11
     }
 }
+
+export const GAME_CONFIG = {
+    COLOR_BACKGROUND: 0xEEE8DF, //cream-colored
+    SCREEN_WIDTH: 1080,
+    SCREEN_HEIGHT: 1920,
+    ORIGIN_X: 0,
+    ORIGIN_Y: 0,
+}
