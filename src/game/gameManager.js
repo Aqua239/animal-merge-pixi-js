@@ -1,13 +1,15 @@
 import { Texture } from "pixi.js";
-import { ANIMAL_LEVEL } from "../constant";
+import { ANIMAL_LEVEL, GAME_CONFIG, PhysicsConfig } from "../constant";
 import { Animal } from "./entities/animal";
-import { PhysicsConfig } from "./system/physicConfig";
 import { Physics } from "./system/physics";
 import { RemoveItem } from "./entities/items/removeItem";
+import GameOverPopup from "../overlays/gameOverPopup";
 
 export class GameManager{
-    constructor(app){
+    constructor({app, gameContainer, gameScreen}){
         this.app = app;
+        this.gameContainer = gameContainer;
+        this.gameScreen = gameScreen;
 
         this.isGameOver = false;
         this.isGameRunning = false;
@@ -24,7 +26,13 @@ export class GameManager{
         this.animalPool = [];
 
         this.physics = new Physics();
-        this.physics.box = {x: 100, y: 100, width: 500, height: 450};
+        this.gameOverPopup = null;
+        this.physics.box = {
+            x: 0,
+            y: GAME_CONFIG.CEILING_Y,
+            width: GAME_CONFIG.GAME_AREA_WIDTH,
+            height: GAME_CONFIG.FLOOR_Y - GAME_CONFIG.CEILING_Y
+        };
 
         this.listenEvent();
         this.start();
@@ -41,7 +49,7 @@ export class GameManager{
             },
         });
 
-        this.app.stage.addChild(this.removeItem);
+        this.gameContainer.addChild(this.removeItem);
     }
 
     start(){
@@ -51,7 +59,12 @@ export class GameManager{
         this.isGameOver = false;
 
         this.app.ticker.add(this.update.bind(this));
-        this.initSpawn(550,50,50,50);
+        this.initSpawn(
+            GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
+            GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
+            GAME_CONFIG.GAME_AREA_WIDTH/2,
+            GAME_CONFIG.ANIMAL_SPAWN_Y
+        );
     }
 
     pause(){
@@ -73,19 +86,70 @@ export class GameManager{
         this.isGameRunning = false;
 
         this.removeItem.deactivate();
+
+        this.gameOverPopup = new GameOverPopup({
+            score: this.score,
+            onReplay: () => {this.replayGame()},
+
+            onReturnMainMenu: () => {
+            console.log("Return main menu");
+            },
+        });
+        this.gameContainer.addChild(this.gameOverPopup);
+        this.gameOverPopup.show();
     }
 
-    reset(){
-        this.score = 0;
-        this.currentAnimal = null;
-        this.nextAnimal = null;
+    reset() {
+        if (this.currentAnimal) {
+            this.currentAnimal.destroy();
+            this.currentAnimal = null;
+        }
+
+        if (this.nextAnimal) {
+            this.nextAnimal.destroy();
+            this.nextAnimal = null;
+        }
+
+        for (const animal of this.animalPool) {
+            if (!animal.destroyed) {
+            animal.destroy();
+            }
+        }
         this.animalPool = [];
+        this.physics.circleColliders.length = 0;
+        this.score = 0;
+
+        this.topCollisionTime = 0;
+        this.isChangeTopCollisionTime = false;
+        this.isSpawner = false;
+        this.isDrop = false;
+
+        this.isGameOver = false;
+        this.isGamePause = false;
+        this.isGameRunning = false;
+
+        this.removeItem.deactivate();
+    }
+
+    replayGame(){
+        if (this.gameOverPopup) {
+            this.gameOverPopup.removeFromParent();
+
+            this.gameOverPopup.destroy({
+                children: true,
+            });
+
+            this.gameOverPopup = null;
+        }
+
+        this.reset();
+        this.start();
     }
 
     update(ticker){
         if(!this.isGameRunning || this.isGameOver || this.isGamePause) return;
 
-        const timestep = PhysicsConfig.timeStep * ticker.deltaTime;
+        const timestep = PhysicsConfig.timeStep * ticker.deltaMS;
         this.physics.update(timestep);
 
         for(let i = 0; i < this.animalPool.length; i++){
@@ -108,13 +172,13 @@ export class GameManager{
     initSpawn(xSpawnNext, ySpawnNext, xSpawnCurrent, ySpawnCurrent){
         if(this.nextAnimal === null){
             this.isSpawner = true;
-            let randomLevel = Math.floor(Math.random() * 3) + 1;
+            let randomLevel = Math.floor(Math.random() * 5) + 1;
             this.nextAnimal = this.spawnAnimal(xSpawnNext, ySpawnNext, randomLevel, true);
         }
 
         if(this.currentAnimal === null){
             this.isSpawner = true;
-            let randomLevel = Math.floor(Math.random() * 3) + 1;
+            let randomLevel = Math.floor(Math.random() * 5) + 1;
             this.currentAnimal = this.spawnAnimal(xSpawnCurrent, ySpawnCurrent, randomLevel, false);
             this.isDrop = true;
         }
@@ -124,8 +188,8 @@ export class GameManager{
         if(this.currentAnimal === null){
             this.currentAnimal = this.nextAnimal;
             if(this.currentAnimal){
-                this.currentAnimal.x = 50;
-                this.currentAnimal.y = 50;
+                this.currentAnimal.x = GAME_CONFIG.GAME_AREA_WIDTH/2 + Math.floor(Math.random()*50);
+                this.currentAnimal.y = GAME_CONFIG.ANIMAL_SPAWN_Y;
                 this.currentAnimal.convertFromNextToCurrent();
                 this.isDrop = true;
             }
@@ -133,7 +197,7 @@ export class GameManager{
 
         if(this.nextAnimal === null || this.nextAnimal === this.currentAnimal){
             this.isSpawner = true;
-            let randomLevel = Math.floor(Math.random() * 3) + 1;
+            let randomLevel = Math.floor(Math.random() * 5) + 1;
             this.nextAnimal = this.spawnAnimal(xSpawn, ySpawn, randomLevel, true);
         }
     }
@@ -142,40 +206,53 @@ export class GameManager{
         if(!this.isSpawner) return;
         this.isSpawner = false;
         let newAnimal = new Animal(level, xSpawn, ySpawn, isNextAnimal);
-        this.app.stage.addChild(newAnimal);
+        this.gameContainer.addChild(newAnimal);
         return newAnimal;
     }
 
     listenEvent(){
-        this.app.stage.eventMode = "static";
-        this.app.stage.hitArea = this.app.screen;
+        this.gameContainer.eventMode = "static";
+        this.gameContainer.hitArea = {
+            contains: (x, y) => {
+                return (
+                    x >= 0 &&
+                    x <= GAME_CONFIG.SCREEN_WIDTH &&
+                    y >= 0 &&
+                    y <= GAME_CONFIG.SCREEN_HEIGHT
+                );
+            },
+        };
         const box = this.physics.box;
 
-        this.app.stage.on("pointermove", (event) => {
+        this.gameContainer.on("pointermove", (event) => {
             if(!this.canInteractWithCurrentAnimal()) return;
-            if(this.detectCursorInBox(event, box) && !this.removeItem.isActive){
+            const pointerPosition = event.getLocalPosition(this.gameContainer);
+
+            if(this.detectCursorInBox(pointerPosition, box) && !this.removeItem.isActive){
                 let animalPosition = Math.max(
                     box.x + this.currentAnimal.radius,
-                    Math.min(event.global.x, box.x + box.width - this.currentAnimal.radius)
+                    Math.min(pointerPosition.x, box.x + box.width - this.currentAnimal.radius)
                 );
 
                 this.currentAnimal.x = animalPosition;
             }
         });
 
-        this.app.stage.on("pointerdown", (event) => {
+        this.gameContainer.on("pointerdown", (event) => {
             if(!this.canInteractWithCurrentAnimal()) return;
-            if(this.detectCursorInBox(event, box) && !this.removeItem.isActive){
+            const pointerPosition = event.getLocalPosition(this.gameContainer);
+
+            if(this.detectCursorInBox(pointerPosition, box) && !this.removeItem.isActive){
                 this.dropAnimal();
             }
         });
     }
 
-    detectCursorInBox(event, box){
-        return box.x <= event.global.x &&
-            event.global.x <= box.x + box.width &&
-            box.y <= event.global.y &&
-            event.global.y <= box.y + box.height
+    detectCursorInBox(position, box){
+        return box.x <= position.x &&
+            position.x <= box.x + box.width &&
+            box.y <= position.y &&
+            position.y <= box.y + box.height
     }
 
     handleAnimalEvent(animal){
@@ -249,7 +326,10 @@ export class GameManager{
 
         setTimeout(() => {
             if(this.isGameRunning && !this.isGameOver){
-                this.stateAnimalForScene(550,50);
+                this.stateAnimalForScene(
+                    GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
+                    GAME_CONFIG.NEXT_ANIMAL_POSITION_Y
+                );
             }
         }, 1000);
     }
@@ -278,6 +358,7 @@ export class GameManager{
         this.removeAnimalFromPool(animal2);
 
         this.score += animal1.score;
+        this.gameScreen.updateCurrentScore(this.score);
 
         mergedCollider.radius = nextConfig.radius;
         const mergedAnimal = new Animal(
@@ -289,7 +370,7 @@ export class GameManager{
 
         mergedAnimal.attachCollider(mergedCollider);
 
-        this.app.stage.addChild(mergedAnimal);
+        this.gameContainer.addChild(mergedAnimal);
         this.animalPool.push(mergedAnimal);
         this.addAnimalToPhysicState(mergedAnimal);
         this.handleAnimalEvent(mergedAnimal);
@@ -298,7 +379,7 @@ export class GameManager{
     }
 
     checkAnimaltoTop(deltaTime){
-        if(this.physics.handleCollisionsAllCirclesToTop(100)){
+        if(this.physics.handleCollisionsAllCirclesToTop(GAME_CONFIG.CEILING_Y)){
             if(!this.isChangeTopCollisionTime){
                 this.topCollisionTime = deltaTime;
                 this.isChangeTopCollisionTime = true;

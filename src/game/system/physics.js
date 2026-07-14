@@ -79,8 +79,11 @@ export class Physics {
 
     handleCollisionsAllCirclesToTop(y) {
         for (const collider of this.circleColliders) {
-            this.handleCollisionsCircleToTop(collider, y);
+            if(this.handleCollisionsCircleToTop(collider, y)){
+                return true;
+            };
         }
+        return false;
     }
 
     handleCollisionsAllCirclesToBox(Box) {
