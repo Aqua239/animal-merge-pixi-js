@@ -131,13 +131,13 @@ export class GameManager{
     initSpawn(xSpawnNext, ySpawnNext, xSpawnCurrent, ySpawnCurrent){
         if(this.nextAnimal === null){
             this.isSpawner = true;
-            let randomLevel = Math.floor(Math.random() * 3) + 1;
+            let randomLevel = Math.floor(Math.random() * 5) + 1;
             this.nextAnimal = this.spawnAnimal(xSpawnNext, ySpawnNext, randomLevel, true);
         }
 
         if(this.currentAnimal === null){
             this.isSpawner = true;
-            let randomLevel = Math.floor(Math.random() * 3) + 1;
+            let randomLevel = Math.floor(Math.random() * 5) + 1;
             this.currentAnimal = this.spawnAnimal(xSpawnCurrent, ySpawnCurrent, randomLevel, false);
             this.isDrop = true;
         }
@@ -147,7 +147,7 @@ export class GameManager{
         if(this.currentAnimal === null){
             this.currentAnimal = this.nextAnimal;
             if(this.currentAnimal){
-                this.currentAnimal.x = GAME_CONFIG.GAME_AREA_WIDTH/2;
+                this.currentAnimal.x = GAME_CONFIG.GAME_AREA_WIDTH/2 + Math.floor(Math.random()*50);
                 this.currentAnimal.y = GAME_CONFIG.ANIMAL_SPAWN_Y;
                 this.currentAnimal.convertFromNextToCurrent();
                 this.isDrop = true;
@@ -156,7 +156,7 @@ export class GameManager{
 
         if(this.nextAnimal === null || this.nextAnimal === this.currentAnimal){
             this.isSpawner = true;
-            let randomLevel = Math.floor(Math.random() * 3) + 1;
+            let randomLevel = Math.floor(Math.random() * 5) + 1;
             this.nextAnimal = this.spawnAnimal(xSpawn, ySpawn, randomLevel, true);
         }
     }
