@@ -42,7 +42,11 @@ class GameStore{
         }
     }
 
-    getData(){}
+    getData(){
+        return structuredClone(this.data);
+    }
 
-    show(){}
+    show(){
+        console.log(this.getData());
+    }
 }
