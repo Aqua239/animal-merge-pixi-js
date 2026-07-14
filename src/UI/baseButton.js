@@ -1,7 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 
 export class BaseButton extends Container {
-    constructor({textureName, x = 0, y = 0, width, height, onClick}) {
+    constructor({textureName, x = 0, y = 0, width, height, onClick, iconName, iconScale = 1}) {
         super();
 
         this.onClickCallback = onClick;
@@ -13,29 +13,42 @@ export class BaseButton extends Container {
             this.buttonSprite.height = height;
         }
 
-        this.baseScaleX = this.buttonSprite.scale.x;
-        this.baseScaleY = this.buttonSprite.scale.y;
-
         this.addChild(this.buttonSprite);
         this.position.set(x, y);
 
-        this.buttonSprite.eventMode = 'static';
-        this.buttonSprite.cursor = 'pointer';
+        if (iconName) {
+            this.iconSprite = Sprite.from(iconName);
 
-        this.buttonSprite.on('pointerdown', this.onPointerDown.bind(this));
-        this.buttonSprite.on('pointerup', this.onPointerUp.bind(this));
-        this.buttonSprite.on('pointerupoutside', this.onPointerUpOutside.bind(this));
-        this.buttonSprite.on('pointerover', this.onPointerOver.bind(this));
-        this.buttonSprite.on('pointerout', this.onPointerOut.bind(this));
+            this.iconSprite.anchor.set(0.5);
+
+            const maxIconSize = Math.min(this.buttonSprite.width, this.buttonSprite.height) * 0.7 * iconScale;
+
+            const scaleRatio = maxIconSize / Math.max(this.iconSprite.width, this.iconSprite.height);
+            this.iconSprite.scale.set(scaleRatio);
+
+            this.addChild(this.iconSprite);
+        }
+
+        this.eventMode = 'static';
+        this.cursor = 'pointer';
+
+        this.on('pointerdown', this.onPointerDown.bind(this));
+        this.on('pointerup', this.onPointerUp.bind(this));
+        this.on('pointerupoutside', this.onPointerUpOutside.bind(this));
+        this.on('pointerover', this.onPointerOver.bind(this));
+        this.on('pointerout', this.onPointerOut.bind(this));
+
+        this.baseScaleX = this.scale.x;
+        this.baseScaleY = this.scale.y;
     }
 
     setVisualPressedState(isPressed){
         if(isPressed) {
-            this.buttonSprite.scale.set(this.baseScaleX * 0.9, this.baseScaleY * 0.9);
+            this.scale.set(this.baseScaleX * 0.9, this.baseScaleY * 0.9);
             this.buttonSprite.tint = 0xAAAAAA;
         }
         else {
-            this.buttonSprite.scale.set(this.baseScaleX, this.baseScaleY);
+            this.scale.set(this.baseScaleX, this.baseScaleY);
             this.buttonSprite.tint = 0xFFFFFF;
         }
     }
@@ -57,10 +70,10 @@ export class BaseButton extends Container {
     }
 
     onPointerOver() {
-        this.buttonSprite.scale.set(this.baseScaleX * 1.2, this.baseScaleY * 1.2);
+        this.scale.set(this.baseScaleX * 1.2, this.baseScaleY * 1.2);
     }
 
     onPointerOut() {
-        this.buttonSprite.scale.set(this.baseScaleX, this.baseScaleY);
+        this.scale.set(this.baseScaleX, this.baseScaleY);
     }
 }
