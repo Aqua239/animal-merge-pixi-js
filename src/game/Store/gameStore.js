@@ -17,7 +17,27 @@ class GameStore{
 
     save(){}
 
-    mergeWithDefault(){}
+    mergeWithDefault(savedData){
+        return{
+            ...structuredClone(DEFAULT_GAME_DATA),
+            ...savedData,
+
+            player: {
+                ...DEFAULT_GAME_DATA.player,
+                ...savedData.player
+            },
+
+            scores: {
+                ...DEFAULT_GAME_DATA.scores,
+                ...savedData.scores,
+            },
+
+            items: {
+                ...DEFAULT_GAME_DATA.items,
+                ...savedData.items,
+            }
+        }
+    }
 
     getData(){}
 
