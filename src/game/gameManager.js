@@ -118,6 +118,7 @@ export class GameManager{
         this.animalPool = [];
         this.physics.circleColliders.length = 0;
         this.score = 0;
+        this.gameScreen.updateCurrentScore(0);
 
         this.topCollisionTime = 0;
         this.isChangeTopCollisionTime = false;
