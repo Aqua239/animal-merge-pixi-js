@@ -3,6 +3,7 @@ import { ANIMAL_LEVEL, GAME_CONFIG, PhysicsConfig } from "../constant";
 import { Animal } from "./entities/animal";
 import { Physics } from "./system/physics";
 import { RemoveItem } from "./entities/items/removeItem";
+import GameOverPopup from "../overlays/gameOverPopup";
 
 export class GameManager{
     constructor({app, gameContainer}){
@@ -24,6 +25,7 @@ export class GameManager{
         this.animalPool = [];
 
         this.physics = new Physics();
+        this.gameOverPopup = null;
         this.physics.box = {
             x: 0,
             y: GAME_CONFIG.CEILING_Y,
@@ -83,6 +85,17 @@ export class GameManager{
         this.isGameRunning = false;
 
         this.removeItem.deactivate();
+
+        this.gameOverPopup = new GameOverPopup({
+            score: this.score,
+            onReplay: () => {this.replayGame()},
+
+            onReturnMainMenu: () => {
+            console.log("Return main menu");
+            },
+        });
+        this.gameContainer.addChild(this.gameOverPopup);
+        this.gameOverPopup.show();
     }
 
     reset(){
@@ -324,7 +337,7 @@ export class GameManager{
     }
 
     checkAnimaltoTop(deltaTime){
-        if(this.physics.handleCollisionsAllCirclesToTop(100)){
+        if(this.physics.handleCollisionsAllCirclesToTop(GAME_CONFIG.CEILING_Y)){
             if(!this.isChangeTopCollisionTime){
                 this.topCollisionTime = deltaTime;
                 this.isChangeTopCollisionTime = true;
