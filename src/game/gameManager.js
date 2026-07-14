@@ -98,11 +98,51 @@ export class GameManager{
         this.gameOverPopup.show();
     }
 
-    reset(){
-        this.score = 0;
-        this.currentAnimal = null;
-        this.nextAnimal = null;
+    reset() {
+        if (this.currentAnimal) {
+            this.currentAnimal.destroy();
+            this.currentAnimal = null;
+        }
+
+        if (this.nextAnimal) {
+            this.nextAnimal.destroy();
+            this.nextAnimal = null;
+        }
+
+        for (const animal of this.animalPool) {
+            if (!animal.destroyed) {
+            animal.destroy();
+            }
+        }
         this.animalPool = [];
+        this.physics.circleColliders.length = 0;
+        this.score = 0;
+
+        this.topCollisionTime = 0;
+        this.isChangeTopCollisionTime = false;
+        this.isSpawner = false;
+        this.isDrop = false;
+
+        this.isGameOver = false;
+        this.isGamePause = false;
+        this.isGameRunning = false;
+
+        this.removeItem.deactivate();
+    }
+
+    replayGame(){
+        if (this.gameOverPopup) {
+            this.gameOverPopup.removeFromParent();
+
+            this.gameOverPopup.destroy({
+                children: true,
+            });
+
+            this.gameOverPopup = null;
+        }
+
+        this.reset();
+        this.start();
     }
 
     update(ticker){
