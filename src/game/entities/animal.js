@@ -92,6 +92,8 @@ export class Animal extends Container{
     setSpriteFollowCollider(){
         this.x = this.collider.x;
         this.y = this.collider.y;
+        this.sprite.rotation = this.collider.angle;
+
     }
 
     checkTwoCircleSameId(otherAnimal){
