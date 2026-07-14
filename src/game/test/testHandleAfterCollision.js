@@ -79,8 +79,6 @@ import { Application, Container, Graphics } from "pixi.js";
     app.ticker.add((time) => {
         let dt = PhysicsConfig.timeStep * time.deltaMS;
 
-
-
         collisionSystem.beginFrame();
 
         // Update all colliders
@@ -94,7 +92,7 @@ import { Application, Container, Graphics } from "pixi.js";
         for (let iter = 0; iter < solverIterations; iter++) {
             // Box
             for (const obj of circles) {
-                collisionSystem.detectAndHandleCollisionCircleToBox(obj.collider, B);
+                obj.collider.checkCollisionCircleToBox(B);
             }
 
             // Ciccle to Circle
@@ -103,7 +101,7 @@ import { Application, Container, Graphics } from "pixi.js";
                     const A = circles[i].collider;
                     const C = circles[j].collider;
 
-                    if (collisionSystem.detectCollisionCircleToCircle(A, C)) {
+                    if (A.checkCollisionWithCircle(C)) {
                         collisionSystem.resolveCollisionCircleToCircleByPush(A, C);
                     }
                 }

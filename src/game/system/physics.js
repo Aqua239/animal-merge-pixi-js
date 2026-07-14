@@ -1,94 +1,125 @@
-import { CircleCollider } from './circleCollider.js';
-import { Collision } from './collision.js';
 import { PhysicsConfig } from "../../constant.js";
-
 export class Physics {
 
     constructor() {
-        this.circleColliders = [];
-        this.box = null; // {x,y,width,height}
-        this.systemCollision = new Collision();
     }
 
-    update(timestep) {
-        this.handleCollisionsAllCircles();
-        this.handleCollisionsAllCirclesToBox(this.box);
-        for (const collider of this.circleColliders) {
-            collider.update(timestep);
-        }
+    //Handle penetration issue between 2 colliders
+    static resolvePenetration(colliderA, colliderB, normal, distance) {
+        const penetration = colliderA.radius + colliderB.radius - distance;
+
+        const invMassA = 1 / colliderA.computeMass();
+        const invMassB = 1 / colliderB.computeMass();
+
+        const correction = penetration / (invMassA + invMassB);
+
+        colliderA.x -= correction * invMassA * normal.x;
+        colliderA.y -= correction * invMassA * normal.y;
+
+        colliderB.x += correction * invMassB * normal.x;
+        colliderB.y += correction * invMassB * normal.y;
     }
 
-    //pipeline
-    // physics.beginFrame();
-    // for --> physics.handleCollisionsCircleToCircle();
-    // for --> physics.handleCollisionsCircleToTop();
-    // physics.endFrame();
-    //
-    beginFrame() {
-        this.systemCollision.beginFrame();
+    //Compute vector
+    static computeNewRadiusByLevel(colliderA, colliderB) {
+        if (colliderA.radius !== colliderB.radius) return;
+        const levelA = colliderA.getLevel();
+        let newradius = ANIMAL_LEVEL[levelA + 1].radius;
+        return newradius;
     }
 
-    endFrame() {
-        this.systemCollision.endFrame();
-    }
+    //compute normal, distance
+    static computeCollisionNormalAndDistance(colliderA, colliderB) {
+        const vCollision = {
+            x: colliderB.x - colliderA.x,
+            y: colliderB.y - colliderA.y,
+        };
 
-    // If diff radius --> pussh --> return void
-    // If same radius --> merge --> return new CircleCollider
-    handleCollisionsCircleToCircle(circleColliderA, circleColliderB) {
-        if (!this.systemCollision.detectCollisionCircleToCircle(circleColliderA, circleColliderB)) return;
+        let distance = Math.sqrt(
+            vCollision.x * vCollision.x + vCollision.y * vCollision.y
+        );
 
-        if (circleColliderA.radius == circleColliderB.radius && circleColliderA.radius < PhysicsConfig.maxRadius) {
-            return this.systemCollision.resolveCollisionCircleToCircleByMerge(circleColliderA, circleColliderB);
+        let vCollisionNorm;
+        //fix divide by 0
+        if (distance === 0) {
+            vCollisionNorm = { x: 1, y: 0 };
+            distance = 1;
         } else {
-            this.systemCollision.resolveCollisionCircleToCircleByPush(circleColliderA, circleColliderB);
-        }
-    }
-
-    //(CircleCollider, y) => boolean, if true --> gameover
-    handleCollisionsCircleToTop(circleCollider, y) {
-        return this.systemCollision.detectCollisionCircleOverTop(circleCollider, y);
-    }
-
-    //(CircleCollider, Box (x,y,width,height)) => void
-    handleCollisionsCircleToBox(circleCollider, Box) {
-        this.systemCollision.detectAndHandleCollisionCircleToBox(circleCollider, Box);
-    }
-
-    //Additional methods
-    handleCollisionsAllCircles() {
-        // for (let i = 0; i < this.circleColliders.length; i++) {
-        //     for (let j = i + 1; j < this.circleColliders.length; j++) {
-        //         const circleColliderA = this.circleColliders[i];
-        //         const circleColliderB = this.circleColliders[j];
-
-        //         if (!this.systemCollision.detectCollisionCircleToCircle(circleColliderA, circleColliderB)) continue;
-
-        //         if (circleColliderA.radius == circleColliderB.radius) {
-        //             let newCircle = this.systemCollision.resolveCollisionCircleToCircleByMerge(circleColliderA, circleColliderB);
-        //             this.circleColliders.splice(j, 1);
-        //             this.circleColliders.splice(i, 1);
-        //             i--;
-        //             j--;
-        //             this.circleColliders.push(newCircle);
-        //         } else {
-        //             this.systemCollision.resolveCollisionCircleToCircleByPush(circleColliderA, circleColliderB);
-        //         }
-        //     }
-        // }
-    }
-
-    handleCollisionsAllCirclesToTop(y) {
-        for (const collider of this.circleColliders) {
-            if(this.handleCollisionsCircleToTop(collider, y)){
-                return true;
+            vCollisionNorm = {
+                x: vCollision.x / distance,
+                y: vCollision.y / distance,
             };
         }
-        return false;
+
+        return { normal: vCollisionNorm, distance: distance };
     }
 
-    handleCollisionsAllCirclesToBox(Box) {
-        for (const collider of this.circleColliders) {
-            this.handleCollisionsCircleToBox(collider, Box);
+    //Compute impluse veclocity
+    static computeImpulseVelocity(colliderA, colliderB, normal) {
+        const invMassA = 1 / colliderA.computeMass();
+        const invMassB = 1 / colliderB.computeMass();
+
+        const rv = this.getRelativeVelocity(colliderA, colliderB);
+
+        const speed = rv.x * normal.x + rv.y * normal.y;
+
+        if (speed > 0) return;
+
+        const j = (-(1 + PhysicsConfig.restitution) * speed) / (invMassA + invMassB);
+
+        const impulse = {
+            x: j * normal.x,
+            y: j * normal.y,
+        };
+
+        return { impulse };
+    }
+
+    //Update vecto vx,vy of collider based on gravity and friction
+    static applyImpulse(colliderA, colliderB, impluse) {
+
+        if (impluse === undefined) return;
+
+        const invMassA = 1 / colliderA.computeMass();
+        const invMassB = 1 / colliderB.computeMass();
+
+        colliderA.vx -= impluse.x * invMassA;
+        colliderA.vy -= impluse.y * invMassA;
+
+        colliderB.vx += impluse.x * invMassB;
+        colliderB.vy += impluse.y * invMassB;
+    }
+
+    static getRelativeVelocity(colliderA, colliderB) {
+        return {
+            x: colliderB.vx - colliderA.vx,
+            y: colliderB.vy - colliderA.vy,
+        };
+    }
+
+    static updateAngularVelocity(colliderA, colliderB, normal) {
+        const tangent = {
+            x: -normal.y,
+            y: normal.x,
+        };
+
+        const tangentSpeed =
+            (colliderB.vx - colliderA.vx) * tangent.x +
+            (colliderB.vy - colliderA.vy) * tangent.y;
+
+        if (Math.abs(tangentSpeed) < PhysicsConfig.spinThreshold) {
+            return;
         }
+
+        const spinDelta = Math.max(
+            -PhysicsConfig.maxAngularVelocity,
+            Math.min(PhysicsConfig.maxAngularVelocity, tangentSpeed * PhysicsConfig.spinFactor)
+        );
+
+        colliderA.angularVelocity = -spinDelta;
+        colliderB.angularVelocity = spinDelta;
+
+        colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
+        colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
     }
 }
