@@ -17,6 +17,20 @@ export class Physics {
         }
     }
 
+    //pipeline
+    // physics.beginFrame();
+    // for --> physics.handleCollisionsCircleToCircle();
+    // for --> physics.handleCollisionsCircleToTop();
+    // physics.endFrame();
+    //
+    beginFrame() {
+        this.systemCollision.beginFrame();
+    }
+
+    endFrame() {
+        this.systemCollision.endFrame();
+    }
+
     // If diff radius --> pussh --> return void
     // If same radius --> merge --> return new CircleCollider
     handleCollisionsCircleToCircle(circleColliderA, circleColliderB) {

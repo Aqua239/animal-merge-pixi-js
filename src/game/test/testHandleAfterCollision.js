@@ -36,9 +36,18 @@ import { Application, Container, Graphics } from "pixi.js";
         collider.vx = vx;
         collider.vy = vy;
 
-        const graphics = new Graphics()
+        const circleView = new Graphics()
             .circle(0, 0, radius)
             .fill({ color, alpha: 0.5 });
+
+        const angleLine = new Graphics()
+            .moveTo(0, 0)
+            .lineTo(radius, 0)
+            .stroke({ width: 3, color: 0xffffff, alpha: 1 });
+
+        const graphics = new Container();
+        graphics.addChild(circleView);
+        graphics.addChild(angleLine);
 
         graphics.position.set(x, y);
 
@@ -71,6 +80,8 @@ import { Application, Container, Graphics } from "pixi.js";
     app.ticker.add((time) => {
         const dt = 0.1 * time.deltaTime;
 
+        collisionSystem.beginFrame();
+
         // Update all colliders
         for (const obj of circles) {
             obj.collider.update(dt);
@@ -82,10 +93,7 @@ import { Application, Container, Graphics } from "pixi.js";
         for (let iter = 0; iter < solverIterations; iter++) {
             // Box
             for (const obj of circles) {
-                collisionSystem.detectAndHandleCollisionCircleToBox(
-                    obj.collider,
-                    B
-                );
+                collisionSystem.detectAndHandleCollisionCircleToBox(obj.collider, B);
             }
 
             // Ciccle to Circle
@@ -101,12 +109,15 @@ import { Application, Container, Graphics } from "pixi.js";
             }
         }
 
+        collisionSystem.endFrame();
+
         // Update graphics position
         for (const obj of circles) {
             obj.graphics.position.set(
                 obj.collider.x,
                 obj.collider.y
             );
+            obj.graphics.rotation = obj.collider.angle;
         }
     });
 })();

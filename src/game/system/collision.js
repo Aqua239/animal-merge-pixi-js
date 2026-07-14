@@ -5,6 +5,22 @@ export class Collision {
 
     constructor() {
         this.restitution = PhysicsConfig.restitution;
+        this.colliderIds = new WeakMap();
+        this.nextColliderId = 1;
+        this.activeContactPairs = new Set();
+        this.seenContactPairs = new Set();
+    }
+
+    beginFrame() {
+        this.seenContactPairs.clear();
+    }
+
+    endFrame() {
+        for (const pairKey of this.activeContactPairs) {
+            if (!this.seenContactPairs.has(pairKey)) {
+                this.activeContactPairs.delete(pairKey);
+            }
+        }
     }
 
     // (CircleCollider, CircleCollider) -> Boolean, has Collision: true
@@ -51,32 +67,27 @@ export class Collision {
 
     // (circleCollider, circleCollider) -> void
     resolveCollisionCircleToCircleByPush(colliderA, colliderB) {
-        const vCollision = {
-            x: colliderB.x - colliderA.x,
-            y: colliderB.y - colliderA.y,
-        };
+        const pairKey = this.getPairKey(colliderA, colliderB);
+        this.seenContactPairs.add(pairKey);
 
-        let distance = Math.sqrt(
-            vCollision.x * vCollision.x + vCollision.y * vCollision.y
-        );
+        const { normal: vCollisionNorm, distance } = this.computeCollisionNormalAndDistance(colliderA, colliderB);
 
-        let vCollisionNorm;
-        //fix divide by 0
-        if (distance === 0) {
-            vCollisionNorm = { x: 1, y: 0 };
-            distance = 1;
-        } else {
-            vCollisionNorm = {
-                x: vCollision.x / distance,
-                y: vCollision.y / distance,
-            };
+        this.resolvePenetration(colliderA, colliderB, vCollisionNorm, distance);
+        const impulseResult = this.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm);
+
+        if (impulseResult === undefined) return;
+
+        const { impulse } = impulseResult;
+
+        this.applyImpulse(colliderA, colliderB, impulse);
+
+        if (!this.activeContactPairs.has(pairKey)) {
+            this.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
+            this.activeContactPairs.add(pairKey);
         }
 
-        //Update positions to resolve penetration
-        this.resolvePenetration(colliderA, colliderB, vCollisionNorm, distance);
-
-        this.updateVelocity(colliderA, colliderB, vCollisionNorm);
     }
+
 
     //Handle collision between 2 colliders by merge
     resolveCollisionCircleToCircleByMerge(colliderA, colliderB) {
@@ -101,10 +112,50 @@ export class Collision {
 
     }
 
+    //compute normal, distance
+    computeCollisionNormalAndDistance(colliderA, colliderB) {
+        const vCollision = {
+            x: colliderB.x - colliderA.x,
+            y: colliderB.y - colliderA.y,
+        };
+
+        let distance = Math.sqrt(
+            vCollision.x * vCollision.x + vCollision.y * vCollision.y
+        );
+
+        let vCollisionNorm;
+        //fix divide by 0
+        if (distance === 0) {
+            vCollisionNorm = { x: 1, y: 0 };
+            distance = 1;
+        } else {
+            vCollisionNorm = {
+                x: vCollision.x / distance,
+                y: vCollision.y / distance,
+            };
+        }
+
+        return { normal: vCollisionNorm, distance: distance };
+    }
+
+    getPairKey(colliderA, colliderB) {
+        const idA = this.getColliderId(colliderA);
+        const idB = this.getColliderId(colliderB);
+
+        return idA < idB ? `${idA}:${idB}` : `${idB}:${idA}`;
+    }
+
+    getColliderId(collider) {
+        if (!this.colliderIds.has(collider)) {
+            this.colliderIds.set(collider, this.nextColliderId++);
+        }
+
+        return this.colliderIds.get(collider);
+    }
+
     //Handle penetration issue between 2 colliders
     resolvePenetration(colliderA, colliderB, normal, distance) {
         const penetration = colliderA.radius + colliderB.radius - distance;
-        if (penetration <= 0) return;
 
         const invMassA = 1 / colliderA.computeMass();
         const invMassB = 1 / colliderB.computeMass();
@@ -118,8 +169,8 @@ export class Collision {
         colliderB.y += correction * invMassB * normal.y;
     }
 
-    //Update vecto vx,vy of collider based on gravity and friction
-    updateVelocity(colliderA, colliderB, normal) {
+    //Compute impluse veclocity
+    computeImpulseVelocity(colliderA, colliderB, normal) {
         const invMassA = 1 / colliderA.computeMass();
         const invMassB = 1 / colliderB.computeMass();
 
@@ -131,11 +182,27 @@ export class Collision {
 
         const j = (-(1 + this.restitution) * speed) / (invMassA + invMassB);
 
-        colliderA.vx -= j * normal.x * invMassA;
-        colliderA.vy -= j * normal.y * invMassA;
+        const impulse = {
+            x: j * normal.x,
+            y: j * normal.y,
+        };
 
-        colliderB.vx += j * normal.x * invMassB;
-        colliderB.vy += j * normal.y * invMassB;
+        return { impulse };
+    }
+
+    //Update vecto vx,vy of collider based on gravity and friction
+    applyImpulse(colliderA, colliderB, impluse) {
+
+        if (impluse === undefined) return;
+
+        const invMassA = 1 / colliderA.computeMass();
+        const invMassB = 1 / colliderB.computeMass();
+
+        colliderA.vx -= impluse.x * invMassA;
+        colliderA.vy -= impluse.y * invMassA;
+
+        colliderB.vx += impluse.x * invMassB;
+        colliderB.vy += impluse.y * invMassB;
     }
 
     getRelativeVelocity(colliderA, colliderB) {
@@ -143,5 +210,31 @@ export class Collision {
             x: colliderB.vx - colliderA.vx,
             y: colliderB.vy - colliderA.vy,
         };
+    }
+
+    updateAngularVelocity(colliderA, colliderB, normal) {
+        const tangent = {
+            x: -normal.y,
+            y: normal.x,
+        };
+
+        const tangentSpeed =
+            (colliderB.vx - colliderA.vx) * tangent.x +
+            (colliderB.vy - colliderA.vy) * tangent.y;
+
+        if (Math.abs(tangentSpeed) < PhysicsConfig.spinThreshold) {
+            return;
+        }
+
+        const spinDelta = Math.max(
+            -PhysicsConfig.maxAngularVelocity,
+            Math.min(PhysicsConfig.maxAngularVelocity, tangentSpeed * PhysicsConfig.spinFactor)
+        );
+
+        colliderA.angularVelocity -= spinDelta;
+        colliderB.angularVelocity += spinDelta;
+
+        colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
+        colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
     }
 }
