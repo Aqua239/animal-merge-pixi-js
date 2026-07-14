@@ -1,6 +1,6 @@
 import { CircleCollider } from './circleCollider.js';
 import { Collision } from './collision.js';
-import { PhysicsConfig } from "../system/physicConfig.js";
+import { PhysicsConfig } from "../../constant.js";
 
 export class Physics {
 
