@@ -36,7 +36,7 @@ export class Collision {
         Physics.resolvePenetration(colliderA, colliderB, vCollisionNorm, distance);
 
         if (!applyFriction) return;
-        // if new collision, apply restitution, else apply rolling friction
+
         const restitution = isNewContact ? PhysicsConfig.restitution : 0;
         const impulseResult = Physics.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm, restitution);
 
@@ -44,16 +44,15 @@ export class Collision {
             Physics.applyImpulse(colliderA, colliderB, impulseResult.impulse);
         }
 
-        if (impulseResult !== undefined && isNewContact) {
-            Physics.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
+        if (isNewContact) {
+            this.activeContactPairs.add(pairKey);
+            if (impulseResult !== undefined) {
+                Physics.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
+            }
         }
 
-        if (isNewContact) {
-            // Physics.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
-            this.activeContactPairs.add(pairKey);
-        } else {
-            Physics.applyRollingFrictionCircleToCircle(colliderA, colliderB, vCollisionNorm);
-        }
+        Physics.applyRollingFrictionCircleToCircle(colliderA, colliderB, vCollisionNorm);
+
     }
 
     //Handle collision between 2 colliders by merge

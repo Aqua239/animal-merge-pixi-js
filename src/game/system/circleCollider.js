@@ -81,18 +81,21 @@ export class CircleCollider extends Collider {
     }
 
     rollingFriction() {
-        let contactVx = this.vx - (this.angularVelocity * this.radius);
-        if (Math.abs(contactVx) > 0.1) {
-            let frictionImpulse = -contactVx * PhysicsConfig.FRICTION;
-            this.vx += frictionImpulse;
-            let spinDelta = -(frictionImpulse / this.radius) * PhysicsConfig.spinFactor * 100;
+        const contactVx = this.vx - this.angularVelocity * this.radius;
+        if (Math.abs(contactVx) < 0.5) return;
 
-            this.angularVelocity += spinDelta;
-            this.angularVelocity = Math.max(
-                -PhysicsConfig.maxAngularVelocity,
-                Math.min(PhysicsConfig.maxAngularVelocity, this.angularVelocity)
-            );
-        }
+        const invMass = 1 / this.computeMass();
+        const invI = 2 * invMass;
+        const effectiveMass = invMass + this.radius * this.radius * invI;
+
+        const frictionImpulse = -contactVx * PhysicsConfig.FRICTION / effectiveMass;
+        this.vx += frictionImpulse * invMass;
+        this.angularVelocity -= frictionImpulse * this.radius * invI;
+
+        this.angularVelocity = Math.max(
+            -PhysicsConfig.maxAngularVelocity,
+            Math.min(PhysicsConfig.maxAngularVelocity, this.angularVelocity)
+        );
     }
     //box(x,y,width,height)
     checkCollisionCircleToBox(box) {

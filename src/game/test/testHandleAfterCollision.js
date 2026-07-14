@@ -16,7 +16,7 @@ import { Application, Container, Graphics } from "pixi.js";
     const B = {
         x: 15,
         y: 15,
-        width: 300,
+        width: 400,
         height: 400,
     };
 

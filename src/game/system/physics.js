@@ -99,32 +99,33 @@ export class Physics {
     static applyRollingFrictionCircleToCircle(colliderA, colliderB, normal) {
         const tangent = { x: -normal.y, y: normal.x };
 
-        const relVx = colliderB.vx - colliderA.vx;
-        const relVy = colliderB.vy - colliderA.vy;
-        const relTangentSpeed = relVx * tangent.x + relVy * tangent.y;
+        const vA_contact = (colliderA.vx * tangent.x + colliderA.vy * tangent.y)
+                         + colliderA.angularVelocity * colliderA.radius;
+        const vB_contact = (colliderB.vx * tangent.x + colliderB.vy * tangent.y)
+                         - colliderB.angularVelocity * colliderB.radius;
 
-        // slip = vận tốc trượt tương đối tại điểm tiếp xúc (có tính cả spin của cả 2)
-        const slip = relTangentSpeed
-            - colliderA.angularVelocity * colliderA.radius
-            - colliderB.angularVelocity * colliderB.radius;
+        const slip = vA_contact - vB_contact;
 
-        if (Math.abs(slip) < 0.1) return;
+        if (Math.abs(slip) < 0.5) return;
 
         const invMassA = 1 / colliderA.computeMass();
         const invMassB = 1 / colliderB.computeMass();
+        const invIA = 2 * invMassA;
+        const invIB = 2 * invMassB;
 
-        const frictionImpulse = slip * PhysicsConfig.FRICTION / (invMassA + invMassB);
+        const effectiveMass = invMassA + invMassB
+                            + colliderA.radius * colliderA.radius * invIA
+                            + colliderB.radius * colliderB.radius * invIB;
+
+        const frictionImpulse = -slip * PhysicsConfig.FRICTION / effectiveMass;
 
         colliderA.vx += frictionImpulse * invMassA * tangent.x;
         colliderA.vy += frictionImpulse * invMassA * tangent.y;
         colliderB.vx -= frictionImpulse * invMassB * tangent.x;
         colliderB.vy -= frictionImpulse * invMassB * tangent.y;
 
-        const spinDeltaA = (frictionImpulse * invMassA / colliderA.radius) * PhysicsConfig.spinFactor * 100;
-        const spinDeltaB = (frictionImpulse * invMassB / colliderB.radius) * PhysicsConfig.spinFactor * 100;
-
-        colliderA.angularVelocity += spinDeltaA;
-        colliderB.angularVelocity += spinDeltaB;
+        colliderA.angularVelocity += frictionImpulse * colliderA.radius * invIA;
+        colliderB.angularVelocity += frictionImpulse * colliderB.radius * invIB;
 
         colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
         colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
@@ -149,7 +150,7 @@ export class Physics {
             Math.min(PhysicsConfig.maxAngularVelocity, tangentSpeed * PhysicsConfig.spinFactor)
         );
 
-        colliderA.angularVelocity -= spinDelta;
+        colliderA.angularVelocity += spinDelta;
         colliderB.angularVelocity += spinDelta;
 
         colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
