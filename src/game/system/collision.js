@@ -1,6 +1,6 @@
 import { CircleCollider } from "../system/circleCollider.js";
 import { PhysicsConfig } from "../system/physicConfig.js";
-
+import { ANIMAL_LEVEL } from "../../constant";
 export class Collision {
 
     constructor() {
@@ -91,7 +91,7 @@ export class Collision {
 
     //Handle collision between 2 colliders by merge
     resolveCollisionCircleToCircleByMerge(colliderA, colliderB) {
-        let newRadius = colliderA.radius + colliderB.radius;
+        let newRadius = this.computeNewRadiusByLevel(colliderA, colliderB);
         let newCircle = new CircleCollider(
             (colliderA.x + colliderB.x) / 2,
             (colliderA.y + colliderB.y) / 2,

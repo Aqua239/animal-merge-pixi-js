@@ -1,5 +1,6 @@
 import { Collider } from "./collider.js";
 import { PhysicsConfig } from "./physicConfig.js";
+import { ANIMAL_LEVEL } from "../../constant";
 
 export class CircleCollider extends Collider {
     constructor(x, y, radius) {
@@ -25,5 +26,14 @@ export class CircleCollider extends Collider {
 
     computeMass() {
         return Math.PI * this.radius * this.radius;
+    }
+
+    getLevel() {
+        for (let level in ANIMAL_LEVEL) {
+            if (ANIMAL_LEVEL[level].radius === this.radius) {
+                return parseInt(level);
+            }
+        }
+        return null;
     }
 }
