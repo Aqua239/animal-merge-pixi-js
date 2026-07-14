@@ -1,7 +1,9 @@
-import { ANIMAL_LEVEL } from "../../constant";
-import { Animal } from "../entities/animal";
-import { PhysicsConfig } from "../system/physicConfig";
-import { Physics } from "./physics";
+import { Texture } from "pixi.js";
+import { ANIMAL_LEVEL } from "../constant";
+import { Animal } from "./entities/animal";
+import { PhysicsConfig } from "./system/physicConfig";
+import { Physics } from "./system/physics";
+import { RemoveItem } from "./entities/items/removeItem";
 
 export class GameManager{
     constructor(app){
@@ -26,6 +28,20 @@ export class GameManager{
 
         this.listenEvent();
         this.start();
+
+        this.removeItem = new RemoveItem({
+            texture: Texture.WHITE,
+            quantity: 1,
+            x: 50,
+            y: 200,
+            width: 50,
+            height: 50,
+            onUse: (item) => {
+                this.setRemoveAnimalMode(item.isActive);
+            },
+        });
+
+        this.app.stage.addChild(this.removeItem);
     }
 
     start(){
@@ -55,6 +71,8 @@ export class GameManager{
         this.isGameOver = true;
         this.isGamePause = false;
         this.isGameRunning = false;
+
+        this.removeItem.deactivate();
     }
 
     reset(){
@@ -131,18 +149,65 @@ export class GameManager{
     listenEvent(){
         this.app.stage.eventMode = "static";
         this.app.stage.hitArea = this.app.screen;
+        const box = this.physics.box;
 
         this.app.stage.on("pointermove", (event) => {
             if(!this.canInteractWithCurrentAnimal()) return;
+            if(this.detectCursorInBox(event, box) && !this.removeItem.isActive){
+                let animalPosition = Math.max(
+                    box.x + this.currentAnimal.radius,
+                    Math.min(event.global.x, box.x + box.width - this.currentAnimal.radius)
+                );
 
-            this.currentAnimal.x = event.global.x;
+                this.currentAnimal.x = animalPosition;
+            }
         });
 
-        this.app.stage.on("pointerdown", () => {
+        this.app.stage.on("pointerdown", (event) => {
             if(!this.canInteractWithCurrentAnimal()) return;
-
-            this.dropAnimal();
+            if(this.detectCursorInBox(event, box) && !this.removeItem.isActive){
+                this.dropAnimal();
+            }
         });
+    }
+
+    detectCursorInBox(event, box){
+        return box.x <= event.global.x &&
+            event.global.x <= box.x + box.width &&
+            box.y <= event.global.y &&
+            event.global.y <= box.y + box.height
+    }
+
+    handleAnimalEvent(animal){
+        animal.eventMode = "static";
+        this.updateAnimalCursor(animal);
+
+        animal.on("pointerdown", (event) => {
+            if(!this.removeItem.isActive) return;
+
+            event.stopPropagation();
+            this.removeAnimalToPhysicState(animal);
+            this.removeAnimalFromPool(animal);
+            animal.destroy();
+            this.removeItem.use();
+        })
+    }
+
+    setRemoveAnimalMode(isActive) {
+        if (this.currentAnimal) {
+            this.currentAnimal.visible =!isActive;
+        }
+
+        for (const animal of this.animalPool) {
+            this.updateAnimalCursor(animal, isActive);
+            console.log(animal.cursor);
+        }
+    }
+
+    updateAnimalCursor(animal, isActive) {
+        animal.cursor = isActive
+            ? "pointer"
+            : "default";
     }
 
     canInteractWithCurrentAnimal(){
@@ -179,7 +244,7 @@ export class GameManager{
 
         this.animalPool.push(this.currentAnimal);
         this.addAnimalToPhysicState(this.currentAnimal);
-
+        this.handleAnimalEvent(this.currentAnimal);
         this.currentAnimal = null;
 
         setTimeout(() => {
@@ -227,12 +292,13 @@ export class GameManager{
         this.app.stage.addChild(mergedAnimal);
         this.animalPool.push(mergedAnimal);
         this.addAnimalToPhysicState(mergedAnimal);
+        this.handleAnimalEvent(mergedAnimal);
         animal1.destroy();
         animal2.destroy();
     }
 
     checkAnimaltoTop(deltaTime){
-        if(this.physics.handleCollisionsAllCirclesToTop(530)){
+        if(this.physics.handleCollisionsAllCirclesToTop(100)){
             if(!this.isChangeTopCollisionTime){
                 this.topCollisionTime = deltaTime;
                 this.isChangeTopCollisionTime = true;
