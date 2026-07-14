@@ -87,26 +87,23 @@ import { Application, Container, Graphics } from "pixi.js";
         }
 
         // Detect and handle collisions
-        const solverIterations = 5;
+        // Box
+        for (const obj of circles) {
+            obj.collider.checkCollisionCircleToBox(B);
+        }
 
-        for (let iter = 0; iter < solverIterations; iter++) {
-            // Box
-            for (const obj of circles) {
-                obj.collider.checkCollisionCircleToBox(B);
-            }
+        // Ciccle to Circle
+        for (let i = 0; i < circles.length; i++) {
+            for (let j = i + 1; j < circles.length; j++) {
+                const A = circles[i].collider;
+                const C = circles[j].collider;
 
-            // Ciccle to Circle
-            for (let i = 0; i < circles.length; i++) {
-                for (let j = i + 1; j < circles.length; j++) {
-                    const A = circles[i].collider;
-                    const C = circles[j].collider;
-
-                    if (A.checkCollisionWithCircle(C)) {
-                        collisionSystem.resolveCollisionCircleToCircleByPush(A, C);
-                    }
+                if (A.checkCollisionWithCircle(C)) {
+                    collisionSystem.resolveCollisionCircleToCircleByPush(A, C, true);
                 }
             }
         }
+
 
         collisionSystem.endFrame();
         // Update graphics position
@@ -116,6 +113,7 @@ import { Application, Container, Graphics } from "pixi.js";
                 obj.collider.y
             );
             obj.graphics.rotation = obj.collider.angle;
+            console.log("vx = ", obj.collider.vx, "vy = ", obj.collider.vy, "angularVelocity = ", obj.collider.angularVelocity);
         }
     });
 })();

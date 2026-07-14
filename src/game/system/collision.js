@@ -25,24 +25,34 @@ export class Collision {
     }
 
     // (circleCollider, circleCollider) -> void
-    resolveCollisionCircleToCircleByPush(colliderA, colliderB) {
+    resolveCollisionCircleToCircleByPush(colliderA, colliderB, applyFriction = true) {
         const pairKey = this.getPairKey(colliderA, colliderB);
         this.seenContactPairs.add(pairKey);
+
+        const isNewContact = !this.activeContactPairs.has(pairKey);
 
         const { normal: vCollisionNorm, distance } = Physics.computeCollisionNormalAndDistance(colliderA, colliderB);
 
         Physics.resolvePenetration(colliderA, colliderB, vCollisionNorm, distance);
-        const impulseResult = Physics.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm);
 
-        if (impulseResult === undefined) return;
+        if (!applyFriction) return;
+        // if new collision, apply restitution, else apply rolling friction
+        const restitution = isNewContact ? PhysicsConfig.restitution : 0;
+        const impulseResult = Physics.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm, restitution);
 
-        const { impulse } = impulseResult;
+        if (impulseResult !== undefined) {
+            Physics.applyImpulse(colliderA, colliderB, impulseResult.impulse);
+        }
 
-        Physics.applyImpulse(colliderA, colliderB, impulse);
-
-        if (!this.activeContactPairs.has(pairKey)) {
+        if (impulseResult !== undefined && isNewContact) {
             Physics.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
+        }
+
+        if (isNewContact) {
+            // Physics.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
             this.activeContactPairs.add(pairKey);
+        } else {
+            Physics.applyRollingFrictionCircleToCircle(colliderA, colliderB, vCollisionNorm);
         }
     }
 

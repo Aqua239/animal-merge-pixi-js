@@ -107,13 +107,13 @@ const PixelPerMeter = 100; // 1 meter = 100 pixels
 export const PhysicsConfig = {
     initialVelocityX: 0,
     initialVelocityY: 100,
-    linearDamping: 0.2,
-    stopVthreshold: 8,
+    linearDamping: 0.3,
+    stopVthreshold: 0.5,
     gravity: 9.81 * PixelPerMeter,
     restitution: 0.5,
 
-    angularDamping: 2,
-    angularStopThreshold: 1.5,
+    angularDamping: 0.3,
+    angularStopThreshold: 2,
 
     spinThreshold: 0.18,
     spinFactor: 0.1,

@@ -55,17 +55,16 @@ export class Physics {
     }
 
     //Compute impluse veclocity
-    static computeImpulseVelocity(colliderA, colliderB, normal) {
+    static computeImpulseVelocity(colliderA, colliderB, normal, restitution = PhysicsConfig.restitution) {
         const invMassA = 1 / colliderA.computeMass();
         const invMassB = 1 / colliderB.computeMass();
 
         const rv = this.getRelativeVelocity(colliderA, colliderB);
-
         const speed = rv.x * normal.x + rv.y * normal.y;
 
         if (speed > 0) return;
 
-        const j = (-(1 + PhysicsConfig.restitution) * speed) / (invMassA + invMassB);
+        const j = (-(1 + restitution) * speed) / (invMassA + invMassB);
 
         const impulse = {
             x: j * normal.x,
@@ -97,6 +96,40 @@ export class Physics {
         };
     }
 
+    static applyRollingFrictionCircleToCircle(colliderA, colliderB, normal) {
+        const tangent = { x: -normal.y, y: normal.x };
+
+        const relVx = colliderB.vx - colliderA.vx;
+        const relVy = colliderB.vy - colliderA.vy;
+        const relTangentSpeed = relVx * tangent.x + relVy * tangent.y;
+
+        // slip = vận tốc trượt tương đối tại điểm tiếp xúc (có tính cả spin của cả 2)
+        const slip = relTangentSpeed
+            - colliderA.angularVelocity * colliderA.radius
+            - colliderB.angularVelocity * colliderB.radius;
+
+        if (Math.abs(slip) < 0.1) return;
+
+        const invMassA = 1 / colliderA.computeMass();
+        const invMassB = 1 / colliderB.computeMass();
+
+        const frictionImpulse = slip * PhysicsConfig.FRICTION / (invMassA + invMassB);
+
+        colliderA.vx += frictionImpulse * invMassA * tangent.x;
+        colliderA.vy += frictionImpulse * invMassA * tangent.y;
+        colliderB.vx -= frictionImpulse * invMassB * tangent.x;
+        colliderB.vy -= frictionImpulse * invMassB * tangent.y;
+
+        const spinDeltaA = (frictionImpulse * invMassA / colliderA.radius) * PhysicsConfig.spinFactor * 100;
+        const spinDeltaB = (frictionImpulse * invMassB / colliderB.radius) * PhysicsConfig.spinFactor * 100;
+
+        colliderA.angularVelocity += spinDeltaA;
+        colliderB.angularVelocity += spinDeltaB;
+
+        colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
+        colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
+    }
+
     static updateAngularVelocity(colliderA, colliderB, normal) {
         const tangent = {
             x: -normal.y,
@@ -116,8 +149,8 @@ export class Physics {
             Math.min(PhysicsConfig.maxAngularVelocity, tangentSpeed * PhysicsConfig.spinFactor)
         );
 
-        colliderA.angularVelocity = -spinDelta;
-        colliderB.angularVelocity = spinDelta;
+        colliderA.angularVelocity -= spinDelta;
+        colliderB.angularVelocity += spinDelta;
 
         colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
         colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
