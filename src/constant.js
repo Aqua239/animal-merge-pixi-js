@@ -108,7 +108,7 @@ export const PhysicsConfig = {
     initialVelocityX: 0,
     initialVelocityY: 100,
     linearDamping: 0.2,
-    stopVthreshold: 8,
+    stopVthreshold: 5,
     gravity: 9.81 * PixelPerMeter,
     restitution: 0.5,
 
