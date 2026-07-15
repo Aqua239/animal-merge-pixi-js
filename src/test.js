@@ -3,10 +3,11 @@ import { GAME_CONFIG } from "./constant";
 import LoadingScreen from "./screens/loadingScreen";
 import GameScreen from "./screens/gameScreen";
 import { loadGameAssets } from "./assetLoader";
-//import { sound } from "@pixi/sound";
+import { sound } from "@pixi/sound";
 //import BasePopup from "./overlays/basePopup";
 import GameOverPopup from "./overlays/gameOverPopup";
 import { GameManager } from "./game/gameManager";
+import MainMenuScreen from "./screens/mainMenuScreen";
 
 async function runTest() {
     const app = new Application();
@@ -57,11 +58,21 @@ async function runTest() {
 
     const gameScreen = new GameScreen();
     masterContainer.addChild(gameScreen.container);
-
-    const gameOverPopup = new GameOverPopup({
-        score: 100
+    const mainMenuScreen = new MainMenuScreen({
+        onPlay: () => {
+            mainMenuScreen.hide();
+            gameScreen.show();
+            const game = new GameManager({
+                app,
+                gameContainer: gameScreen.container,
+                gameScreen: gameScreen
+            });
+            console.log("Pixi App đã khởi tạo:", app);
+            window.gameTest = game;
+        }
     });
-    masterContainer.addChild(gameOverPopup);
+    mainMenuScreen.show();
+    masterContainer.addChild(mainMenuScreen.container);
 
     // window.addEventListener("keydown", (event) => {
     //     if (event.code === "Space") {
@@ -71,16 +82,6 @@ async function runTest() {
     //         // Ví dụ: gameScreen.pause();
     //     }
     // });
-
-
-    gameScreen.show();
-    const game = new GameManager({
-        app,
-        gameContainer: gameScreen.container,
-        gameScreen: gameScreen
-    });
-    console.log("Pixi App đã khởi tạo:", app);
-    window.gameTest = game;
 }
 
 runTest();
