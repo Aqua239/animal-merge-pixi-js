@@ -26,7 +26,7 @@ export class InputSystem {
 
             if(
                 this.detectCursorInBox(pointerPosition, box) &&
-                !this.gameManager.removeItem.isActive
+                !this.gameManager.removeItemController.isActive
             ){
                 let animalPosition = Math.max(
                     box.x + this.gameManager.currentAnimal.radius,
@@ -46,7 +46,7 @@ export class InputSystem {
             const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
             if(
                 this.detectCursorInBox(pointerPosition, box) &&
-                !this.gameManager.removeItem.isActive
+                !this.gameManager.removeItemController.isActive
             ){
                 this.dropAnimal();
             }
@@ -78,7 +78,7 @@ export class InputSystem {
 
         this.gameManager.animalPool.push(this.gameManager.currentAnimal);
         this.gameManager.addAnimalToPhysicState(this.gameManager.currentAnimal);
-        this.gameManager.handleAnimalEvent(this.gameManager.currentAnimal);
+        this.gameManager.removeItemController.handleAnimalEvent(this.gameManager.currentAnimal);
         this.gameManager.currentAnimal = null;
 
         setTimeout(() => {

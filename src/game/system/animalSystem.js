@@ -99,7 +99,7 @@ export class AnimalSystem {
         this.gameManager.gameContainer.addChild(mergedAnimal);
         this.gameManager.animalPool.push(mergedAnimal);
         this.gameManager.addAnimalToPhysicState(mergedAnimal);
-        this.gameManager.handleAnimalEvent(mergedAnimal);
+        this.gameManager.removeItemController.handleAnimalEvent(mergedAnimal);
         animal1.destroy();
         animal2.destroy();
     }

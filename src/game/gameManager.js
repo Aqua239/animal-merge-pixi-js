@@ -1,11 +1,9 @@
-import { Texture } from "pixi.js";
-import { ANIMAL_LEVEL, GAME_CONFIG, PhysicsConfig } from "../constant";
-import { Animal } from "./entities/animal";
+import { GAME_CONFIG, PhysicsConfig } from "../constant";
 import { Physics } from "./system/physics";
-import { RemoveItem } from "./entities/items/removeItem";
 import GameOverPopup from "../overlays/gameOverPopup";
 import { InputSystem } from "./system/inputSystem";
 import { AnimalSystem } from "./system/animalSystem";
+import { RemoveItemController } from "./controller/removeItemController";
 
 export class GameManager{
     constructor({app, gameContainer, gameScreen}){
@@ -38,22 +36,9 @@ export class GameManager{
 
         this.animalSystem = new AnimalSystem(this);
         this.inputSystem = new InputSystem(this);
+        this.removeItemController = new RemoveItemController(this);
         this.inputSystem.listenEvent();
         this.start();
-
-        this.removeItem = new RemoveItem({
-            texture: Texture.WHITE,
-            quantity: 1,
-            x: 50,
-            y: 200,
-            width: 50,
-            height: 50,
-            onUse: (item) => {
-                this.setRemoveAnimalMode(item.isActive);
-            },
-        });
-
-        this.gameContainer.addChild(this.removeItem);
     }
 
     start(){
@@ -171,37 +156,6 @@ export class GameManager{
         for(let animal of this.animalPool){
             animal.setSpriteFollowCollider();
         }
-    }
-
-    handleAnimalEvent(animal){
-        animal.eventMode = "static";
-        this.updateAnimalCursor(animal);
-
-        animal.on("pointerdown", (event) => {
-            if(!this.removeItem.isActive) return;
-
-            event.stopPropagation();
-            this.removeAnimalToPhysicState(animal);
-            this.removeAnimalFromPool(animal);
-            animal.destroy();
-            this.removeItem.use();
-        })
-    }
-
-    setRemoveAnimalMode(isActive) {
-        if (this.currentAnimal) {
-            this.currentAnimal.visible =!isActive;
-        }
-
-        for (const animal of this.animalPool) {
-            this.updateAnimalCursor(animal, isActive);
-        }
-    }
-
-    updateAnimalCursor(animal, isActive) {
-        animal.cursor = isActive
-            ? "pointer"
-            : "default";
     }
 
     addAnimalToPhysicState(animal){
