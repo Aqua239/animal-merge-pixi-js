@@ -8,7 +8,7 @@ export class IconButton extends BaseButton {
         super({...baseConfig, content: iconSprite});
 
         if (this.buttonSprite.width && this.buttonSprite.height) {
-            const maxIconSize = Math.min(this.buttonSprite.width, this.buttonSprite.height) * 0.7 . iconScale;
+            const maxIconSize = Math.min(this.buttonSprite.width, this.buttonSprite.height) * 0.7 * iconScale;
             const scaleRatio = maxIconSize / Math.max(iconSprite.width, iconSprite.height);
 
             iconSprite.scale.set(scaleRatio);
