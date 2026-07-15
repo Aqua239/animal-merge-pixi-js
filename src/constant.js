@@ -109,20 +109,18 @@ export const PhysicsConfig = {
     initialVelocityY: 100,
 
     // --- Linear motion ---
-    gravity: 9.81 * PixelPerMeter,
-    linearDamping: 0.8,     // velocity decay per second: vx *= exp(-damping * dt)
-    stopVthreshold: 2,      // zero out velocity below this threshold
-    restitution: 0.3,       // bounciness (0 = no bounce, 1 = full bounce)
+    gravity: 20 * PixelPerMeter,
+    linearDamping: 0.6,     // velocity decay per second: vx *= exp(-damping * dt)
+    stopVthreshold: 1,      // zero out velocity below this threshold
+    restitution: 0.5,       // bounciness (0 = no bounce, 1 = full bounce)
 
     // --- Rotation ---
-    angularDamping: 5.0,         // angular velocity decay per second
-    angularStopThreshold: 1.0,   // zero out angular velocity below this threshold
+    angularDamping: 4.0,         // angular velocity decay per second
+    angularStopThreshold: 0.3,   // zero out angular velocity below this threshold
     maxAngularVelocity: 5,       // max spin speed (rad/s)
 
     // --- Friction & Spin ---
-    spinThreshold: 5,       // min tangential speed to apply spin on first contact
-    spinFactor: 0.05,       // fraction of tangential speed transferred to angular velocity
-    FRICTION: 0.3,          // rolling friction coefficient (slip reduction per step)
+    FRICTION: 0.15,          // tangential friction coefficient for circle-circle contact
 
     timeStep: 1 / 1000,
     maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,

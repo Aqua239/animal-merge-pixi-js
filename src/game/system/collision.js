@@ -40,19 +40,20 @@ export class Collision {
         const restitution = isNewContact ? PhysicsConfig.restitution : 0;
         const impulseResult = Physics.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm, restitution);
 
+        let normalImpulse = 0;
         if (impulseResult !== undefined) {
             Physics.applyImpulse(colliderA, colliderB, impulseResult.impulse);
+            normalImpulse = Math.sqrt(
+                impulseResult.impulse.x * impulseResult.impulse.x +
+                impulseResult.impulse.y * impulseResult.impulse.y
+            );
         }
 
         if (isNewContact) {
             this.activeContactPairs.add(pairKey);
-            if (impulseResult !== undefined) {
-                Physics.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
-            }
         }
 
-        Physics.applyRollingFrictionCircleToCircle(colliderA, colliderB, vCollisionNorm);
-
+        Physics.applyRollingFrictionCircleToCircle(colliderA, colliderB, vCollisionNorm, normalImpulse);
     }
 
     //Handle collision between 2 colliders by merge

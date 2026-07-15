@@ -104,7 +104,7 @@ export class Physics {
         };
     }
 
-    static applyRollingFrictionCircleToCircle(colliderA, colliderB, normal) {
+    static applyRollingFrictionCircleToCircle(colliderA, colliderB, normal, normalImpulse = 0) {
         const tangent = { x: -normal.y, y: normal.x };
 
         const vA_contact = (colliderA.vx * tangent.x + colliderA.vy * tangent.y)
@@ -118,22 +118,31 @@ export class Physics {
 
         const invMassA = 1 / colliderA.computeMass();
         const invMassB = 1 / colliderB.computeMass();
-        const invIA = 2 * invMassA;
-        const invIB = 2 * invMassB;
+        // solid disk: I = ½mr²  →  r·invI = 2·invMass/r
+        const invIA = 2 * invMassA / colliderA.radius;
+        const invIB = 2 * invMassB / colliderB.radius;
 
+        // effectiveMass = 3*(invMassA + invMassB)
         const effectiveMass = invMassA + invMassB
-            + colliderA.radius * colliderA.radius * invIA
-            + colliderB.radius * colliderB.radius * invIB;
+            + colliderA.radius * invIA
+            + colliderB.radius * invIB;
 
-        const frictionImpulse = -slip * PhysicsConfig.FRICTION / effectiveMass;
+        // Impulse to fully resolve slip
+        let frictionImpulse = -slip / effectiveMass;
+
+        // Coulomb friction limit: |frictionImpulse| <= μ * normalImpulse
+        const maxFriction = PhysicsConfig.FRICTION * normalImpulse;
+        if (Math.abs(frictionImpulse) > maxFriction) {
+            frictionImpulse = Math.sign(frictionImpulse) * maxFriction;
+        }
 
         colliderA.vx += frictionImpulse * invMassA * tangent.x;
         colliderA.vy += frictionImpulse * invMassA * tangent.y;
         colliderB.vx -= frictionImpulse * invMassB * tangent.x;
         colliderB.vy -= frictionImpulse * invMassB * tangent.y;
 
-        colliderA.angularVelocity += frictionImpulse * colliderA.radius * invIA;
-        colliderB.angularVelocity += frictionImpulse * colliderB.radius * invIB;
+        colliderA.angularVelocity += frictionImpulse * invIA;
+        colliderB.angularVelocity += frictionImpulse * invIB;
 
         colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
         colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));

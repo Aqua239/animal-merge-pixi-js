@@ -5,25 +5,27 @@ export class CircleCollider extends Collider {
     constructor(x, y, radius) {
         super(x, y);
         this.radius = radius;
-        this.angle = 0;     //rad
-        this.angularVelocity = 0;      //rad/s
+        this.angle = 0;           // rad
+        this.angularVelocity = 0; // rad/s — only meaningful while on floor
     }
 
     update(timestep) {
-        const g = PhysicsConfig.gravity;
-        this.vy += g * timestep;
+        // If both velocities are below the threshold, the object is at rest.
+        if (Math.abs(this.vx) < PhysicsConfig.stopVthreshold && Math.abs(this.vy) < PhysicsConfig.stopVthreshold) {
+            this.vx = 0;
+            this.vy = 0;
+            this.angularVelocity = 0;
+        }
+
+        // Gravity + linear damping
+        this.vy += PhysicsConfig.gravity * timestep;
         this.vx *= Math.exp(-PhysicsConfig.linearDamping * timestep);
 
-        if (Math.abs(this.vx) < PhysicsConfig.stopVthreshold) {
-            this.vx = 0;
-        }
+        if (Math.abs(this.vx) < PhysicsConfig.stopVthreshold) this.vx = 0;
+        if (Math.abs(this.vy) < PhysicsConfig.stopVthreshold) this.vy = 0;
 
-        if (Math.abs(this.vy) < PhysicsConfig.stopVthreshold) {
-            this.vy = 0;
-        }
-
+        // Mid-air spin decay (no floor contact)
         this.angularVelocity *= Math.exp(-PhysicsConfig.angularDamping * timestep);
-
         if (Math.abs(this.angularVelocity) < PhysicsConfig.angularStopThreshold) {
             this.angularVelocity = 0;
         }
@@ -45,69 +47,47 @@ export class CircleCollider extends Collider {
         return null;
     }
 
-    // (CircleCollider, CircleCollider) -> Boolean, has Collision: true
+    // (CircleCollider, CircleCollider) -> Boolean
     checkCollisionWithCircle(colliderOther) {
-        let dx = this.x - colliderOther.x;
-        let dy = this.y - colliderOther.y;
-        let distance = dx * dx + dy * dy;
-        let radiusSum = this.radius + colliderOther.radius;
-        return distance <= radiusSum * radiusSum;
+        const dx = this.x - colliderOther.x;
+        const dy = this.y - colliderOther.y;
+        const radiusSum = this.radius + colliderOther.radius;
+        return dx * dx + dy * dy < radiusSum * radiusSum;
     }
 
     checkCollisionCircleOnLeftRight(x, width) {
-        if (this.x - this.radius <= x) {
+        if (this.x - this.radius < x) {
             this.vx = Math.abs(this.vx) * PhysicsConfig.restitution;
             this.x = x + this.radius;
         }
-        if (this.x + this.radius >= x + width) {
+        if (this.x + this.radius > x + width) {
             this.vx = -Math.abs(this.vx) * PhysicsConfig.restitution;
             this.x = x + width - this.radius;
         }
     }
 
     checkCollisionCircleInBottom(y, height) {
-        if (this.y + this.radius >= y + height) {
+        if (this.y + this.radius > y + height) {
             this.vy = -Math.abs(this.vy) * PhysicsConfig.restitution;
             this.y = y + height - this.radius;
 
-            if (Math.abs(this.vy) < PhysicsConfig.stopVthreshold) {
-                this.vy = 0;
-            }
+            if (Math.abs(this.vy) < PhysicsConfig.stopVthreshold) this.vy = 0;
 
-            // rolling friction
-            this.rollingFriction();
-            // console.log("rolling friction: vx = ", this.vx, "angularVelocity = ", this.angularVelocity);
+            if (Math.abs(this.vx) < PhysicsConfig.stopVthreshold) {
+                this.vx = 0;
+                this.angularVelocity = 0;
+            } else {
+                this.angularVelocity = this.vx / this.radius;
+            }
         }
     }
 
-    rollingFriction() {
-        const contactVx = this.vx - this.angularVelocity * this.radius;
-        if (Math.abs(contactVx) < 0.5) return;
-
-        const invMass = 1 / this.computeMass();
-        const invI = 2 * invMass;
-        const effectiveMass = invMass + this.radius * this.radius * invI;
-
-        const frictionImpulse = -contactVx * PhysicsConfig.FRICTION / effectiveMass;
-        this.vx += frictionImpulse * invMass;
-        this.angularVelocity -= frictionImpulse * this.radius * invI;
-
-        this.angularVelocity = Math.max(
-            -PhysicsConfig.maxAngularVelocity,
-            Math.min(PhysicsConfig.maxAngularVelocity, this.angularVelocity)
-        );
-    }
-    //box(x,y,width,height)
     checkCollisionCircleToBox(box) {
         this.checkCollisionCircleOnLeftRight(box.x, box.width);
         this.checkCollisionCircleInBottom(box.y, box.height);
     }
 
-    //Check collision of circle with top to gameover
     checkCollisionCircleOverTop(y) {
-        if (this.y - this.radius <= y) {
-            return true;
-        }
-        return false;
+        return this.y - this.radius <= y;
     }
 }
