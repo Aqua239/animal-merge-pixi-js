@@ -115,8 +115,8 @@ export const PhysicsConfig = {
     restitution: 0.3,       // bounciness (0 = no bounce, 1 = full bounce)
 
     // --- Rotation ---
-    angularDamping: 1.5,         // angular velocity decay per second
-    angularStopThreshold: 0.3,   // zero out angular velocity below this threshold
+    angularDamping: 5.0,         // angular velocity decay per second
+    angularStopThreshold: 1.0,   // zero out angular velocity below this threshold
     maxAngularVelocity: 5,       // max spin speed (rad/s)
 
     // --- Friction & Spin ---

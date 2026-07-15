@@ -86,24 +86,27 @@ import { Application, Container, Graphics } from "pixi.js";
             obj.collider.update(dt);
         }
 
-        // Detect and handle collisions
-        // Box
-        for (const obj of circles) {
-            obj.collider.checkCollisionCircleToBox(B);
-        }
+        const maxloop = 10;
+        for (let i = 0; i < maxloop; i++) {
+            // Detect and handle collisions
+            // Box
+            for (const obj of circles) {
+                obj.collider.checkCollisionCircleToBox(B);
+            }
 
-        // Ciccle to Circle
-        for (let i = 0; i < circles.length; i++) {
-            for (let j = i + 1; j < circles.length; j++) {
-                const A = circles[i].collider;
-                const C = circles[j].collider;
+            // Ciccle to Circle
+            for (let i = 0; i < circles.length; i++) {
+                for (let j = i + 1; j < circles.length; j++) {
+                    const A = circles[i].collider;
+                    const C = circles[j].collider;
 
-                if (A.checkCollisionWithCircle(C)) {
-                    collisionSystem.resolveCollisionCircleToCircleByPush(A, C, true);
+                    if (A.checkCollisionWithCircle(C)) {
+                        collisionSystem.resolveCollisionCircleToCircleByPush(A, C, true);
+                    }
                 }
             }
-        }
 
+        }
 
         collisionSystem.endFrame();
         // Update graphics position

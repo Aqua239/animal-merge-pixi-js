@@ -20,6 +20,14 @@ export class Physics {
         colliderB.y += correction * invMassB * normal.y;
     }
 
+    // static resolvePenetration(colliderA, colliderB, normal, distance) {
+    //     const penetration = colliderA.radius + colliderB.radius - distance;
+
+    //     if (penetration <= 0) return;
+    //     colliderA.x -= penetration * normal.x;
+    //     colliderA.y -= penetration * normal.y;
+    // }
+
     //Compute vector
     static computeNewRadiusByLevel(colliderA, colliderB) {
         if (colliderA.radius !== colliderB.radius) return;
@@ -100,9 +108,9 @@ export class Physics {
         const tangent = { x: -normal.y, y: normal.x };
 
         const vA_contact = (colliderA.vx * tangent.x + colliderA.vy * tangent.y)
-                         + colliderA.angularVelocity * colliderA.radius;
+            + colliderA.angularVelocity * colliderA.radius;
         const vB_contact = (colliderB.vx * tangent.x + colliderB.vy * tangent.y)
-                         - colliderB.angularVelocity * colliderB.radius;
+            - colliderB.angularVelocity * colliderB.radius;
 
         const slip = vA_contact - vB_contact;
 
@@ -114,8 +122,8 @@ export class Physics {
         const invIB = 2 * invMassB;
 
         const effectiveMass = invMassA + invMassB
-                            + colliderA.radius * colliderA.radius * invIA
-                            + colliderB.radius * colliderB.radius * invIB;
+            + colliderA.radius * colliderA.radius * invIA
+            + colliderB.radius * colliderB.radius * invIB;
 
         const frictionImpulse = -slip * PhysicsConfig.FRICTION / effectiveMass;
 
