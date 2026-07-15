@@ -1,4 +1,5 @@
 import { Collision } from "../system/collision.js";
+import { PhysicsConfig, ANIMAL_LEVEL } from "../../constant.js";
 
 export class World {
     /**
@@ -67,7 +68,11 @@ export class World {
                 if (toRemove.has(animalB)) continue;
 
                 if (animalA.collider.checkCollisionWithCircle(animalB.collider)) {
-                    if (animalA.level === animalB.level) {
+
+                    const keys = Object.keys(ANIMAL_LEVEL);
+                    const maxLevel = Math.max(...keys);
+
+                    if (animalA.level === animalB.level && animalA.level < maxLevel) {
                         const newCollider = this.collisionSystem.resolveCollisionCircleToCircleByMerge(animalA.collider, animalB.collider);
                         let newAnimal = null;
                         if (this.onMerge) {
