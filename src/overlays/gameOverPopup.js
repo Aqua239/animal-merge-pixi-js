@@ -21,23 +21,23 @@ export default class GameOverPopup extends BasePopup {
         scoreText.y = -100;
 
         const replayButton = new BaseButton({
-            textureName: "base_button",
+            textureName: "button_base",
             x: -250,
             y: 250,
             width: 300,
             height: 300,
             onClick: onReplay,
-            iconName: 'replay_icon'
+            iconName: 'icon_return'
         });
 
         const returnMainMenuButton = new BaseButton({
-            textureName: "base_button",
+            textureName: "button_base",
             x: 250,
             y: 250,
             width: 300,
             height: 300,
             onClick: onReturnMainMenu,
-            iconName: 'main_menu_icon'
+            iconName: 'icon_home'
         });
 
         this.boardSprite.addChild(titleText, scoreText, replayButton, returnMainMenuButton);
