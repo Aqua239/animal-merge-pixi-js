@@ -1,9 +1,9 @@
 import { GAME_CONFIG, PhysicsConfig } from "../constant";
 import { Physics } from "./system/physics";
-import GameOverPopup from "../overlays/gameOverPopup";
 import { InputSystem } from "./system/inputSystem";
 import { AnimalSystem } from "./system/animalSystem";
 import { RemoveItemController } from "./controller/removeItemController";
+import { GameOverController } from "./controller/gameOverController";
 
 export class GameManager{
     constructor({app, gameContainer, gameScreen}){
@@ -26,7 +26,6 @@ export class GameManager{
         this.animalPool = [];
 
         this.physics = new Physics();
-        this.gameOverPopup = null;
         this.physics.box = {
             x: 0,
             y: GAME_CONFIG.CEILING_Y,
@@ -37,6 +36,7 @@ export class GameManager{
         this.animalSystem = new AnimalSystem(this);
         this.inputSystem = new InputSystem(this);
         this.removeItemController = new RemoveItemController(this);
+        this.gameOverController = new GameOverController(this);
         this.inputSystem.listenEvent();
         this.start();
     }
@@ -68,26 +68,6 @@ export class GameManager{
         this.isGamePause = false;
     }
 
-    gameover(){
-        if(this.isGameOver) return;
-        this.isGameOver = true;
-        this.isGamePause = false;
-        this.isGameRunning = false;
-
-        this.removeItem.deactivate();
-
-        this.gameOverPopup = new GameOverPopup({
-            score: this.score,
-            onReplay: () => {this.replayGame()},
-
-            onReturnMainMenu: () => {
-            console.log("Return main menu");
-            },
-        });
-        this.gameContainer.addChild(this.gameOverPopup);
-        this.gameOverPopup.show();
-    }
-
     reset() {
         if (this.currentAnimal) {
             this.currentAnimal.destroy();
@@ -117,22 +97,7 @@ export class GameManager{
         this.isGamePause = false;
         this.isGameRunning = false;
 
-        this.removeItem.deactivate();
-    }
-
-    replayGame(){
-        if (this.gameOverPopup) {
-            this.gameOverPopup.removeFromParent();
-
-            this.gameOverPopup.destroy({
-                children: true,
-            });
-
-            this.gameOverPopup = null;
-        }
-
-        this.reset();
-        this.start();
+        this.removeItemController.removeItem.deactivate();
     }
 
     update(ticker){
@@ -151,7 +116,7 @@ export class GameManager{
             }
         }
 
-        this.checkAnimalToTop(ticker.lastTime);
+        this.gameOverController.checkAnimalToTop(ticker.lastTime);
 
         for(let animal of this.animalPool){
             animal.setSpriteFollowCollider();
@@ -173,21 +138,5 @@ export class GameManager{
     removeAnimalFromPool(animal){
         let indexAnimal = this.animalPool.indexOf(animal);
         this.animalPool.splice(indexAnimal, 1);
-    }
-
-    checkAnimalToTop(deltaTime){
-        if(this.physics.handleCollisionsAllCirclesToTop(GAME_CONFIG.CEILING_Y)){
-            if(!this.isChangeTopCollisionTime){
-                this.topCollisionTime = deltaTime;
-                this.isChangeTopCollisionTime = true;
-            }else{
-                if(deltaTime - this.topCollisionTime >= 5000){
-                    this.gameover();
-                }
-            }
-        }else{
-            this.topCollisionTime = 0;
-            this.isChangeTopCollisionTime = false;
-        }
     }
 }

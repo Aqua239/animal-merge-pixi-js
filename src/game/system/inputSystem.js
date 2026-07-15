@@ -26,7 +26,7 @@ export class InputSystem {
 
             if(
                 this.detectCursorInBox(pointerPosition, box) &&
-                !this.gameManager.removeItemController.isActive
+                !this.gameManager.removeItemController.removeItem.isActive
             ){
                 let animalPosition = Math.max(
                     box.x + this.gameManager.currentAnimal.radius,
@@ -46,7 +46,7 @@ export class InputSystem {
             const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
             if(
                 this.detectCursorInBox(pointerPosition, box) &&
-                !this.gameManager.removeItemController.isActive
+                !this.gameManager.removeItemController.removeItem.isActive
             ){
                 this.dropAnimal();
             }
