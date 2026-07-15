@@ -1,4 +1,4 @@
-import { PhysicsConfig } from "../../constant.js";
+import { PhysicsConfig, ANIMAL_LEVEL } from "../../constant.js";
 export class Physics {
 
     constructor() {
