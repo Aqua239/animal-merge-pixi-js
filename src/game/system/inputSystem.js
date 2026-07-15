@@ -18,7 +18,7 @@ export class InputSystem {
             },
         };
 
-        const box = this.gameManager.physics.box;
+        const box = this.gameManager.world.box;
 
         this.gameManager.gameContainer.on("pointermove", (event) => {
             if(!this.canInteractWithCurrentAnimal()) return;

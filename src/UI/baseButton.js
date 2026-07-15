@@ -1,11 +1,13 @@
 import { Container, Sprite } from "pixi.js";
+import { sound } from "@pixi/sound";
 
 export class BaseButton extends Container {
-    constructor({textureName, x = 0, y = 0, width, height, onClick, iconName, iconScale = 1}) {
+    constructor({textureName, x = 0, y = 0, width, height, onClick, content, clickSound = 'click'}) {
         super();
 
         this.onClickCallback = onClick;
         this.buttonSprite = Sprite.from(textureName);
+        this.clickSound = clickSound;
         this.buttonSprite.anchor.set(0.5);
 
         if(width && height) {
@@ -16,17 +18,12 @@ export class BaseButton extends Container {
         this.addChild(this.buttonSprite);
         this.position.set(x, y);
 
-        if (iconName) {
-            this.iconSprite = Sprite.from(iconName);
-
-            this.iconSprite.anchor.set(0.5);
-
-            const maxIconSize = Math.min(this.buttonSprite.width, this.buttonSprite.height) * 0.7 * iconScale;
-
-            const scaleRatio = maxIconSize / Math.max(this.iconSprite.width, this.iconSprite.height);
-            this.iconSprite.scale.set(scaleRatio);
-
-            this.addChild(this.iconSprite);
+        if (content) {
+            this.content = content;
+            if (this.content.anchor) {
+                this.content.anchor.set(0.5);
+            }
+            this.addChild(this.content);
         }
 
         this.eventMode = 'static';
@@ -55,6 +52,9 @@ export class BaseButton extends Container {
 
     onPointerDown() {
         this.setVisualPressedState(true);
+        if (this.clickSound) {
+            sound.play('sound_sfx_atlas', {sprite: this.clickSound});
+        }
     }
 
     onPointerUp() {

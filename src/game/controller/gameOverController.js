@@ -42,7 +42,7 @@ export class GameOverController {
     }
 
     checkAnimalToTop(deltaTime){
-        if(this.gameManager.physics.handleCollisionsAllCirclesToTop(GAME_CONFIG.CEILING_Y)){
+        if(this.gameManager.world.checkCollisionCircleToTop(GAME_CONFIG.CEILING_Y)){
             if(!this.gameManager.isChangeTopCollisionTime){
                 this.gameManager.topCollisionTime = deltaTime;
                 this.gameManager.isChangeTopCollisionTime = true;

@@ -1,15 +1,16 @@
 import { GAME_CONFIG, PhysicsConfig } from "../constant";
-import { Physics } from "./system/physics";
 import { InputSystem } from "./system/inputSystem";
 import { AnimalSystem } from "./system/animalSystem";
 import { RemoveItemController } from "./controller/removeItemController";
 import { GameOverController } from "./controller/gameOverController";
+import { World } from "./system/world";
 
-export class GameManager{
-    constructor({app, gameContainer, gameScreen}){
+export class GameManager {
+    constructor({ app, gameContainer, gameScreen }) {
         this.app = app;
         this.gameContainer = gameContainer;
         this.gameScreen = gameScreen;
+        this.updateHandler = this.update.bind(this);
 
         this.isGameOver = false;
         this.isGameRunning = false;
@@ -25,8 +26,9 @@ export class GameManager{
         this.nextAnimal = null;
         this.animalPool = [];
 
-        this.physics = new Physics();
-        this.physics.box = {
+        // this.physics = new Physics();
+        // this.physics.box = {
+        this.box = {
             x: 0,
             y: GAME_CONFIG.CEILING_Y,
             width: GAME_CONFIG.GAME_AREA_WIDTH,
@@ -37,34 +39,41 @@ export class GameManager{
         this.inputSystem = new InputSystem(this);
         this.removeItemController = new RemoveItemController(this);
         this.gameOverController = new GameOverController(this);
+        this.world = new World(this.box,
+            (animal1, animal2, mergedCollider) => {
+                return this.animalSystem.mergeAnimals(animal1, animal2, mergedCollider);
+            }
+        );
+
         this.inputSystem.listenEvent();
         this.start();
     }
 
-    start(){
-        if(this.isGameRunning) return;
+    start() {
+        if (this.isGameRunning) return;
         this.isGameRunning = true;
         this.isGamePause = false;
         this.isGameOver = false;
 
-        this.app.ticker.add(this.update.bind(this));
+        this.app.ticker.remove(this.updateHandler);
+        this.app.ticker.add(this.updateHandler);
         this.animalSystem.initSpawn(
             GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
             GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
-            GAME_CONFIG.GAME_AREA_WIDTH/2,
+            GAME_CONFIG.GAME_AREA_WIDTH / 2,
             GAME_CONFIG.ANIMAL_SPAWN_Y
         );
     }
 
-    pause(){
-        if(this.isGamePause) return;
+    pause() {
+        if (this.isGamePause) return;
         this.isGamePause = true;
         this.isGameOver = false;
         this.isGameRunning = false;
     }
 
-    resume(){
-        if(!this.isGamePause) return;
+    resume() {
+        if (!this.isGamePause) return;
         this.isGamePause = false;
     }
 
@@ -81,12 +90,15 @@ export class GameManager{
 
         for (const animal of this.animalPool) {
             if (!animal.destroyed) {
-            animal.destroy();
+                animal.destroy();
             }
         }
         this.animalPool = [];
-        this.physics.circleColliders.length = 0;
+        this.world.animals.length = 0;
         this.score = 0;
+        if (this.gameScreen) {
+            this.gameScreen.updateCurrentScore(0);
+        }
 
         this.topCollisionTime = 0;
         this.isChangeTopCollisionTime = false;
@@ -100,42 +112,45 @@ export class GameManager{
         this.removeItemController.removeItem.deactivate();
     }
 
-    update(ticker){
-        if(!this.isGameRunning || this.isGameOver || this.isGamePause) return;
+    update(ticker) {
+        if (!this.isGameRunning || this.isGameOver || this.isGamePause) return;
 
         const timestep = PhysicsConfig.timeStep * ticker.deltaMS;
-        this.physics.update(timestep);
+        // this.physics.update(timestep);
 
-        for(let i = 0; i < this.animalPool.length; i++){
-            for(let j = i + 1; j < this.animalPool.length; j++){
-                if(this.animalPool[i].isMerging || this.animalPool[j].isMerging) continue;
-                this.animalSystem.handleAnimalCollisions(
-                    this.animalPool[i],
-                    this.animalPool[j]
-                );
-            }
-        }
+        // for(let i = 0; i < this.animalPool.length; i++){
+        //     for(let j = i + 1; j < this.animalPool.length; j++){
+        //         if(this.animalPool[i].isMerging || this.animalPool[j].isMerging) continue;
+        //         this.animalSystem.handleAnimalCollisions(
+        //             this.animalPool[i],
+        //             this.animalPool[j]
+        //         );
+        //     }
+        // }
+        this.world.update(timestep);
 
         this.gameOverController.checkAnimalToTop(ticker.lastTime);
 
-        for(let animal of this.animalPool){
+        for (let animal of this.animalPool) {
             animal.setSpriteFollowCollider();
         }
     }
 
-    addAnimalToPhysicState(animal){
-        let checkStateAnimal = this.physics.circleColliders.includes(animal.collider)
-        if(checkStateAnimal) return;
-
-        this.physics.circleColliders.push(animal.collider);
+    // addAnimalToPhysicState(animal){
+    //     let checkStateAnimal = this.physics.circleColliders.includes(animal.collider)
+    //     if(checkStateAnimal) return;
+    addAnimalToPhysicState(animal) {
+        let checkStateAnimal = this.world.animals.includes(animal);
+        if (checkStateAnimal) return;
+        this.world.animals.push(animal);
     }
 
-    removeAnimalToPhysicState(animal){
-        let indexAnimal = this.physics.circleColliders.indexOf(animal.collider);
-        this.physics.circleColliders.splice(indexAnimal, 1);
+    removeAnimalToPhysicState(animal) {
+        let indexAnimal = this.world.animals.indexOf(animal);
+        this.world.animals.splice(indexAnimal, 1);
     }
 
-    removeAnimalFromPool(animal){
+    removeAnimalFromPool(animal) {
         let indexAnimal = this.animalPool.indexOf(animal);
         this.animalPool.splice(indexAnimal, 1);
     }

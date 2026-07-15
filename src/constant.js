@@ -1,7 +1,7 @@
 export const ANIMAL_LEVEL = {
     1: {
         radius: 30,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 547,
         ySprite: 408,
         widthSprite: 136,
@@ -10,7 +10,7 @@ export const ANIMAL_LEVEL = {
     },
     2: {
         radius: 45,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 140,
         ySprite: 0,
         widthSprite: 137,
@@ -19,7 +19,7 @@ export const ANIMAL_LEVEL = {
     },
     3: {
         radius: 60,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 683,
         ySprite: 409,
         widthSprite: 136,
@@ -28,7 +28,7 @@ export const ANIMAL_LEVEL = {
     },
     4: {
         radius: 75,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 274,
         ySprite: 272,
         widthSprite: 137,
@@ -37,7 +37,7 @@ export const ANIMAL_LEVEL = {
     },
     5: {
         radius: 90,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 550,
         ySprite: 0,
         widthSprite: 136,
@@ -46,7 +46,7 @@ export const ANIMAL_LEVEL = {
     },
     6: {
         radius: 105,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 137,
         ySprite: 551,
         widthSprite: 137,
@@ -55,7 +55,7 @@ export const ANIMAL_LEVEL = {
     },
     7: {
         radius: 120,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 411,
         ySprite: 408,
         widthSprite: 136,
@@ -64,7 +64,7 @@ export const ANIMAL_LEVEL = {
     },
     8: {
         radius: 145,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 137,
         ySprite: 415,
         widthSprite: 137,
@@ -73,7 +73,7 @@ export const ANIMAL_LEVEL = {
     },
     9: {
         radius: 175,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 411,
         ySprite: 680,
         widthSprite: 136,
@@ -82,7 +82,7 @@ export const ANIMAL_LEVEL = {
     },
     10: {
         radius: 210,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 274,
         ySprite: 680,
         widthSprite: 137,
@@ -91,7 +91,7 @@ export const ANIMAL_LEVEL = {
     },
     11: {
         radius: 245,
-        textureName: "/assets/images/animals_spritesheet.png",
+        textureName: "sprite_animals",
         xSprite: 0,
         ySprite: 140,
         widthSprite: 140,
@@ -106,20 +106,21 @@ const PixelPerMeter = 100; // 1 meter = 100 pixels
 
 export const PhysicsConfig = {
     initialVelocityX: 0,
-    initialVelocityY: 100,
-    linearDamping: 0.2,
-    stopVthreshold: 8,
-    gravity: 9.81 * PixelPerMeter,
-    restitution: 0.5,
+    initialVelocityY: 0,
 
-    angularDamping: 2,
-    angularStopThreshold: 1.5,
+    // --- Linear motion ---
+    gravity: 40 * PixelPerMeter,
+    linearDamping: 0.6,     // velocity decay per second: vx *= exp(-damping * dt)
+    stopVthreshold: 5,      // zero out velocity below this threshold
+    restitution: 0.5,       // bounciness (0 = no bounce, 1 = full bounce)
 
-    spinThreshold: 0.18,
-    spinFactor: 0.1,
+    // --- Rotation ---
+    angularDamping: 4.0,         // angular velocity decay per second
+    angularStopThreshold: 0.05,  // zero out angular velocity below this threshold
+    maxAngularVelocity: 5,       // max spin speed (rad/s)
 
-    maxAngularVelocity: 3.5,
-    FRICTION: 0.05,
+    // --- Friction & Spin ---
+    FRICTION: 0.15,          // tangential friction coefficient for circle-circle contact
 
     timeStep: 1 / 1000,
     maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,
@@ -140,4 +141,30 @@ export const GAME_CONFIG = {
     NEXT_ANIMAL_POSITION_X: 950,
     NEXT_ANIMAL_POSITION_Y: 150,
     ANIMAL_SPAWN_Y: 375
+}
+
+export const SFX_CONFIG = {
+    RESOURCE: "sfx_atlas.ogg",
+    SPRITES: {
+        drop: {
+            start: 0,
+            end: 0.49299319727891155,
+            loop: false
+        },
+        merge: {
+            start: 2,
+            end: 2.641065759637188,
+            loop: false
+        },
+        click: {
+            start: 4,
+            end: 4.492993197278912,
+            loop: false
+        },
+        gameover: {
+            start: 6,
+            end: 8.80922902494331,
+            loop: false
+        }
+    }
 }

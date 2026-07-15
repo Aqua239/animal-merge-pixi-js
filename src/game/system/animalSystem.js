@@ -1,8 +1,4 @@
-import {
-    ANIMAL_LEVEL,
-    GAME_CONFIG
-} from "../../constant";
-
+import {ANIMAL_LEVEL, GAME_CONFIG} from "../../constant";
 import { Animal } from "../entities/animal";
 
 export class AnimalSystem {
@@ -61,16 +57,16 @@ export class AnimalSystem {
         return newAnimal;
     }
 
-    handleAnimalCollisions(animal1, animal2){
-        const mergedCollider =
-            this.gameManager.physics.handleCollisionsCircleToCircle(
-                    animal1.collider,
-                    animal2.collider
-                );
+    // handleAnimalCollisions(animal1, animal2){
+    //     const mergedCollider =
+    //         this.gameManager.physics.handleCollisionsCircleToCircle(
+    //                 animal1.collider,
+    //                 animal2.collider
+    //             );
 
-        if(!mergedCollider) return;
-        this.mergeAnimals(animal1, animal2, mergedCollider);
-    }
+    //     if(!mergedCollider) return;
+    //     this.mergeAnimals(animal1, animal2, mergedCollider);
+    // }
 
     mergeAnimals(animal1, animal2, mergedCollider){
         const nextConfig = ANIMAL_LEVEL[animal1.level + 1];
@@ -98,9 +94,10 @@ export class AnimalSystem {
         mergedAnimal.attachCollider(mergedCollider);
         this.gameManager.gameContainer.addChild(mergedAnimal);
         this.gameManager.animalPool.push(mergedAnimal);
-        this.gameManager.addAnimalToPhysicState(mergedAnimal);
         this.gameManager.removeItemController.handleAnimalEvent(mergedAnimal);
         animal1.destroy();
         animal2.destroy();
+
+        return mergedAnimal;
     }
 }
