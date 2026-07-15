@@ -4,6 +4,7 @@ import { Animal } from "./entities/animal";
 import { Physics } from "./system/physics";
 import { RemoveItem } from "./entities/items/removeItem";
 import GameOverPopup from "../overlays/gameOverPopup";
+import { InputSystem } from "./system/inputSystem";
 
 export class GameManager{
     constructor({app, gameContainer, gameScreen}){
@@ -34,7 +35,8 @@ export class GameManager{
             height: GAME_CONFIG.FLOOR_Y - GAME_CONFIG.CEILING_Y
         };
 
-        this.listenEvent();
+        this.inputSystem = new InputSystem(this);
+        this.inputSystem.listenEvent();
         this.start();
 
         this.removeItem = new RemoveItem({
@@ -210,51 +212,6 @@ export class GameManager{
         return newAnimal;
     }
 
-    listenEvent(){
-        this.gameContainer.eventMode = "static";
-        this.gameContainer.hitArea = {
-            contains: (x, y) => {
-                return (
-                    x >= 0 &&
-                    x <= GAME_CONFIG.SCREEN_WIDTH &&
-                    y >= 0 &&
-                    y <= GAME_CONFIG.SCREEN_HEIGHT
-                );
-            },
-        };
-        const box = this.physics.box;
-
-        this.gameContainer.on("pointermove", (event) => {
-            if(!this.canInteractWithCurrentAnimal()) return;
-            const pointerPosition = event.getLocalPosition(this.gameContainer);
-
-            if(this.detectCursorInBox(pointerPosition, box) && !this.removeItem.isActive){
-                let animalPosition = Math.max(
-                    box.x + this.currentAnimal.radius,
-                    Math.min(pointerPosition.x, box.x + box.width - this.currentAnimal.radius)
-                );
-
-                this.currentAnimal.x = animalPosition;
-            }
-        });
-
-        this.gameContainer.on("pointerdown", (event) => {
-            if(!this.canInteractWithCurrentAnimal()) return;
-            const pointerPosition = event.getLocalPosition(this.gameContainer);
-
-            if(this.detectCursorInBox(pointerPosition, box) && !this.removeItem.isActive){
-                this.dropAnimal();
-            }
-        });
-    }
-
-    detectCursorInBox(position, box){
-        return box.x <= position.x &&
-            position.x <= box.x + box.width &&
-            box.y <= position.y &&
-            position.y <= box.y + box.height
-    }
-
     handleAnimalEvent(animal){
         animal.eventMode = "static";
         this.updateAnimalCursor(animal);
@@ -277,7 +234,6 @@ export class GameManager{
 
         for (const animal of this.animalPool) {
             this.updateAnimalCursor(animal, isActive);
-            console.log(animal.cursor);
         }
     }
 
@@ -285,15 +241,6 @@ export class GameManager{
         animal.cursor = isActive
             ? "pointer"
             : "default";
-    }
-
-    canInteractWithCurrentAnimal(){
-        return (this.isGameRunning &&
-            !this.isGamePause &&
-            !this.isGameOver &&
-            this.isDrop &&
-            this.currentAnimal !== null
-        );
     }
 
     addAnimalToPhysicState(animal){
@@ -311,27 +258,6 @@ export class GameManager{
     removeAnimalFromPool(animal){
         let indexAnimal = this.animalPool.indexOf(animal);
         this.animalPool.splice(indexAnimal, 1);
-    }
-
-    dropAnimal(){
-        if(!this.canInteractWithCurrentAnimal()) return;
-
-        this.isDrop = false;
-        this.currentAnimal.convertPhysicMode();
-
-        this.animalPool.push(this.currentAnimal);
-        this.addAnimalToPhysicState(this.currentAnimal);
-        this.handleAnimalEvent(this.currentAnimal);
-        this.currentAnimal = null;
-
-        setTimeout(() => {
-            if(this.isGameRunning && !this.isGameOver){
-                this.stateAnimalForScene(
-                    GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
-                    GAME_CONFIG.NEXT_ANIMAL_POSITION_Y
-                );
-            }
-        }, 1000);
     }
 
     handleAnimalCollisions(animal1, animal2){
