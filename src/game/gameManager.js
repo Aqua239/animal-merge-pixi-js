@@ -10,6 +10,7 @@ export class GameManager {
         this.app = app;
         this.gameContainer = gameContainer;
         this.gameScreen = gameScreen;
+        this.updateHandler = this.update.bind(this);
 
         this.isGameOver = false;
         this.isGameRunning = false;
@@ -58,8 +59,8 @@ export class GameManager {
         this.isGameRunning = true;
         this.isGamePause = false;
         this.isGameOver = false;
-
-        this.app.ticker.add(this.update.bind(this));
+        this.app.ticker.remove(this.updateHandler);
+        this.app.ticker.add(this.updateHandler);
         this.initSpawn(
             GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
             GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
