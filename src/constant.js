@@ -1,6 +1,6 @@
 export const ANIMAL_LEVEL = {
     1: {
-        radius: 15,
+        radius: 30,
         textureName: "sprite_animals",
         xSprite: 547,
         ySprite: 408,
@@ -9,7 +9,7 @@ export const ANIMAL_LEVEL = {
         score: 1
     },
     2: {
-        radius: 20,
+        radius: 45,
         textureName: "sprite_animals",
         xSprite: 140,
         ySprite: 0,
@@ -18,7 +18,7 @@ export const ANIMAL_LEVEL = {
         score: 2
     },
     3: {
-        radius: 25,
+        radius: 60,
         textureName: "sprite_animals",
         xSprite: 683,
         ySprite: 409,
@@ -27,7 +27,7 @@ export const ANIMAL_LEVEL = {
         score: 3
     },
     4: {
-        radius: 30,
+        radius: 75,
         textureName: "sprite_animals",
         xSprite: 274,
         ySprite: 272,
@@ -36,7 +36,7 @@ export const ANIMAL_LEVEL = {
         score: 4
     },
     5: {
-        radius: 35,
+        radius: 90,
         textureName: "sprite_animals",
         xSprite: 550,
         ySprite: 0,
@@ -45,7 +45,7 @@ export const ANIMAL_LEVEL = {
         score: 5
     },
     6: {
-        radius: 40,
+        radius: 105,
         textureName: "sprite_animals",
         xSprite: 137,
         ySprite: 551,
@@ -54,7 +54,7 @@ export const ANIMAL_LEVEL = {
         score: 6
     },
     7: {
-        radius: 45,
+        radius: 120,
         textureName: "sprite_animals",
         xSprite: 411,
         ySprite: 408,
@@ -63,7 +63,7 @@ export const ANIMAL_LEVEL = {
         score: 7
     },
     8: {
-        radius: 50,
+        radius: 145,
         textureName: "sprite_animals",
         xSprite: 137,
         ySprite: 415,
@@ -72,7 +72,7 @@ export const ANIMAL_LEVEL = {
         score: 8
     },
     9: {
-        radius: 55,
+        radius: 175,
         textureName: "sprite_animals",
         xSprite: 411,
         ySprite: 680,
@@ -81,7 +81,7 @@ export const ANIMAL_LEVEL = {
         score: 9
     },
     10: {
-        radius: 60,
+        radius: 210,
         textureName: "sprite_animals",
         xSprite: 274,
         ySprite: 680,
@@ -90,7 +90,7 @@ export const ANIMAL_LEVEL = {
         score: 10
     },
     11: {
-        radius: 65,
+        radius: 245,
         textureName: "sprite_animals",
         xSprite: 0,
         ySprite: 140,
@@ -99,6 +99,31 @@ export const ANIMAL_LEVEL = {
         score: 11
     }
 }
+
+const levelKeys = Object.keys(ANIMAL_LEVEL);
+const maxLevelKey = Math.max(...levelKeys);
+const PixelPerMeter = 100; // 1 meter = 100 pixels
+
+export const PhysicsConfig = {
+    initialVelocityX: 0,
+    initialVelocityY: 100,
+    linearDamping: 0.2,
+    stopVthreshold: 5,
+    gravity: 9.81 * PixelPerMeter,
+    restitution: 0.5,
+
+    angularDamping: 2,
+    angularStopThreshold: 1.5,
+
+    spinThreshold: 0.18,
+    spinFactor: 0.1,
+
+    maxAngularVelocity: 3.5,
+    FRICTION: 0.05,
+
+    timeStep: 1 / 1000,
+    maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,
+};
 
 export const GAME_CONFIG = {
     BACKGROUND_COLOR: 0xEEE8DF, //cream-colored

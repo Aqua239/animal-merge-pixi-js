@@ -6,6 +6,7 @@ import { loadGameAssets } from "./assetLoader";
 //import { sound } from "@pixi/sound";
 //import BasePopup from "./overlays/basePopup";
 import GameOverPopup from "./overlays/gameOverPopup";
+import { GameManager } from "./game/gameManager";
 
 async function runTest() {
     const app = new Application();
@@ -73,7 +74,13 @@ async function runTest() {
 
 
     gameScreen.show();
-
+    const game = new GameManager({
+        app,
+        gameContainer: gameScreen.container,
+        gameScreen
+    });
+    console.log("Pixi App đã khởi tạo:", app);
+    window.gameTest = game;
 }
 
 runTest();

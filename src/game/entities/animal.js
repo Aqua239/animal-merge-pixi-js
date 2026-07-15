@@ -9,7 +9,7 @@ export class Animal extends Container{
         this.x = xSpawn;
         this.y = ySpawn;
         this.level = level;
-        this.radius = isNextAnimal ? 20 : config.radius;
+        this.radius = isNextAnimal ? 75 : config.radius;
         this.score = config.score;
 
         this.isNextAnimal = isNextAnimal;
@@ -92,6 +92,8 @@ export class Animal extends Container{
     setSpriteFollowCollider(){
         this.x = this.collider.x;
         this.y = this.collider.y;
+        this.sprite.rotation = this.collider.angle;
+
     }
 
     checkTwoCircleSameId(otherAnimal){

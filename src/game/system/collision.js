@@ -1,6 +1,5 @@
 import { CircleCollider } from "../system/circleCollider.js";
-import { PhysicsConfig } from "../system/physicConfig.js";
-
+import { PhysicsConfig, ANIMAL_LEVEL } from "../../constant.js";
 export class Collision {
 
     constructor() {
@@ -48,6 +47,24 @@ export class Collision {
         if (collider.y + collider.radius >= y + height) {
             collider.vy = -Math.abs(collider.vy) * this.restitution;
             collider.y = y + height - collider.radius;
+
+            if (Math.abs(collider.vy) < PhysicsConfig.stopVthreshold) {
+                collider.vy = 0;
+            }
+
+            // rolling friction
+            let contactVx = collider.vx - (collider.angularVelocity * collider.radius);
+            if (Math.abs(contactVx) > 0.1) {
+                let frictionImpulse = -contactVx * PhysicsConfig.FRICTION;
+                collider.vx += frictionImpulse;
+                let spinDelta = -(frictionImpulse / collider.radius) * PhysicsConfig.spinFactor * 100;
+
+                collider.angularVelocity += spinDelta;
+                collider.angularVelocity = Math.max(
+                    -PhysicsConfig.maxAngularVelocity,
+                    Math.min(PhysicsConfig.maxAngularVelocity, collider.angularVelocity)
+                );
+            }
         }
     }
 
@@ -85,18 +102,12 @@ export class Collision {
             this.updateAngularVelocity(colliderA, colliderB, vCollisionNorm);
             this.activeContactPairs.add(pairKey);
         }
-
     }
-
 
     //Handle collision between 2 colliders by merge
     resolveCollisionCircleToCircleByMerge(colliderA, colliderB) {
-        let newRadius = colliderA.radius + colliderB.radius;
-        let newCircle = new CircleCollider(
-            (colliderA.x + colliderB.x) / 2,
-            (colliderA.y + colliderB.y) / 2,
-            newRadius
-        );
+        let newRadius = this.computeNewRadiusByLevel(colliderA, colliderB);
+        let newCircle = new CircleCollider((colliderA.x + colliderB.x) / 2, (colliderA.y + colliderB.y) / 2, newRadius);
 
         const m1 = colliderA.computeMass();
         const m2 = colliderB.computeMass();
@@ -106,10 +117,17 @@ export class Collision {
         const newVy = (m1 * colliderA.vy + m2 * colliderB.vy) / (m1 + m2);
 
         newCircle.vx = newVx;
-        newCircle.vy = newVy;
+        newCircle.vy = newVy + 50;
 
         return newCircle;
 
+    }
+
+    computeNewRadiusByLevel(colliderA, colliderB) {
+        if (colliderA.radius !== colliderB.radius) return;
+        const levelA = colliderA.getLevel();
+        let newradius = ANIMAL_LEVEL[levelA + 1].radius;
+        return newradius;
     }
 
     //compute normal, distance
@@ -231,8 +249,8 @@ export class Collision {
             Math.min(PhysicsConfig.maxAngularVelocity, tangentSpeed * PhysicsConfig.spinFactor)
         );
 
-        colliderA.angularVelocity -= spinDelta;
-        colliderB.angularVelocity += spinDelta;
+        colliderA.angularVelocity = -spinDelta;
+        colliderB.angularVelocity = spinDelta;
 
         colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
         colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));

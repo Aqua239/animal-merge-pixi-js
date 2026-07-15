@@ -1,5 +1,6 @@
 import { CircleCollider } from "../system/circleCollider.js";
 import { Collision } from "../system/collision.js";
+import { PhysicsConfig } from "../../constant.js";
 
 import { Application, Container, Graphics } from "pixi.js";
 
@@ -31,10 +32,8 @@ import { Application, Container, Graphics } from "pixi.js";
     // Data all cirles
     const circles = [];
 
-    function spawnCircle(x, y, radius, color, vx = 0, vy = 0) {
+    function spawnCircle(x, y, radius, color) {
         const collider = new CircleCollider(x, y, radius);
-        collider.vx = vx;
-        collider.vy = vy;
 
         const circleView = new Graphics()
             .circle(0, 0, radius)
@@ -60,12 +59,12 @@ import { Application, Container, Graphics } from "pixi.js";
     }
 
     // spawn 2 circles
-    spawnCircle(30, 20, 40, 0x0000ff);
-    spawnCircle(60, 60, 40, 0xff0000);
+    spawnCircle(30, 20, 30, 0x0000ff);
+    spawnCircle(60, 60, 30, 0xff0000);
 
     // spawn new circle every 5s
     setInterval(() => {
-        const x = 40 + Math.random() * 80;
+        const x = 60 + Math.random() * 120;
 
         spawnCircle(
             x,
@@ -78,7 +77,9 @@ import { Application, Container, Graphics } from "pixi.js";
     }, 5000);
 
     app.ticker.add((time) => {
-        const dt = 0.1 * time.deltaTime;
+        let dt = PhysicsConfig.timeStep * time.deltaMS;
+
+
 
         collisionSystem.beginFrame();
 
@@ -110,7 +111,6 @@ import { Application, Container, Graphics } from "pixi.js";
         }
 
         collisionSystem.endFrame();
-
         // Update graphics position
         for (const obj of circles) {
             obj.graphics.position.set(
