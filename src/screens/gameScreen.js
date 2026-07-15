@@ -111,7 +111,7 @@ export default class GameScreen extends BaseScreen {
 
     drawSettingsButton(){
         const settingButton = new BaseButton({
-            textureName: "setting_button",
+            textureName: "button_setting",
             x: 130,
             y: 150,
             width: 80,
