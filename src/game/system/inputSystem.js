@@ -83,7 +83,7 @@ export class InputSystem {
 
         setTimeout(() => {
             if(this.gameManager.isGameRunning && !this.gameManager.isGameOver){
-                this.gameManager.stateAnimalForScene(
+                this.gameManager.animalSystem.stateAnimalForScene(
                     GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
                     GAME_CONFIG.NEXT_ANIMAL_POSITION_Y
                 );
