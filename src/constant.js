@@ -106,20 +106,21 @@ const PixelPerMeter = 100; // 1 meter = 100 pixels
 
 export const PhysicsConfig = {
     initialVelocityX: 0,
-    initialVelocityY: 100,
-    linearDamping: 0.2,
-    stopVthreshold: 8,
-    gravity: 9.81 * PixelPerMeter,
-    restitution: 0.5,
+    initialVelocityY: 0,
 
-    angularDamping: 2,
-    angularStopThreshold: 1.5,
+    // --- Linear motion ---
+    gravity: 40 * PixelPerMeter,
+    linearDamping: 0.6,     // velocity decay per second: vx *= exp(-damping * dt)
+    stopVthreshold: 5,      // zero out velocity below this threshold
+    restitution: 0.5,       // bounciness (0 = no bounce, 1 = full bounce)
 
-    spinThreshold: 0.18,
-    spinFactor: 0.1,
+    // --- Rotation ---
+    angularDamping: 4.0,         // angular velocity decay per second
+    angularStopThreshold: 0.05,  // zero out angular velocity below this threshold
+    maxAngularVelocity: 5,       // max spin speed (rad/s)
 
-    maxAngularVelocity: 3.5,
-    FRICTION: 0.05,
+    // --- Friction & Spin ---
+    FRICTION: 0.15,          // tangential friction coefficient for circle-circle contact
 
     timeStep: 1 / 1000,
     maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,

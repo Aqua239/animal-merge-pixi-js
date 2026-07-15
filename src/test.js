@@ -77,6 +77,7 @@ async function runTest() {
     const game = new GameManager({
         app,
         gameContainer: gameScreen.container,
+        gameScreen: gameScreen
     });
     console.log("Pixi App đã khởi tạo:", app);
     window.gameTest = game;
