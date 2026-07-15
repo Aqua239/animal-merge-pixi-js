@@ -98,4 +98,15 @@ export class World {
         toRemove.forEach(a => this.removeAnimal(a));
         toAdd.forEach(a => this.addAnimal(a));
     }
+
+    checkCollisionCircleToTop(y) {
+        for (const animal of this.animals) {
+            if (animal.isPhysicsActive) {
+                if (animal.collider.checkCollisionCircleToTop(y)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
