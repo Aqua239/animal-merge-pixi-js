@@ -106,17 +106,17 @@ const PixelPerMeter = 100; // 1 meter = 100 pixels
 
 export const PhysicsConfig = {
     initialVelocityX: 0,
-    initialVelocityY: 100,
+    initialVelocityY: 0,
 
     // --- Linear motion ---
-    gravity: 20 * PixelPerMeter,
+    gravity: 40 * PixelPerMeter,
     linearDamping: 0.6,     // velocity decay per second: vx *= exp(-damping * dt)
-    stopVthreshold: 1,      // zero out velocity below this threshold
+    stopVthreshold: 5,      // zero out velocity below this threshold
     restitution: 0.5,       // bounciness (0 = no bounce, 1 = full bounce)
 
     // --- Rotation ---
     angularDamping: 4.0,         // angular velocity decay per second
-    angularStopThreshold: 0.3,   // zero out angular velocity below this threshold
+    angularStopThreshold: 0.05,  // zero out angular velocity below this threshold
     maxAngularVelocity: 5,       // max spin speed (rad/s)
 
     // --- Friction & Spin ---

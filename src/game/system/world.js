@@ -28,7 +28,7 @@ export class World {
     update(dt) {
         this.collisionSystem.beginFrame();
         this.updatePositions(dt);
-        const maxloop = 10;
+        const maxloop = 8;
         for (let i = 0; i < maxloop; i++) {
             this.handleCollisionsCirclesToBoxes();
             this.handleCollisionsCirclesToCircles();
@@ -102,7 +102,7 @@ export class World {
     checkCollisionCircleToTop(y) {
         for (const animal of this.animals) {
             if (animal.isPhysicsActive) {
-                if (animal.collider.checkCollisionCircleToTop(y)) {
+                if (animal.collider.checkCollisionCircleOverTop(y)) {
                     return true;
                 }
             }
