@@ -1,7 +1,7 @@
 import { fontStringFromTextStyle, Graphics, Text, TextStyle } from "pixi.js";
 import BaseScreen from "./baseScreen";
 import { GAME_CONFIG } from "../constant";
-import { TextButton } from "../UI/button";
+import { AudioToggleButton, TextButton } from "../UI/button";
 
 export default class MainMenuScreen extends BaseScreen {
     constructor({onPlay, onLeaderboard}) {
@@ -15,6 +15,8 @@ export default class MainMenuScreen extends BaseScreen {
         this.drawGameName();
         this.drawPlayButton();
         this.drawLeaderboardButton();
+        this.drawBackgroundMusicButton();
+        this.drawSfxButton();
     }
 
     drawGameName() {
@@ -74,5 +76,33 @@ export default class MainMenuScreen extends BaseScreen {
             onClick: this.onLeaderboard
         });
         this.container.addChild(leaderboardButton);
+    }
+
+    drawBackgroundMusicButton() {
+        const backgroundMusicButton = new AudioToggleButton({
+            textureName: "button_base",
+            targetAlias: "sound_background",
+            iconOn: "icon_music",
+            iconOff: "icon_music_off",
+            x: 100,
+            y: 100,
+            width: 120,
+            height: 120
+        });
+        this.container.addChild(backgroundMusicButton);
+    }
+
+    drawSfxButton() {
+        const sfxMusicButton = new AudioToggleButton({
+            textureName: "button_base",
+            targetAlias: "sound_sfx_atlas",
+            iconOn: "icon_audio",
+            iconOff: "icon_audio_off",
+            x: 240,
+            y: 100,
+            width: 120,
+            height: 120
+        });
+        this.container.addChild(sfxMusicButton);
     }
 }

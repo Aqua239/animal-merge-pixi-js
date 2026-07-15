@@ -56,13 +56,16 @@ async function runTest() {
 
     loadingScreen.hide();
 
+    sound.play("sound_background", {loop: true});
+
+    let game = null;
     const gameScreen = new GameScreen();
     masterContainer.addChild(gameScreen.container);
     const mainMenuScreen = new MainMenuScreen({
         onPlay: () => {
             mainMenuScreen.hide();
             gameScreen.show();
-            const game = new GameManager({
+            game = new GameManager({
                 app,
                 gameContainer: gameScreen.container,
                 gameScreen: gameScreen
@@ -74,14 +77,14 @@ async function runTest() {
     mainMenuScreen.show();
     masterContainer.addChild(mainMenuScreen.container);
 
-    // window.addEventListener("keydown", (event) => {
-    //     if (event.code === "Space") {
-    //         event.preventDefault();
-    //         gameOverPopup.show();
+    window.addEventListener("keydown", (event) => {
+        if (event.code === "Space") {
+            event.preventDefault();
+            game.gameover();
 
-    //         // Ví dụ: gameScreen.pause();
-    //     }
-    // });
+            // Ví dụ: gameScreen.pause();
+        }
+    });
 }
 
 runTest();
