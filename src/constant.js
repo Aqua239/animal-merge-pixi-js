@@ -116,3 +116,29 @@ export const GAME_CONFIG = {
     NEXT_ANIMAL_POSITION_Y: 150,
     ANIMAL_SPAWN_Y: 375
 }
+
+export const SFX_CONFIG = {
+    RESOURCE: "sfx_atlas.ogg",
+    SPRITES: {
+        drop: {
+            start: 0,
+            end: 0.49299319727891155,
+            loop: false
+        },
+        merge: {
+            start: 2,
+            end: 2.641065759637188,
+            loop: false
+        },
+        click: {
+            start: 4,
+            end: 4.492993197278912,
+            loop: false
+        },
+        gameover: {
+            start: 6,
+            end: 8.80922902494331,
+            loop: false
+        }
+    }
+}
