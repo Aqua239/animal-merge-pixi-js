@@ -24,6 +24,7 @@ export class GameOverController {
         });
 
         gameStore.updateScores(this.gameManager.score);
+        this.gameManager.leaderBoardPopup.updateScores(gameStore.showListScore());
         this.gameManager.gameContainer.addChild(this.gameOverPopup);
         this.gameOverPopup.show();
     }

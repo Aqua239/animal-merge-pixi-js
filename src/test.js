@@ -74,6 +74,7 @@ async function runTest() {
                     app,
                     gameContainer: gameScreen.container,
                     gameScreen: gameScreen,
+                    leaderBoardPopup: leaderBoardPopup,
                     onReturnMainMenu: () => {
                         gameScreen.hide();
                         mainMenuScreen.show();
