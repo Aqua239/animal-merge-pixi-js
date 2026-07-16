@@ -50,6 +50,25 @@ class GameStore{
         console.log(this.getData());
     }
 
+    addCoin(amount){
+        if(amount <= 0) return;
+
+        this.data.player.coin += amount;
+        this.save();
+    }
+
+    spendCoin(amount){
+        if(amount <= 0 || this.data.player.coin < amount) return false;
+
+        this.data.player.coin -= amount;
+        this.save();
+        return true;
+    }
+
+    getCoin(){
+        return this.data.player.coin;
+    }
+
     updateScores(newScore) {
         if (!this.checkScoreInTop(newScore)) return false;
 
