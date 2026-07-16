@@ -1,5 +1,6 @@
 import {ANIMAL_LEVEL, GAME_CONFIG} from "../../constant";
 import { Animal } from "../entities/animal";
+import { gameStore } from "../store/gameStore";
 
 export class AnimalSystem {
     constructor(gameManager){
@@ -82,6 +83,10 @@ export class AnimalSystem {
 
         this.gameManager.score += animal1.score;
         this.gameManager.gameScreen.updateCurrentScore(this.gameManager.score);
+
+        if(gameStore.showHighestScore() < this.gameManager.score){
+            this.gameManager.gameScreen.updateHighScore(this.gameManager.score);
+        }
 
         mergedCollider.radius =nextConfig.radius;
         const mergedAnimal = new Animal(

@@ -4,6 +4,7 @@ import { AnimalSystem } from "./system/animalSystem";
 import { RemoveItemController } from "./controller/removeItemController";
 import { GameOverController } from "./controller/gameOverController";
 import { World } from "./system/world";
+import { gameStore } from "./store/gameStore";
 
 export class GameManager {
     constructor({ app, gameContainer, gameScreen }) {
@@ -57,6 +58,8 @@ export class GameManager {
 
         this.app.ticker.remove(this.updateHandler);
         this.app.ticker.add(this.updateHandler);
+
+        this.gameScreen.updateHighScore(gameStore.showHighestScore());
         this.animalSystem.initSpawn(
             GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
             GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,

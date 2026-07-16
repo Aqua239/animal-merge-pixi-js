@@ -1,5 +1,6 @@
 import { GAME_CONFIG } from "../../constant";
 import GameOverPopup from "../../overlays/gameOverPopup";
+import { gameStore } from "../store/gameStore";
 
 export class GameOverController {
     constructor(gameManager){
@@ -24,6 +25,7 @@ export class GameOverController {
             },
         });
 
+        gameStore.updateScores(this.gameManager.score);
         this.gameManager.gameContainer.addChild(this.gameOverPopup);
         this.gameOverPopup.show();
     }
@@ -36,7 +38,6 @@ export class GameOverController {
             });
             this.gameOverPopup = null;
         }
-
         this.gameManager.reset();
         this.gameManager.start();
     }
