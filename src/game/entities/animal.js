@@ -1,4 +1,4 @@
-import { ANIMAL_LEVEL } from "../../constant";
+import { ANIMAL_LEVEL, GAME_CONFIG } from "../../constant";
 import { Sprite, Assets, Rectangle, Texture, Container } from 'pixi.js';
 import { CircleCollider } from "../system/circleCollider";
 
@@ -9,7 +9,7 @@ export class Animal extends Container{
         this.x = xSpawn;
         this.y = ySpawn;
         this.level = level;
-        this.radius = isNextAnimal ? 75 : config.radius;
+        this.radius = isNextAnimal ? GAME_CONFIG.NEXT_ANIMAL_RADIUS : config.radius;
         this.score = config.score;
 
         this.isNextAnimal = isNextAnimal;

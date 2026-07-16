@@ -1,4 +1,4 @@
-import { Text, Sprite, Texture } from "pixi.js";
+import { Text, Sprite, Texture, Circle } from "pixi.js";
 import { BaseButton } from "./baseButton";
 import { sound } from "@pixi/sound";
 
@@ -72,5 +72,20 @@ export class AudioToggleButton extends IconButton {
 
     static synchronizeAllButtons() {
         AudioToggleButton.allInstances.forEach(button => button.synchronizeIcon());
+    }
+}
+
+export class IconCircleButton extends IconButton {
+    constructor({radius, iconScale = 0.5, ...baseConfig}){
+        super({radius, ...baseConfig});
+
+        this.hitArea = new Circle(0, 0, radius);
+
+        if(this.content) {
+            const buttonDiameter = radius * 2;
+            const targetIconSize = buttonDiameter * iconScale;
+            this.content.width = targetIconSize;
+            this.content.height = targetIconSize;
+        }
     }
 }
