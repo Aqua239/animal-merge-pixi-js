@@ -112,7 +112,7 @@ export class GameManager {
         this.isGamePause = false;
         this.isGameRunning = false;
 
-        this.removeItemController.removeItem.deactivate();
+        this.removeItemController.removeItem.cancel();
     }
 
     update(ticker) {

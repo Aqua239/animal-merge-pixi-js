@@ -15,7 +15,7 @@ export class GameOverController {
         this.gameManager.isGamePause = false;
         this.gameManager.isGameRunning = false;
 
-        this.gameManager.removeItemController.removeItem.deactivate();
+        this.gameManager.removeItemController.removeItem.cancel();
 
         this.gameOverPopup = new GameOverPopup({
             score: this.gameManager.score,
