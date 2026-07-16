@@ -71,6 +71,26 @@ class GameStore{
 
         return newScore > lowestScore;
     }
+
+    showListScore() {
+        const listScore = [...this.data.scores.highScores];
+        console.log(listScore);
+
+        while(listScore.length < 3){
+            listScore.push(0);
+        }
+        console.log("List score:", listScore);
+
+        return listScore;
+    }
+
+    showHighestScore() {
+        const highestScore = this.data.scores.highScores[0] ?? 0;
+        console.log("Highest score:", highestScore);
+
+        return highestScore;
+    }
+
 }
 
 export const gameStore = new GameStore();
