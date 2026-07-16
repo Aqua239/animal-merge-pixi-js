@@ -34,7 +34,7 @@ export class World {
         const preY = this.animals.map(a => a.collider.y);
 
         this.updatePositions(dt);
-        const maxloop = 80;
+        const maxloop = 200;
         for (let i = 0; i < maxloop; i++) {
             const groundContacts = this.handleCollisionsCirclesToBoxes();
             const circleContacts = this.handleCollisionsCirclesToCircles();
