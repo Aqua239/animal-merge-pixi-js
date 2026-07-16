@@ -11,6 +11,7 @@ export class Animal extends Container{
         this.level = level;
         this.radius = isNextAnimal ? GAME_CONFIG.NEXT_ANIMAL_RADIUS : config.radius;
         this.score = config.score;
+        this.coin = config.coin;
 
         this.isNextAnimal = isNextAnimal;
         this.isPhysicsActive = false;
