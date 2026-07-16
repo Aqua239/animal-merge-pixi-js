@@ -15,14 +15,12 @@ export class GameOverController {
         this.gameManager.isGamePause = false;
         this.gameManager.isGameRunning = false;
 
-        this.gameManager.removeItemController.removeItem.deactivate();
+        this.gameManager.removeItemController.removeItem.cancel();
 
         this.gameOverPopup = new GameOverPopup({
             score: this.gameManager.score,
             onReplay: () => {this.replayGame();},
-            onReturnMainMenu: () => {
-                console.log("Return main menu");
-            },
+            onReturnMainMenu: () => {this.backHomeScreen();},
         });
 
         gameStore.updateScores(this.gameManager.score);
@@ -42,20 +40,33 @@ export class GameOverController {
         this.gameManager.start();
     }
 
-    checkAnimalToTop(deltaTime){
-        if(this.gameManager.world.checkCollisionCircleToTop(GAME_CONFIG.CEILING_Y)){
-            if(!this.gameManager.isChangeTopCollisionTime){
-                this.gameManager.topCollisionTime = deltaTime;
-                this.gameManager.isChangeTopCollisionTime = true;
-            }else{
-                if(deltaTime - this.gameManager.topCollisionTime >= 5000){
-                    this.gameOver();
-                }
-            }
-        }else{
-            this.gameManager.topCollisionTime = 0;
+    backHomeScreen(){
+        if(this.gameOverPopup){
+            this.gameOverPopup.removeFromParent();
+            this.gameOverPopup.destroy({
+                children: true,
+            });
+            this.gameOverPopup = null;
+        }
 
-            this.gameManager.isChangeTopCollisionTime = false;
+        this.gameManager.reset();
+        if(this.gameManager.onReturnMainMenu){
+            this.gameManager.onReturnMainMenu();
+        }
+    }
+
+    checkAnimalToTop(deltaMS){
+        if(this.gameManager.world.checkCollisionCircleToTop(GAME_CONFIG.CEILING_Y)){
+            if (this.gameManager.removeItemController.removeItem.isActive) return;
+
+            this.gameManager.topCollisionTime += deltaMS;
+            console.log(this.gameManager.topCollisionTime);
+
+            if (this.gameManager.topCollisionTime >= 5000) {
+                this.gameOver();
+            }
+        }else {
+            this.gameManager.topCollisionTime = 0;
         }
     }
 }

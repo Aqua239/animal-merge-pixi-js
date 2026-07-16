@@ -7,10 +7,11 @@ import { World } from "./system/world";
 import { gameStore } from "./store/gameStore";
 
 export class GameManager {
-    constructor({ app, gameContainer, gameScreen }) {
+    constructor({ app, gameContainer, gameScreen, onReturnMainMenu = null }) {
         this.app = app;
         this.gameContainer = gameContainer;
         this.gameScreen = gameScreen;
+        this.onReturnMainMenu = onReturnMainMenu;
         this.updateHandler = this.update.bind(this);
 
         this.isGameOver = false;
@@ -21,7 +22,6 @@ export class GameManager {
         this.topCollisionTime = 0;
         this.isSpawner = false;
         this.isDrop = false;
-        this.isChangeTopCollisionTime = false;
 
         this.currentAnimal = null;
         this.nextAnimal = null;
@@ -38,7 +38,7 @@ export class GameManager {
 
         this.animalSystem = new AnimalSystem(this);
         this.inputSystem = new InputSystem(this);
-        this.removeItemController = new RemoveItemController(this);
+        this.removeItemController = new RemoveItemController(this, gameScreen);
         this.gameOverController = new GameOverController(this);
         this.world = new World(this.box,
             (animal1, animal2, mergedCollider) => {
@@ -60,6 +60,7 @@ export class GameManager {
         this.app.ticker.add(this.updateHandler);
 
         this.gameScreen.updateHighScore(gameStore.showHighestScore());
+        this.gameScreen.updateCoin(gameStore.getCoin());
         this.animalSystem.initSpawn(
             GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
             GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
@@ -104,7 +105,6 @@ export class GameManager {
         }
 
         this.topCollisionTime = 0;
-        this.isChangeTopCollisionTime = false;
         this.isSpawner = false;
         this.isDrop = false;
 
@@ -112,7 +112,7 @@ export class GameManager {
         this.isGamePause = false;
         this.isGameRunning = false;
 
-        this.removeItemController.removeItem.deactivate();
+        this.removeItemController.removeItem.cancel();
     }
 
     update(ticker) {
@@ -132,7 +132,7 @@ export class GameManager {
         // }
         this.world.update(timestep);
 
-        this.gameOverController.checkAnimalToTop(ticker.lastTime);
+        this.gameOverController.checkAnimalToTop(ticker.deltaMS);
 
         for (let animal of this.animalPool) {
             animal.setSpriteFollowCollider();

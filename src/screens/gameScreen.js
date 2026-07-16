@@ -12,6 +12,10 @@ export default class GameScreen extends BaseScreen {
         this.highScoreText = null;
         this.coinText = null;
 
+        this.removeItemButton = null;
+        this.onRemoveItemClick = null;
+
+
         this.drawBoundaries();
         this.drawNextAnimalBackground();
         this.drawScores();
@@ -169,12 +173,17 @@ export default class GameScreen extends BaseScreen {
         itemContainer.x = 50;
         itemContainer.y = 125;
 
-        const itemButton = new IconCircleButton({
+        this.removeItemButton = new IconCircleButton({
             textureName: "button_circle",
             x: 0, y: 0,
             width: 100, height: 100,
             radius: 50,
-            iconName: "icon_x"
+            iconName: "icon_x",
+            onClick: () => {
+                if (this.onRemoveItemClick) {
+                    this.onRemoveItemClick();
+                }
+            }
         });
 
         const itemPriceContainer = new Container();
@@ -201,9 +210,9 @@ export default class GameScreen extends BaseScreen {
 
         itemPriceContainer.addChild(itemPriceText, itemPriceIcon);
         itemPriceContainer.x = -itemPriceContainer.width / 2;
-        itemPriceContainer.y = (itemButton.height / 2) + 25;
+        itemPriceContainer.y = (this.removeItemButton.height / 2) + 25;
 
-        itemContainer.addChild(itemButton, itemPriceContainer);
+        itemContainer.addChild(this.removeItemButton, itemPriceContainer);
         parentContainer.addChild(itemContainer);
     }
 
@@ -214,5 +223,9 @@ export default class GameScreen extends BaseScreen {
     }
 
     drawMergeTree(){};
+
+    setRemoveItemClickHandler(callback) {
+        this.onRemoveItemClick = callback;
+    }
 }
 
