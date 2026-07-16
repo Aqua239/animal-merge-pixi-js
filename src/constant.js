@@ -6,7 +6,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 408,
         widthSprite: 136,
         heightSprite: 137,
-        score: 1
+        score: 1,
+        coin: 0
     },
     2: {
         radius: 45,
@@ -15,7 +16,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 0,
         widthSprite: 137,
         heightSprite: 136,
-        score: 2
+        score: 2,
+        coin: 0
     },
     3: {
         radius: 60,
@@ -24,7 +26,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 409,
         widthSprite: 136,
         heightSprite: 136,
-        score: 3
+        score: 3,
+        coin: 0
     },
     4: {
         radius: 75,
@@ -33,7 +36,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 272,
         widthSprite: 137,
         heightSprite: 136,
-        score: 4
+        score: 4,
+        coin: 0
     },
     5: {
         radius: 90,
@@ -42,7 +46,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 0,
         widthSprite: 136,
         heightSprite: 136,
-        score: 5
+        score: 5,
+        coin: 0
     },
     6: {
         radius: 105,
@@ -51,7 +56,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 551,
         widthSprite: 137,
         heightSprite: 136,
-        score: 6
+        score: 6,
+        coin: 5
     },
     7: {
         radius: 120,
@@ -60,7 +66,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 408,
         widthSprite: 136,
         heightSprite: 136,
-        score: 7
+        score: 7,
+        coin: 10
     },
     8: {
         radius: 145,
@@ -69,7 +76,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 415,
         widthSprite: 137,
         heightSprite: 136,
-        score: 8
+        score: 8,
+        coin: 20
     },
     9: {
         radius: 175,
@@ -78,7 +86,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 680,
         widthSprite: 136,
         heightSprite: 137,
-        score: 9
+        score: 9,
+        coin: 30
     },
     10: {
         radius: 210,
@@ -87,7 +96,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 680,
         widthSprite: 137,
         heightSprite: 136,
-        score: 10
+        score: 10,
+        coin: 50
     },
     11: {
         radius: 245,
@@ -96,7 +106,8 @@ export const ANIMAL_LEVEL = {
         ySprite: 140,
         widthSprite: 140,
         heightSprite: 139,
-        score: 11
+        score: 11,
+        coin: 80
     }
 }
 
