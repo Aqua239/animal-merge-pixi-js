@@ -3,6 +3,7 @@ import { GAME_CONFIG } from "../../constant";
 export class InputSystem {
     constructor(gameManager){
         this.gameManager = gameManager;
+        this.pointerX = GAME_CONFIG.GAME_AREA_WIDTH / 2;
     }
 
     listenEvent(){
@@ -21,19 +22,17 @@ export class InputSystem {
         const box = this.gameManager.world.box;
 
         this.gameManager.gameContainer.on("pointermove", (event) => {
-            if(!this.canInteractWithCurrentAnimal()) return;
             const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
+            this.pointerX = pointerPosition.x;
+
+            if(!this.canInteractWithCurrentAnimal()) return;
 
             if(
                 this.detectCursorInBox(pointerPosition, box) &&
                 !this.gameManager.removeItemController.removeItem.isActive
             ){
-                let animalPosition = Math.max(
-                    box.x + this.gameManager.currentAnimal.radius,
-                    Math.min(
-                        pointerPosition.x,
-                        box.x + box.width - this.gameManager.currentAnimal.radius
-                    )
+                let animalPosition = this.getAnimalPositionX(
+                    box, this.gameManager.currentAnimal.radius,
                 );
 
                 this.gameManager.currentAnimal.x = animalPosition;
@@ -41,9 +40,10 @@ export class InputSystem {
         });
 
         this.gameManager.gameContainer.on("pointerdown", (event) => {
-            if(!this.canInteractWithCurrentAnimal()) return;
-
             const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
+            this.pointerX = pointerPosition.x;
+            
+            if(!this.canInteractWithCurrentAnimal()) return;
             if(
                 this.detectCursorInBox(pointerPosition, box) &&
                 !this.gameManager.removeItemController.removeItem.isActive
@@ -51,6 +51,16 @@ export class InputSystem {
                 this.dropAnimal();
             }
         });
+    }
+
+    getAnimalPositionX(box, radius){
+        return Math.max(
+            box.x + radius,
+            Math.min(
+                this.pointerX,
+                box.x + box.width - radius
+            )
+        );
     }
 
     detectCursorInBox(position, box){
