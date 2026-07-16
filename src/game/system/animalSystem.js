@@ -97,6 +97,7 @@ export class AnimalSystem {
         }
 
         gameStore.addCoin(mergedAnimal.coin);
+        this.gameManager.gameScreen.updateCoin(gameStore.getCoin());
 
         mergedAnimal.attachCollider(mergedCollider);
         this.gameManager.gameContainer.addChild(mergedAnimal);

@@ -60,6 +60,7 @@ export class GameManager {
         this.app.ticker.add(this.updateHandler);
 
         this.gameScreen.updateHighScore(gameStore.showHighestScore());
+        this.gameScreen.updateCoin(gameStore.getCoin());
         this.animalSystem.initSpawn(
             GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
             GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
