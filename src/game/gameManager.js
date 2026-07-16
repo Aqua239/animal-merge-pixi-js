@@ -7,10 +7,11 @@ import { World } from "./system/world";
 import { gameStore } from "./store/gameStore";
 
 export class GameManager {
-    constructor({ app, gameContainer, gameScreen }) {
+    constructor({ app, gameContainer, gameScreen, onReturnMainMenu = null }) {
         this.app = app;
         this.gameContainer = gameContainer;
         this.gameScreen = gameScreen;
+        this.onReturnMainMenu = onReturnMainMenu;
         this.updateHandler = this.update.bind(this);
 
         this.isGameOver = false;

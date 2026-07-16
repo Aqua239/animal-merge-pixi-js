@@ -20,9 +20,7 @@ export class GameOverController {
         this.gameOverPopup = new GameOverPopup({
             score: this.gameManager.score,
             onReplay: () => {this.replayGame();},
-            onReturnMainMenu: () => {
-                console.log("Return main menu");
-            },
+            onReturnMainMenu: () => {this.backHomeScreen();},
         });
 
         gameStore.updateScores(this.gameManager.score);
@@ -40,6 +38,21 @@ export class GameOverController {
         }
         this.gameManager.reset();
         this.gameManager.start();
+    }
+
+    backHomeScreen(){
+        if(this.gameOverPopup){
+            this.gameOverPopup.removeFromParent();
+            this.gameOverPopup.destroy({
+                children: true,
+            });
+            this.gameOverPopup = null;
+        }
+        
+        this.gameManager.reset();
+        if(this.gameManager.onReturnMainMenu){
+            this.gameManager.onReturnMainMenu();
+        }
     }
 
     checkAnimalToTop(deltaTime){

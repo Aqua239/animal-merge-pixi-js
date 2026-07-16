@@ -69,14 +69,23 @@ async function runTest() {
             sound.play("sound_background", {loop: true});
             mainMenuScreen.hide();
             gameScreen.show();
-            game = new GameManager({
-                app,
-                gameContainer: gameScreen.container,
-                gameScreen: gameScreen
-            });
-            console.log("Pixi App đã khởi tạo:", app);
-            window.gameTest = game;
+            if(game === null){
+                game = new GameManager({
+                    app,
+                    gameContainer: gameScreen.container,
+                    gameScreen: gameScreen,
+                    onReturnMainMenu: () => {
+                        gameScreen.hide();
+                        mainMenuScreen.show();
+                    }
+                });
+                console.log("Pixi App đã khởi tạo:", app);
+                window.gameTest = game;
+            }else{
+                game.start();
+            }
         },
+
         onLeaderboard: () => {
             leaderBoardPopup.show();
         }
