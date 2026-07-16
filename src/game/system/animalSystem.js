@@ -81,13 +81,6 @@ export class AnimalSystem {
         this.gameManager.removeAnimalFromPool(animal1);
         this.gameManager.removeAnimalFromPool(animal2);
 
-        this.gameManager.score += animal1.score;
-        this.gameManager.gameScreen.updateCurrentScore(this.gameManager.score);
-
-        if(gameStore.showHighestScore() < this.gameManager.score){
-            this.gameManager.gameScreen.updateHighScore(this.gameManager.score);
-        }
-
         mergedCollider.radius =nextConfig.radius;
         const mergedAnimal = new Animal(
             animal1.level + 1,
@@ -95,6 +88,15 @@ export class AnimalSystem {
             mergedCollider.y,
             false
         );
+
+        this.gameManager.score += mergedAnimal.score;
+        this.gameManager.gameScreen.updateCurrentScore(this.gameManager.score);
+
+        if(gameStore.showHighestScore() < this.gameManager.score){
+            this.gameManager.gameScreen.updateHighScore(this.gameManager.score);
+        }
+
+        gameStore.addCoin(mergedAnimal.coin);
 
         mergedAnimal.attachCollider(mergedCollider);
         this.gameManager.gameContainer.addChild(mergedAnimal);
