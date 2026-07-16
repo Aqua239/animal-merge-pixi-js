@@ -8,7 +8,7 @@ export const DEFAULT_GAME_DATA = {
   },
 
   scores: {
-    top3: [],
+    highScores: [],
   },
 
   items: {
