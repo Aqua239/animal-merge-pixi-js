@@ -49,6 +49,28 @@ class GameStore{
     show(){
         console.log(this.getData());
     }
+
+    updateScores(newScore) {
+        if (!this.checkScoreInTop(newScore)) return false;
+
+        const newListScore = [...this.data.scores.highScores, newScore];
+        newListScore.sort((firstScore, secondScore) => secondScore - firstScore);
+
+        this.data.scores.highScores =newListScore.slice(0, 3);
+        this.save();
+        return true;
+    }
+
+    checkScoreInTop(newScore) {
+        const listScore = this.data.scores.highScores;
+        if (listScore.length < 3) {
+            return true;
+        }
+
+        const lowestScore = listScore[listScore.length - 1];
+
+        return newScore > lowestScore;
+    }
 }
 
 export const gameStore = new GameStore();
