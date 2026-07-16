@@ -63,8 +63,8 @@ export class World {
             const dx = Math.abs(c.x - preX[i]);
             const dy = Math.abs(c.y - preY[i]);
 
-            const isResting = dx < PhysicsConfig.sleepPosEpsilon
-                && dy < PhysicsConfig.sleepPosEpsilon;
+            const posEpsilon = PhysicsConfig.sleepPosEpsilon * (c.radius / ANIMAL_LEVEL[1].radius);
+            const isResting = dx < posEpsilon && dy < posEpsilon;
 
             if (isResting) {
                 c.stableTime += dt;

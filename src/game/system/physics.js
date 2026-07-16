@@ -211,7 +211,7 @@ export class Physics {
         const rv = this.getRelativeVelocity(colliderA, colliderB);
         const speed = rv.x * normal.x + rv.y * normal.y;
 
-        if (speed >= 0) return; // It's separating, no need to force it.
+        if (speed >= 0) return; // It's separating, no need to force
 
         const j = -speed / (invMassA + invMassB);
         colliderA.vx -= j * invMassA * normal.x;

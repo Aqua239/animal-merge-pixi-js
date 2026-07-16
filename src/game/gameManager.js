@@ -48,7 +48,6 @@ export class GameManager {
                 return this.animalSystem.mergeAnimals(animal1, animal2, mergedCollider);
             }
         );
-        this.world = new World(this.box, (a, b, c) => this.mergeAnimals(a, b, c));
 
         // window._world = this.world; //for debug
 

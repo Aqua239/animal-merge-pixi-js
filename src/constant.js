@@ -122,14 +122,14 @@ export const PhysicsConfig = {
     // --- Linear motion ---
     gravity: 50 * PixelPerMeter,
     linearDamping: 0.6,     // velocity decay per second: vx *= exp(-damping * dt)
-    stopVthreshold: 5,      // zero out velocity below this threshold
+    stopVthreshold: 1,      // zero out velocity below this threshold
     vChanged: 1,
     vTimestepThreshold: 0.25,      // if dt < this threshold, use fixed timestep for physics update
     restitution: 0.3,       // bounciness (0 = no bounce, 1 = full bounce)
 
     // --- Rotation ---
     angularDamping: 4.0,         // angular velocity decay per second
-    angularStopThreshold: 0.05,  // zero out angular velocity below this threshold
+    angularStopThreshold: 0.2,  // zero out angular velocity below this threshold
     maxAngularVelocity: 5,       // max spin speed (rad/s)
 
     // --- Friction & Spin ---
@@ -142,7 +142,7 @@ export const PhysicsConfig = {
 
     //sleep thresholds for resting contacts
     sleepTimeThreshold: 0.2,
-    sleepPosEpsilon: 0.3,
+    sleepPosEpsilon: 0.05,
 
     timeStep: 1 / 1000,
     maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,
