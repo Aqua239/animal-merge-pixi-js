@@ -7,11 +7,12 @@ export class RemoveItemController {
 
         this.removeItem = new RemoveItem({
             texture: Texture.WHITE,
-            quantity: 1,
+            quantity: 0,
             x: 50,
             y: 200,
             width: 50,
             height: 50,
+            cost: 100,
 
             onUse: (item) => {
                 this.setRemoveAnimalMode(
