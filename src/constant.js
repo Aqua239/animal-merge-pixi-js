@@ -117,13 +117,15 @@ const PixelPerMeter = 100; // 1 meter = 100 pixels
 
 export const PhysicsConfig = {
     initialVelocityX: 0,
-    initialVelocityY: 0,
+    initialVelocityY: 200,
 
     // --- Linear motion ---
-    gravity: 40 * PixelPerMeter,
+    gravity: 35 * PixelPerMeter,
     linearDamping: 0.6,     // velocity decay per second: vx *= exp(-damping * dt)
     stopVthreshold: 5,      // zero out velocity below this threshold
-    restitution: 0.5,       // bounciness (0 = no bounce, 1 = full bounce)
+    vChanged: 1,
+    vTimestepThreshold: 0.25,      // if dt < this threshold, use fixed timestep for physics update
+    restitution: 0.3,       // bounciness (0 = no bounce, 1 = full bounce)
 
     // --- Rotation ---
     angularDamping: 4.0,         // angular velocity decay per second
@@ -131,7 +133,12 @@ export const PhysicsConfig = {
     maxAngularVelocity: 5,       // max spin speed (rad/s)
 
     // --- Friction & Spin ---
-    FRICTION: 0.15,          // tangential friction coefficient for circle-circle contact
+    FRICTION: 0.2,          // tangential friction coefficient for circle-circle contact
+    rollingStaticDamping: 0.75,        // strong damping for static/resting stack contacts
+    rollingMovingDamping: 0.999,       // very gentle damping for moving/rolling contacts
+    rollingStaticSpeedThreshold: 35,   // speed threshold (px/s) to classify resting stack
+    baumgarteSlop: 0.05,               // penetration tolerance (pixels)
+    baumgartePercent: 0.6,             // penetration correction factor 
 
     timeStep: 1 / 1000,
     maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,

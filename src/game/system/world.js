@@ -34,6 +34,7 @@ export class World {
             this.handleCollisionsCirclesToBoxes();
             this.handleCollisionsCirclesToCircles();
         }
+        this.syncAnimalPositions();
         this.collisionSystem.endFrame();
     }
 
@@ -41,6 +42,13 @@ export class World {
         for (const animal of this.animals) {
             if (animal.isPhysicsActive) {
                 animal.collider.update(dt);
+            }
+        }
+    }
+
+    syncAnimalPositions() {
+        for (const animal of this.animals) {
+            if (animal.isPhysicsActive) {
                 animal.x = animal.collider.x;
                 animal.y = animal.collider.y;
             }
@@ -72,7 +80,7 @@ export class World {
                     const keys = Object.keys(ANIMAL_LEVEL);
                     const maxLevel = Math.max(...keys);
 
-                    if (animalA.level === animalB.level && animalA.level < maxLevel) {
+                    if (animalA.level === animalB.level && animalA.level < 1) {
                         const newCollider = this.collisionSystem.resolveCollisionCircleToCircleByMerge(animalA.collider, animalB.collider);
                         let newAnimal = null;
                         if (this.onMerge) {

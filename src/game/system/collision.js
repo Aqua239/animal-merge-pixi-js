@@ -37,7 +37,11 @@ export class Collision {
 
         if (!applyFriction) return;
 
-        const restitution = isNewContact ? PhysicsConfig.restitution : 0;
+        const rv = Physics.getRelativeVelocity(colliderA, colliderB);
+        const relativeSpeed = rv.x * vCollisionNorm.x + rv.y * vCollisionNorm.y;
+
+        // Only apply restitution bounce if the relative speed is significant to prevent micro-bounces
+        const restitution = (isNewContact && Math.abs(relativeSpeed) > 100) ? PhysicsConfig.restitution : 0;
         const impulseResult = Physics.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm, restitution);
 
         let normalImpulse = 0;
@@ -52,7 +56,6 @@ export class Collision {
         if (isNewContact) {
             this.activeContactPairs.add(pairKey);
         }
-
         Physics.applyRollingFrictionCircleToCircle(colliderA, colliderB, vCollisionNorm, normalImpulse);
     }
 

@@ -1,4 +1,5 @@
 import { PhysicsConfig, ANIMAL_LEVEL } from "../../constant.js";
+
 export class Physics {
 
     constructor() {
@@ -8,10 +9,16 @@ export class Physics {
     static resolvePenetration(colliderA, colliderB, normal, distance) {
         const penetration = colliderA.radius + colliderB.radius - distance;
 
+        const slop = PhysicsConfig.baumgarteSlop;
+        const percent = PhysicsConfig.baumgartePercent;
+
+        const penetrationCorrection = Math.max(0, penetration - slop);
+        if (penetrationCorrection <= 0) return;
+
         const invMassA = 1 / colliderA.computeMass();
         const invMassB = 1 / colliderB.computeMass();
 
-        const correction = penetration / (invMassA + invMassB);
+        const correction = (penetrationCorrection / (invMassA + invMassB)) * percent;
 
         colliderA.x -= correction * invMassA * normal.x;
         colliderA.y -= correction * invMassA * normal.y;
@@ -19,14 +26,6 @@ export class Physics {
         colliderB.x += correction * invMassB * normal.x;
         colliderB.y += correction * invMassB * normal.y;
     }
-
-    // static resolvePenetration(colliderA, colliderB, normal, distance) {
-    //     const penetration = colliderA.radius + colliderB.radius - distance;
-
-    //     if (penetration <= 0) return;
-    //     colliderA.x -= penetration * normal.x;
-    //     colliderA.y -= penetration * normal.y;
-    // }
 
     //Compute vector
     static computeNewRadiusByLevel(colliderA, colliderB) {
@@ -105,36 +104,34 @@ export class Physics {
     }
 
     static applyRollingFrictionCircleToCircle(colliderA, colliderB, normal, normalImpulse = 0) {
+        const speedThreshold = PhysicsConfig.stopVthreshold;
+        const isStaticA = Math.abs(colliderA.prevVx) < speedThreshold && Math.abs(colliderA.prevVy) < speedThreshold;
+        const isStaticB = Math.abs(colliderB.prevVx) < speedThreshold && Math.abs(colliderB.prevVy) < speedThreshold;
+
+        // Keep rolling resistance active to drain spin when touching/resting
+        colliderA.angularVelocity *= isStaticA ? PhysicsConfig.rollingStaticDamping : PhysicsConfig.rollingMovingDamping;
+        colliderB.angularVelocity *= isStaticB ? PhysicsConfig.rollingStaticDamping : PhysicsConfig.rollingMovingDamping;
+
         const tangent = { x: -normal.y, y: normal.x };
 
-        const vA_contact = (colliderA.vx * tangent.x + colliderA.vy * tangent.y)
-            + colliderA.angularVelocity * colliderA.radius;
-        const vB_contact = (colliderB.vx * tangent.x + colliderB.vy * tangent.y)
-            - colliderB.angularVelocity * colliderB.radius;
+        const vA_contact = (colliderA.vx * tangent.x + colliderA.vy * tangent.y) + colliderA.angularVelocity * colliderA.radius;
+        const vB_contact = (colliderB.vx * tangent.x + colliderB.vy * tangent.y) - colliderB.angularVelocity * colliderB.radius;
 
         const slip = vA_contact - vB_contact;
+        if (Math.abs(slip) < 0.5) {
+            colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
+            colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
+            return;
+        }
 
-        if (Math.abs(slip) < 0.5) return;
+        const { invMass: invMassA, invI: invIA } = this.computeColliderInertia(colliderA);
+        const { invMass: invMassB, invI: invIB } = this.computeColliderInertia(colliderB);
 
-        const invMassA = 1 / colliderA.computeMass();
-        const invMassB = 1 / colliderB.computeMass();
-        // solid disk: I = ½mr²  →  r·invI = 2·invMass/r
-        const invIA = 2 * invMassA / colliderA.radius;
-        const invIB = 2 * invMassB / colliderB.radius;
-
-        // effectiveMass = 3*(invMassA + invMassB)
         const effectiveMass = invMassA + invMassB
             + colliderA.radius * invIA
             + colliderB.radius * invIB;
 
-        // Impulse to fully resolve slip
-        let frictionImpulse = -slip / effectiveMass;
-
-        // Coulomb friction limit: |frictionImpulse| <= μ * normalImpulse
-        const maxFriction = PhysicsConfig.FRICTION * normalImpulse;
-        if (Math.abs(frictionImpulse) > maxFriction) {
-            frictionImpulse = Math.sign(frictionImpulse) * maxFriction;
-        }
+        const frictionImpulse = this.computeClampedFrictionImpulse(slip, effectiveMass, normalImpulse);
 
         colliderA.vx += frictionImpulse * invMassA * tangent.x;
         colliderA.vy += frictionImpulse * invMassA * tangent.y;
@@ -148,29 +145,60 @@ export class Physics {
         colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
     }
 
-    static updateAngularVelocity(colliderA, colliderB, normal) {
-        const tangent = {
-            x: -normal.y,
-            y: normal.x,
-        };
+    // Impulse-based floor rolling friction 
+    static applyRollingFrictionCircleToGround(collider, normalImpulse = 0) {
+        // No contact damping on flat ground to keep it rolling smoothly and prevent stickiness
+        const slip = collider.vx - collider.angularVelocity * collider.radius;
+        if (Math.abs(slip) < 0.5) {
+            collider.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, collider.angularVelocity));
+            return;
+        }
 
-        const tangentSpeed =
-            (colliderB.vx - colliderA.vx) * tangent.x +
-            (colliderB.vy - colliderA.vy) * tangent.y;
+        const { invMass, invI } = this.computeColliderInertia(collider);
+
+        //effectiveMass = invMass + radius * invI
+        const effectiveMass = invMass + collider.radius * invI;
+
+        const frictionImpulse = this.computeClampedFrictionImpulse(-slip, effectiveMass, normalImpulse);
+
+        collider.vx -= frictionImpulse * invMass;
+        collider.angularVelocity += frictionImpulse * invI;
+        collider.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, collider.angularVelocity));
+    }
+
+    static updateAngularVelocity(colliderA, colliderB, normal) {
+        const tangent = { x: -normal.y, y: normal.x };
+        const tangentSpeed = (colliderB.vx - colliderA.vx) * tangent.x + (colliderB.vy - colliderA.vy) * tangent.y;
 
         if (Math.abs(tangentSpeed) < PhysicsConfig.spinThreshold) {
             return;
         }
 
-        const spinDelta = Math.max(
-            -PhysicsConfig.maxAngularVelocity,
-            Math.min(PhysicsConfig.maxAngularVelocity, tangentSpeed * PhysicsConfig.spinFactor)
-        );
+        const spinDelta = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, tangentSpeed * PhysicsConfig.spinFactor));
 
         colliderA.angularVelocity += spinDelta;
         colliderB.angularVelocity += spinDelta;
 
         colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
         colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
+    }
+
+    static computeColliderInertia(collider) {
+        const invMass = 1 / collider.computeMass();
+
+        // reduce inertia so it's easier to spin
+        const invMassRotational = 1 / collider.radius;
+        const invI = 2 * invMassRotational / collider.radius;
+
+        return { invMass, invI };
+    }
+
+    static computeClampedFrictionImpulse(slip, effectiveMass, normalImpulse) {
+        let frictionImpulse = -slip / effectiveMass;
+        const maxFriction = PhysicsConfig.FRICTION * normalImpulse;
+        if (Math.abs(frictionImpulse) > maxFriction) {
+            frictionImpulse = Math.sign(frictionImpulse) * maxFriction;
+        }
+        return frictionImpulse;
     }
 }
