@@ -1,9 +1,9 @@
-import { ANIMAL_LEVEL, GAME_CONFIG } from "../../constant";
+import { ANIMAL_LEVEL, PhysicsConfig, GAME_CONFIG } from "../../constant";
 import { Sprite, Assets, Rectangle, Texture, Container } from 'pixi.js';
 import { CircleCollider } from "../system/circleCollider";
 
-export class Animal extends Container{
-    constructor(level, xSpawn, ySpawn, isNextAnimal){
+export class Animal extends Container {
+    constructor(level, xSpawn, ySpawn, isNextAnimal) {
         const config = ANIMAL_LEVEL[level];
         super();
         this.x = xSpawn;
@@ -40,7 +40,7 @@ export class Animal extends Container{
         this.addChild(this.sprite);
     }
 
-    updateSpriteSize(){
+    updateSpriteSize() {
         const diameter = this.radius * 2;
         this.sprite.width = diameter;
         this.sprite.height = diameter;
@@ -49,7 +49,7 @@ export class Animal extends Container{
         this.sprite.y = 0;
     }
 
-    convertFromNextToCurrent(){
+    convertFromNextToCurrent() {
         const config = ANIMAL_LEVEL[this.level];
         this.isNextAnimal = false;
         this.radius = config.radius;
@@ -63,10 +63,12 @@ export class Animal extends Container{
         this.updateSpriteSize();
     }
 
-    convertPhysicMode(){
+    convertPhysicMode() {
         this.isPhysicsActive = true;
         this.collider.x = this.x;
         this.collider.y = this.y;
+        this.collider.vx = PhysicsConfig.initialVelocityX;
+        this.collider.vy = PhysicsConfig.initialVelocityY;
     }
 
     //function used when the Physics system creates a new collider after a merge
@@ -80,8 +82,8 @@ export class Animal extends Container{
     }
 
     //function used while moving an object before dropping it
-    setColliderFollowSprite(x, y){
-        if(this.isPhysicsActive) return;
+    setColliderFollowSprite(x, y) {
+        if (this.isPhysicsActive) return;
 
         this.x = x;
         this.y = y;
@@ -90,18 +92,18 @@ export class Animal extends Container{
     }
 
     //function used after the object has been released and is moving via physics
-    setSpriteFollowCollider(){
+    setSpriteFollowCollider() {
         this.x = this.collider.x;
         this.y = this.collider.y;
         this.sprite.rotation = this.collider.angle;
 
     }
 
-    checkTwoCircleSameId(otherAnimal){
+    checkTwoCircleSameId(otherAnimal) {
         return this.level === otherAnimal.level;
     }
 
-    destroy(){
+    destroy() {
         super.destroy({
             children: true,
         });

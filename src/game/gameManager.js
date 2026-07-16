@@ -6,6 +6,8 @@ import { GameOverController } from "./controller/gameOverController";
 import { World } from "./system/world";
 import { gameStore } from "./store/gameStore";
 
+import { RemoveItem } from "./entities/items/removeItem";
+import GameOverPopup from "../overlays/gameOverPopup";
 export class GameManager {
     constructor({ app, gameContainer, gameScreen, leaderBoardPopup, onReturnMainMenu = null }) {
         this.app = app;
@@ -46,6 +48,10 @@ export class GameManager {
                 return this.animalSystem.mergeAnimals(animal1, animal2, mergedCollider);
             }
         );
+
+        // window._world = this.world; //for debug
+
+        this.gameOverPopup = null;
 
         this.inputSystem.listenEvent();
         this.start();
@@ -120,17 +126,6 @@ export class GameManager {
         if (!this.isGameRunning || this.isGameOver || this.isGamePause) return;
 
         const timestep = PhysicsConfig.timeStep * ticker.deltaMS;
-        // this.physics.update(timestep);
-
-        // for(let i = 0; i < this.animalPool.length; i++){
-        //     for(let j = i + 1; j < this.animalPool.length; j++){
-        //         if(this.animalPool[i].isMerging || this.animalPool[j].isMerging) continue;
-        //         this.animalSystem.handleAnimalCollisions(
-        //             this.animalPool[i],
-        //             this.animalPool[j]
-        //         );
-        //     }
-        // }
         this.world.update(timestep);
 
         this.gameOverController.checkAnimalToTop(ticker.deltaMS);
