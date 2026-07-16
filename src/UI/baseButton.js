@@ -1,8 +1,8 @@
-import { Container, Sprite } from "pixi.js";
+import { Circle, Container, Sprite } from "pixi.js";
 import { sound } from "@pixi/sound";
 
 export class BaseButton extends Container {
-    constructor({textureName, x = 0, y = 0, width, height, onClick, content, clickSound = 'click'}) {
+    constructor({textureName, x = 0, y = 0, width, height, radius, onClick, content, clickSound = 'click'}) {
         super();
 
         this.onClickCallback = onClick;
@@ -18,12 +18,16 @@ export class BaseButton extends Container {
         this.addChild(this.buttonSprite);
         this.position.set(x, y);
 
-        if (content) {
+        if(content) {
             this.content = content;
             if (this.content.anchor) {
                 this.content.anchor.set(0.5);
             }
             this.addChild(this.content);
+        }
+
+        if(radius) {
+            this.hitArea = new Circle(0, 0, radius);
         }
 
         this.eventMode = 'static';

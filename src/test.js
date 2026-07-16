@@ -8,6 +8,7 @@ import { sound } from "@pixi/sound";
 import GameOverPopup from "./overlays/gameOverPopup";
 import { GameManager } from "./game/gameManager";
 import MainMenuScreen from "./screens/mainMenuScreen";
+import LeaderBoardPopup from "./overlays/leaderBoardPopup";
 
 async function runTest() {
     const app = new Application();
@@ -56,13 +57,16 @@ async function runTest() {
 
     loadingScreen.hide();
 
-    sound.play("sound_background", {loop: true});
+
+    const leaderBoardPopup = new LeaderBoardPopup();
+
 
     let game = null;
     const gameScreen = new GameScreen();
     masterContainer.addChild(gameScreen.container);
     const mainMenuScreen = new MainMenuScreen({
         onPlay: () => {
+            sound.play("sound_background", {loop: true});
             mainMenuScreen.hide();
             gameScreen.show();
             game = new GameManager({
@@ -72,6 +76,9 @@ async function runTest() {
             });
             console.log("Pixi App đã khởi tạo:", app);
             window.gameTest = game;
+        },
+        onLeaderboard: () => {
+            leaderBoardPopup.show();
         }
     });
     mainMenuScreen.show();
@@ -80,11 +87,13 @@ async function runTest() {
     window.addEventListener("keydown", (event) => {
         if (event.code === "Space") {
             event.preventDefault();
-            game.gameover();
+            game.gameOverController.gameOver();
 
             // Ví dụ: gameScreen.pause();
         }
     });
+
+    masterContainer.addChild(leaderBoardPopup);
 }
 
 runTest();
