@@ -22,7 +22,6 @@ export class GameManager {
         this.topCollisionTime = 0;
         this.isSpawner = false;
         this.isDrop = false;
-        this.isChangeTopCollisionTime = false;
 
         this.currentAnimal = null;
         this.nextAnimal = null;
@@ -106,7 +105,6 @@ export class GameManager {
         }
 
         this.topCollisionTime = 0;
-        this.isChangeTopCollisionTime = false;
         this.isSpawner = false;
         this.isDrop = false;
 
@@ -134,7 +132,7 @@ export class GameManager {
         // }
         this.world.update(timestep);
 
-        this.gameOverController.checkAnimalToTop(ticker.lastTime);
+        this.gameOverController.checkAnimalToTop(ticker.deltaMS);
 
         for (let animal of this.animalPool) {
             animal.setSpriteFollowCollider();
