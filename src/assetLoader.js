@@ -14,6 +14,7 @@ export async function loadGameAssets(onProgressCallback) {
         { alias: "button_setting", src: "/assets/images/buttons/setting.svg" },
         { alias: "button_base", src: "/assets/images/buttons/base.svg" },
         { alias: "button_large", src: "/assets/images/buttons/large.svg" },
+        { alias: "button_circle", src: "/assets/images/buttons/circle.svg"},
 
         // Icons
         { alias: "icon_return", src: "/assets/images/icons/return.svg" },

@@ -1,7 +1,8 @@
-import { Container, Graphics, Text } from "pixi.js";
+import { Container, Graphics, Sprite, Text } from "pixi.js";
 import BaseScreen from "./baseScreen";
 import { GAME_CONFIG } from "../constant";
 import { BaseButton } from "../UI/baseButton";
+import { IconButton, IconCircleButton } from "../UI/button";
 
 export default class GameScreen extends BaseScreen {
     constructor() {
@@ -9,15 +10,17 @@ export default class GameScreen extends BaseScreen {
 
         this.currentScoreText = null;
         this.highScoreText = null;
+        this.coinText = null;
 
         this.drawBoundaries();
         this.drawNextAnimalBackground();
         this.drawScores();
         this.drawSettingsButton();
+        this.drawShopPanel()
         this.drawMergeTree();
     }
 
-    drawBoundaries(){
+    drawBoundaries() {
         const marginX = 0;
         const floorThickness = 15;
         const floorColor = GAME_CONFIG.FOREGROUND_COLOR;
@@ -43,8 +46,8 @@ export default class GameScreen extends BaseScreen {
         this.container.addChild(dashLine);
     };
 
-    drawNextAnimalBackground(){
-        const radius = 80;
+    drawNextAnimalBackground() {
+        const radius = GAME_CONFIG.NEXT_ANIMAL_RADIUS;
         const backgroundCircle = new Graphics();
 
         backgroundCircle.circle(
@@ -57,7 +60,7 @@ export default class GameScreen extends BaseScreen {
         this.container.addChild(backgroundCircle);
     };
 
-    drawScores(){
+    drawScores() {
         const screenCenterX = GAME_CONFIG.SCREEN_WIDTH / 2;
         const scoreStyle = {fontFamily: GAME_CONFIG.FONT_FAMILY, fontSize: 50, fill: GAME_CONFIG.TEXT_COLOR, fontWeight: 'bold'};
         const labelStyle = {fontFamily: GAME_CONFIG.FONT_FAMILY, fontSize: 50, fill: GAME_CONFIG.TEXT_COLOR, fontWeight: 'bold'};
@@ -109,19 +112,106 @@ export default class GameScreen extends BaseScreen {
         this.highScoreContainer.x = screenCenterX - (this.highScoreContainer.width / 2);
     }
 
-    drawSettingsButton(){
+    drawSettingsButton() {
         const settingButton = new BaseButton({
             textureName: "button_setting",
-            x: 130,
+            x: 950,
             y: 150,
-            width: 80,
-            height: 80,
+            width: 100,
+            height: 100,
             onClick: () => {
                 //Show Overlay Setting
             }
         })
         this.container.addChild(settingButton);
     };
+
+    drawShopPanel() {
+        const shopPanelContainer = new Container();
+        shopPanelContainer.x = 50;
+        shopPanelContainer.y = 100;
+
+        this.drawCoinDisplay(shopPanelContainer);
+        this.drawItemDisplay(shopPanelContainer);
+
+        this.container.addChild(shopPanelContainer);
+    }
+
+    drawCoinDisplay(parentContainer) {
+        const coinContainer = new Container();
+
+        const coinIcon = Sprite.from("icon_coin");
+        coinIcon.anchor.set(0, 0.5);
+        coinIcon.width = 50;
+        coinIcon.height = 50;
+        coinIcon.x = 0;
+        coinIcon.y = coinIcon.height / 2;
+
+        this.coinText = new Text({
+            text: '0',
+            style: {
+                fontFamily: GAME_CONFIG.FONT_FAMILY,
+                fontSize: 50,
+                fill: GAME_CONFIG.TEXT_COLOR,
+                fontWeight: 'bold'
+            }
+        });
+        this.coinText.anchor.set(0, 0.5);
+        this.coinText.x = coinIcon.x + (coinIcon.width * 1.5);
+        this.coinText.y = coinIcon.y;
+
+        coinContainer.addChild(coinIcon, this.coinText);
+        parentContainer.addChild(coinContainer);
+    }
+
+    drawItemDisplay(parentContainer) {
+        const itemContainer = new Container();
+        itemContainer.x = 50;
+        itemContainer.y = 125;
+
+        const itemButton = new IconCircleButton({
+            textureName: "button_circle",
+            x: 0, y: 0,
+            width: 100, height: 100,
+            radius: 50,
+            iconName: "icon_x"
+        });
+
+        const itemPriceContainer = new Container();
+
+        const itemPriceText = new Text({
+            text: '100',
+            style: {
+                fontFamily: GAME_CONFIG.FONT_FAMILY,
+                fontSize: 30,
+                fill: GAME_CONFIG.TEXT_COLOR,
+                fontWeight: 'bold'
+            }
+        });
+        itemPriceText.anchor.set(0, 0.5);
+        itemPriceText.x = 0;
+        itemPriceText.y = 0;
+
+        const itemPriceIcon = Sprite.from("icon_coin");
+        itemPriceIcon.anchor.set(0, 0.5);
+        itemPriceIcon.x = itemPriceText.width + 5;
+        itemPriceIcon.y = 0;
+        itemPriceIcon.width = 30;
+        itemPriceIcon.height = 30;
+
+        itemPriceContainer.addChild(itemPriceText, itemPriceIcon);
+        itemPriceContainer.x = -itemPriceContainer.width / 2;
+        itemPriceContainer.y = (itemButton.height / 2) + 25;
+
+        itemContainer.addChild(itemButton, itemPriceContainer);
+        parentContainer.addChild(itemContainer);
+    }
+
+    updateCoin(newCoinAmount) {
+        if (this.coinText) {
+            this.coinText.text = newCoinAmount.toString();
+        }
+    }
 
     drawMergeTree(){};
 }
