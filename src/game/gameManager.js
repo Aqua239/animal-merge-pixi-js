@@ -38,7 +38,7 @@ export class GameManager {
 
         this.animalSystem = new AnimalSystem(this);
         this.inputSystem = new InputSystem(this);
-        this.removeItemController = new RemoveItemController(this);
+        this.removeItemController = new RemoveItemController(this, gameScreen);
         this.gameOverController = new GameOverController(this);
         this.world = new World(this.box,
             (animal1, animal2, mergedCollider) => {

@@ -25,12 +25,16 @@ export class SupportItem extends Container{
 
         this.on("pointerdown", (event) => {
             event.stopPropagation();
-            if(!this.isActive){
-                this.activate();
-            }else{
-                this.cancel();
-            }
+            this.toggle();
         });
+    }
+
+    toggle() {
+        if (this.isActive) {
+            return this.cancel();
+        }
+
+        return this.activate();
     }
 
     activate(){
