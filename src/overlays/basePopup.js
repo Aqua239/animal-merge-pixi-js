@@ -16,6 +16,10 @@ export default class BasePopup extends Container {
         overlayBackground.eventMode = 'static';
         this.addChild(overlayBackground);
 
+        this.boardContainer = new Container();
+        this.boardContainer.position.set(GAME_CONFIG.SCREEN_WIDTH / 2, GAME_CONFIG.SCREEN_HEIGHT / 2);
+
+
         this.boardSprite = Sprite.from(textureName);
         this.boardSprite.anchor.set(0.5);
 
@@ -24,8 +28,8 @@ export default class BasePopup extends Container {
             this.boardSprite.height = boardHeight;
         }
 
-        this.boardSprite.position.set(GAME_CONFIG.SCREEN_WIDTH / 2, GAME_CONFIG.SCREEN_HEIGHT / 2);
-        this.addChild(this.boardSprite);
+        this.boardContainer.addChild(this.boardSprite);
+        this.addChild(this.boardContainer);
     }
 
     show() {
