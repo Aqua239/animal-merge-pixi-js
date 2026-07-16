@@ -29,7 +29,7 @@ export class World {
     update(dt) {
         this.collisionSystem.beginFrame();
         this.updatePositions(dt);
-        const maxloop = 8;
+        const maxloop = 10;
         for (let i = 0; i < maxloop; i++) {
             this.handleCollisionsCirclesToBoxes();
             this.handleCollisionsCirclesToCircles();

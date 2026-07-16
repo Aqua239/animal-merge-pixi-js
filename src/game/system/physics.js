@@ -118,9 +118,10 @@ export class Physics {
         const vB_contact = (colliderB.vx * tangent.x + colliderB.vy * tangent.y) - colliderB.angularVelocity * colliderB.radius;
 
         const slip = vA_contact - vB_contact;
+        // circle-circle
         if (Math.abs(slip) < 0.5) {
-            colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
-            colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
+            colliderA.angularVelocity = isStaticA ? 0 : Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
+            colliderB.angularVelocity = isStaticB ? 0 : Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
             return;
         }
 
@@ -147,10 +148,12 @@ export class Physics {
 
     // Impulse-based floor rolling friction 
     static applyRollingFrictionCircleToGround(collider, normalImpulse = 0) {
-        // No contact damping on flat ground to keep it rolling smoothly and prevent stickiness
+        const isStatic = Math.abs(collider.prevVx) < PhysicsConfig.rollingStaticSpeedThreshold
+            && Math.abs(collider.prevVy) < PhysicsConfig.rollingStaticSpeedThreshold;
+
         const slip = collider.vx - collider.angularVelocity * collider.radius;
         if (Math.abs(slip) < 0.5) {
-            collider.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, collider.angularVelocity));
+            collider.angularVelocity = isStatic ? 0 : Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, collider.angularVelocity));
             return;
         }
 

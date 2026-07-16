@@ -81,7 +81,7 @@ export class CircleCollider extends Collider {
                 this.vx = 0;
                 this.angularVelocity = 0;
             } else {
-                const normalImpulse = this.computeMass() * PhysicsConfig.gravity * 0.016;
+                const normalImpulse = this.computeMass() * PhysicsConfig.gravity * 0.016 / 10;
                 Physics.applyRollingFrictionCircleToGround(this, normalImpulse);
             }
         }
