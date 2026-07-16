@@ -128,9 +128,7 @@ export class Physics {
         const { invMass: invMassA, invI: invIA } = this.computeColliderInertia(colliderA);
         const { invMass: invMassB, invI: invIB } = this.computeColliderInertia(colliderB);
 
-        const effectiveMass = invMassA + invMassB
-            + colliderA.radius * invIA
-            + colliderB.radius * invIB;
+        const effectiveMass = invMassA + invMassB + colliderA.radius * invIA + colliderB.radius * invIB;
 
         const frictionImpulse = this.computeClampedFrictionImpulse(slip, effectiveMass, normalImpulse);
 
@@ -146,7 +144,7 @@ export class Physics {
         colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
     }
 
-    // Impulse-based floor rolling friction 
+    // Impulse-based floor rolling friction
     static applyRollingFrictionCircleToGround(collider, normalImpulse = 0) {
         const isStatic = Math.abs(collider.prevVx) < PhysicsConfig.rollingStaticSpeedThreshold
             && Math.abs(collider.prevVy) < PhysicsConfig.rollingStaticSpeedThreshold;
@@ -203,5 +201,22 @@ export class Physics {
             frictionImpulse = Math.sign(frictionImpulse) * maxFriction;
         }
         return frictionImpulse;
+    }
+
+    // Process resting contact to prevent jittering and sliding of stacked circles
+    static pinRestingContactVelocity(colliderA, colliderB, normal) {
+        const invMassA = 1 / colliderA.computeMass();
+        const invMassB = 1 / colliderB.computeMass();
+
+        const rv = this.getRelativeVelocity(colliderA, colliderB);
+        const speed = rv.x * normal.x + rv.y * normal.y;
+
+        if (speed >= 0) return; // It's separating, no need to force it.
+
+        const j = -speed / (invMassA + invMassB);
+        colliderA.vx -= j * invMassA * normal.x;
+        colliderA.vy -= j * invMassA * normal.y;
+        colliderB.vx += j * invMassB * normal.x;
+        colliderB.vy += j * invMassB * normal.y;
     }
 }

@@ -24,41 +24,6 @@ export class Collision {
         }
     }
 
-    // (circleCollider, circleCollider) -> void
-    resolveCollisionCircleToCircleByPush(colliderA, colliderB, applyFriction = true) {
-        const pairKey = this.getPairKey(colliderA, colliderB);
-        this.seenContactPairs.add(pairKey);
-
-        const isNewContact = !this.activeContactPairs.has(pairKey);
-
-        const { normal: vCollisionNorm, distance } = Physics.computeCollisionNormalAndDistance(colliderA, colliderB);
-
-        Physics.resolvePenetration(colliderA, colliderB, vCollisionNorm, distance);
-
-        if (!applyFriction) return;
-
-        const rv = Physics.getRelativeVelocity(colliderA, colliderB);
-        const relativeSpeed = rv.x * vCollisionNorm.x + rv.y * vCollisionNorm.y;
-
-        // Only apply restitution bounce if the relative speed is significant to prevent micro-bounces
-        const restitution = (isNewContact && Math.abs(relativeSpeed) > 100) ? PhysicsConfig.restitution : 0;
-        const impulseResult = Physics.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm, restitution);
-
-        let normalImpulse = 0;
-        if (impulseResult !== undefined) {
-            Physics.applyImpulse(colliderA, colliderB, impulseResult.impulse);
-            normalImpulse = Math.sqrt(
-                impulseResult.impulse.x * impulseResult.impulse.x +
-                impulseResult.impulse.y * impulseResult.impulse.y
-            );
-        }
-
-        if (isNewContact) {
-            this.activeContactPairs.add(pairKey);
-        }
-        Physics.applyRollingFrictionCircleToCircle(colliderA, colliderB, vCollisionNorm, normalImpulse);
-    }
-
     //Handle collision between 2 colliders by merge
     resolveCollisionCircleToCircleByMerge(colliderA, colliderB) {
         let newRadius = Physics.computeNewRadiusByLevel(colliderA, colliderB);
@@ -76,6 +41,39 @@ export class Collision {
 
         return newCircle;
 
+    }
+
+    resolveNormalCircleToCircle(colliderA, colliderB) {
+        const pairKey = this.getPairKey(colliderA, colliderB);
+        this.seenContactPairs.add(pairKey);
+        const isNewContact = !this.activeContactPairs.has(pairKey);
+
+        const { normal: vCollisionNorm, distance } = Physics.computeCollisionNormalAndDistance(colliderA, colliderB);
+        Physics.resolvePenetration(colliderA, colliderB, vCollisionNorm, distance);
+
+        const rv = Physics.getRelativeVelocity(colliderA, colliderB);
+        const relativeSpeed = rv.x * vCollisionNorm.x + rv.y * vCollisionNorm.y;
+
+        const restitution = (isNewContact && Math.abs(relativeSpeed) > 100) ? PhysicsConfig.restitution : 0;
+        const impulseResult = Physics.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm, restitution);
+
+        let normalImpulse = 0;
+        if (impulseResult !== undefined) {
+            Physics.applyImpulse(colliderA, colliderB, impulseResult.impulse);
+            normalImpulse = Math.sqrt(impulseResult.impulse.x ** 2 + impulseResult.impulse.y ** 2);
+        }
+
+        // if contact is already active (resting), pin the normal velocity to zero to prevent jittering and sliding
+        if (!isNewContact) {
+            Physics.pinRestingContactVelocity(colliderA, colliderB, vCollisionNorm);
+        }
+
+        if (isNewContact) this.activeContactPairs.add(pairKey);
+        return { normal: vCollisionNorm, normalImpulse };
+    }
+
+    resolveFrictionCircleToCircle(colliderA, colliderB, normal, normalImpulse) {
+        Physics.applyRollingFrictionCircleToCircle(colliderA, colliderB, normal, normalImpulse);
     }
 
     computeNewRadiusByLevel(colliderA, colliderB) {

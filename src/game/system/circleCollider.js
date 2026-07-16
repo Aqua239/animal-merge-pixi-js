@@ -14,8 +14,22 @@ export class CircleCollider extends Collider {
     }
 
     update(timestep) {
+
+        if (this._debugTag) {
+            console.log(
+                `[${this._debugTag}] vx=${this.vx.toFixed(2)} vy=${this.vy.toFixed(2)} ` +
+                `w=${this.angularVelocity.toFixed(4)} angle=${this.angle.toFixed(4)} ` +
+                `x=${this.x.toFixed(2)} y=${this.y.toFixed(2)}`
+            );
+        }
+
         this.prevVx = this.vx;
         this.prevVy = this.vy;
+
+        // const restThreshold = Math.max(
+        //     PhysicsConfig.stopVthreshold,
+        //     PhysicsConfig.gravity * timestep * 1.5
+        // );
 
         // If both velocities are below the threshold, the object is at rest.
         if (Math.abs(this.vx) < PhysicsConfig.stopVthreshold && Math.abs(this.vy) < PhysicsConfig.stopVthreshold) {
@@ -80,16 +94,22 @@ export class CircleCollider extends Collider {
             if (Math.abs(this.vx) < PhysicsConfig.stopVthreshold) {
                 this.vx = 0;
                 this.angularVelocity = 0;
-            } else {
-                const normalImpulse = this.computeMass() * PhysicsConfig.gravity * 0.016 / 10;
-                Physics.applyRollingFrictionCircleToGround(this, normalImpulse);
             }
+            return true;
+        }
+        return false;
+    }
+
+    applyGroundFriction() {
+        if (Math.abs(this.vx) >= PhysicsConfig.stopVthreshold) {
+            const normalImpulse = this.computeMass() * PhysicsConfig.gravity * 0.016 / 10;
+            Physics.applyRollingFrictionCircleToGround(this, normalImpulse);
         }
     }
 
     checkCollisionCircleToBox(box) {
         this.checkCollisionCircleOnLeftRight(box.x, box.width);
-        this.checkCollisionCircleInBottom(box.y, box.height);
+        return this.checkCollisionCircleInBottom(box.y, box.height); // return to process friction if on ground
     }
 
     checkCollisionCircleOverTop(y) {

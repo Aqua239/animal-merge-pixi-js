@@ -29,10 +29,17 @@ export class World {
     update(dt) {
         this.collisionSystem.beginFrame();
         this.updatePositions(dt);
-        const maxloop = 10;
+        const maxloop = 50;
         for (let i = 0; i < maxloop; i++) {
-            this.handleCollisionsCirclesToBoxes();
-            this.handleCollisionsCirclesToCircles();
+            const groundContacts = this.handleCollisionsCirclesToBoxes();
+            const circleContacts = this.handleCollisionsCirclesToCircles();
+
+            for (const animal of groundContacts) {
+                animal.collider.applyGroundFriction();
+            }
+            for (const c of circleContacts) {
+                this.collisionSystem.resolveFrictionCircleToCircle(c.animalA.collider, c.animalB.collider, c.normal, c.normalImpulse);
+            }
         }
         this.syncAnimalPositions();
         this.collisionSystem.endFrame();
@@ -56,20 +63,25 @@ export class World {
     }
 
     handleCollisionsCirclesToBoxes() {
+        const touching = [];
         for (const animal of this.animals) {
             if (animal.isPhysicsActive) {
-                animal.collider.checkCollisionCircleToBox(this.box);
+                if (animal.collider.checkCollisionCircleToBox(this.box)) {
+                    touching.push(animal);
+                }
             }
         }
+        return touching;
     }
 
     handleCollisionsCirclesToCircles() {
+        const contacts = [];
         const toAdd = [];
         const toRemove = new Set();
 
         for (let i = 0; i < this.animals.length; i++) {
             const animalA = this.animals[i];
-            if (toRemove.has(animalA)) continue; // if merged --> skip
+            if (toRemove.has(animalA)) continue;
 
             for (let j = i + 1; j < this.animals.length; j++) {
                 const animalB = this.animals[j];
@@ -80,36 +92,28 @@ export class World {
                     const keys = Object.keys(ANIMAL_LEVEL);
                     const maxLevel = Math.max(...keys);
 
-                    if (animalA.level === animalB.level && animalA.level < 1) {
+                    if (animalA.level === animalB.level && animalA.level < maxLevel) {
                         const newCollider = this.collisionSystem.resolveCollisionCircleToCircleByMerge(animalA.collider, animalB.collider);
-                        let newAnimal = null;
-                        if (this.onMerge) {
-                            newAnimal = this.onMerge(animalA, animalB, newCollider);
-                        }
+                        let newAnimal = this.onMerge ? this.onMerge(animalA, animalB, newCollider) : null;
                         if (!newAnimal) {
-                            // create a default new animal if onMerge didn't return one
-                            newAnimal = {
-                                collider: newCollider,
-                                level: animalA.level + 1,
-                                isPhysicsActive: true,
-                                x: newCollider.x,
-                                y: newCollider.y,
-                            };
+                            newAnimal = { collider: newCollider, level: animalA.level + 1, isPhysicsActive: true, x: newCollider.x, y: newCollider.y };
                         }
                         toAdd.push(newAnimal);
                         toRemove.add(animalA);
                         toRemove.add(animalB);
-                        break; // if merged, abort
+                        break;
                     } else {
-                        this.collisionSystem.resolveCollisionCircleToCircleByPush(animalA.collider, animalB.collider, true);
+                        const { normal, normalImpulse } = this.collisionSystem.resolveNormalCircleToCircle(animalA.collider, animalB.collider);
+                        contacts.push({ animalA, animalB, normal, normalImpulse });
                     }
                 }
             }
         }
 
-        // conduct the removal and addition of animals after all collisions have been processed
         toRemove.forEach(a => this.removeAnimal(a));
         toAdd.forEach(a => this.addAnimal(a));
+
+        return contacts.filter(c => !toRemove.has(c.animalA) && !toRemove.has(c.animalB));
     }
 
     checkCollisionCircleToTop(y) {
