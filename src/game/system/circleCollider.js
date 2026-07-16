@@ -11,9 +11,12 @@ export class CircleCollider extends Collider {
         this.prevVx = 0;
         this.prevVy = 0;
         this.stableTime = 0;
+        this.isSleeping = false;
     }
 
     update(timestep) {
+
+        if (this.isSleeping) return;
 
         if (this._debugTag) {
             console.log(
@@ -25,11 +28,6 @@ export class CircleCollider extends Collider {
 
         this.prevVx = this.vx;
         this.prevVy = this.vy;
-
-        // const restThreshold = Math.max(
-        //     PhysicsConfig.stopVthreshold,
-        //     PhysicsConfig.gravity * timestep * 1.5
-        // );
 
         // If both velocities are below the threshold, the object is at rest.
         if (Math.abs(this.vx) < PhysicsConfig.stopVthreshold && Math.abs(this.vy) < PhysicsConfig.stopVthreshold) {
@@ -114,5 +112,10 @@ export class CircleCollider extends Collider {
 
     checkCollisionCircleOverTop(y) {
         return this.y - this.radius <= y;
+    }
+
+    wake() {
+        this.isSleeping = false;
+        this.stableTime = 0;
     }
 }

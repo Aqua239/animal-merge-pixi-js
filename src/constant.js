@@ -117,10 +117,10 @@ const PixelPerMeter = 100; // 1 meter = 100 pixels
 
 export const PhysicsConfig = {
     initialVelocityX: 0,
-    initialVelocityY: 200,
+    initialVelocityY: 0,
 
     // --- Linear motion ---
-    gravity: 35 * PixelPerMeter,
+    gravity: 50 * PixelPerMeter,
     linearDamping: 0.6,     // velocity decay per second: vx *= exp(-damping * dt)
     stopVthreshold: 5,      // zero out velocity below this threshold
     vChanged: 1,
@@ -138,7 +138,11 @@ export const PhysicsConfig = {
     rollingMovingDamping: 0.999,       // very gentle damping for moving/rolling contacts
     rollingStaticSpeedThreshold: 35,   // speed threshold (px/s) to classify resting stack
     baumgarteSlop: 0.05,               // penetration tolerance (pixels)
-    baumgartePercent: 0.6,             // penetration correction factor 
+    baumgartePercent: 0.6,             // penetration correction factor
+
+    //sleep thresholds for resting contacts
+    sleepTimeThreshold: 0.2,
+    sleepPosEpsilon: 0.3,
 
     timeStep: 1 / 1000,
     maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,
