@@ -31,13 +31,19 @@ export class AnimalSystem {
     stateAnimalForScene(xSpawn, ySpawn){
         if(this.gameManager.currentAnimal === null){
             this.gameManager.currentAnimal = this.gameManager.nextAnimal;
+
             if(this.gameManager.currentAnimal){
+                this.gameManager.currentAnimal.convertFromNextToCurrent();
+
+                const randomOffset = Math.floor(Math.random() * 11) - 5;
+                const spawnPositionX = this.gameManager.inputSystem.pointerX + randomOffset;
                 this.gameManager.currentAnimal.x = this.gameManager.inputSystem.getAnimalPositionX(
                     this.gameManager.world.box,
-                    this.gameManager.currentAnimal.radius
-                ) + Math.floor(Math.random() * 11) - 5;
+                    this.gameManager.currentAnimal.radius,
+                    spawnPositionX
+                );
+                
                 this.gameManager.currentAnimal.y = GAME_CONFIG.ANIMAL_SPAWN_Y;
-                this.gameManager.currentAnimal.convertFromNextToCurrent();
                 this.gameManager.isDrop = true;
             }
         }

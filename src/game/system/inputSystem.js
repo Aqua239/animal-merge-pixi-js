@@ -42,7 +42,7 @@ export class InputSystem {
         this.gameManager.gameContainer.on("pointerdown", (event) => {
             const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
             this.pointerX = pointerPosition.x;
-            
+
             if(!this.canInteractWithCurrentAnimal()) return;
             if(
                 this.detectCursorInBox(pointerPosition, box) &&
@@ -53,11 +53,11 @@ export class InputSystem {
         });
     }
 
-    getAnimalPositionX(box, radius){
+    getAnimalPositionX(box, radius, positionX = this.pointerX){
         return Math.max(
             box.x + radius,
             Math.min(
-                this.pointerX,
+                positionX,
                 box.x + box.width - radius
             )
         );
