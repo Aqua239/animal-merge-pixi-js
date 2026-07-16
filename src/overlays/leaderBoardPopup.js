@@ -3,6 +3,7 @@ import { GAME_CONFIG } from "../constant";
 import { IconCircleButton } from "../UI/button";
 import BasePopup from "./basePopup";
 import { BaseButton } from "../UI/baseButton";
+import { gameStore } from "../game/store/gameStore";
 
 export default class LeaderBoardPopup extends BasePopup{
     constructor() {
@@ -15,6 +16,7 @@ export default class LeaderBoardPopup extends BasePopup{
         this.drawTitle();
         this.drawScoreList();
         this.drawCloseButton();
+        this.updateScores(gameStore.showListScore());
     }
 
     drawTitle() {
