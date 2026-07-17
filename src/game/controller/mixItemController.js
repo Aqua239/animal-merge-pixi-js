@@ -39,7 +39,9 @@ export class MixItemController {
 
         //handle the physics logic here
 
-        this.mixItem.use();
+        setTimeout(() => {
+            this.mixItem.use();
+        }, 3000)
         this.gameScreen.updateCoin(gameStore.getCoin());
     }
     updateButtonState(isActive) {
