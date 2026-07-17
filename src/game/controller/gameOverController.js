@@ -69,5 +69,24 @@ export class GameOverController {
         }else {
             this.gameManager.topCollisionTime = 0;
         }
+    showCountdown(){
+        if(this.isCountdownVisible) return;
+
+        this.gameManager.gameScreen.showCountdown();
+        this.isCountdownVisible = true;
+    }
+
+    hideCountdown(){
+        if(!this.isCountdownVisible) return;
+
+        this.gameManager.gameScreen.hideCountdown();
+
+        this.isCountdownVisible = false;
+        this.previousCountdown = null;
+    }
+
+     resetCountdown(){
+        this.gameManager.topCollisionTime = 0;
+        this.hideCountdown();
     }
 }
