@@ -39,6 +39,7 @@ export class RemoveItemController {
             this.gameManager.removeAnimalToPhysicState(animal);
             this.gameManager.removeAnimalFromPool(animal);
             animal.destroy();
+            this.gameManager.updateMergeTree();
             this.removeItem.use();
         });
     }
