@@ -1,60 +1,136 @@
 import "./style.css";
-import javascriptLogo from "./assets/javascript.svg";
-import viteLogo from "./assets/vite.svg";
-import heroImg from "./assets/hero.png";
-import { setupCounter } from "./counter.js";
+import { Application, Container } from "pixi.js";
+import { sound } from "@pixi/sound";
+import { GAME_CONFIG } from "./constant";
+import { loadGameAssets } from "./assetLoader";
+import { GameManager } from "./game/gameManager";
+import LoadingScreen from "./screens/loadingScreen";
+import MainMenuScreen from "./screens/mainMenuScreen";
+import GameScreen from "./screens/gameScreen";
+import LeaderBoardPopup from "./overlays/leaderBoardPopup";
+import SettingPopup from "./overlays/settingPopup";
 
-document.querySelector("#app").innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${javascriptLogo}" class="framework" alt="JavaScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.js</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+async function main(){
+    const app = new Application();
 
-<div class="ticks"></div>
+    await app.init({
+        resizeTo: window,
+        backgroundColor: 0xffffff,
+        antialias: true,
+        resolution: window.devicePixelRatio || 1,
+        autoDensity: true,
+    });
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-          <img class="button-icon" src="${javascriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+    document.body.appendChild(app.canvas);
+    document.body.style.margin = "0";
+    document.body.style.overflow = "hidden";
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`;
+    const masterContainer = new Container();
+    app.stage.addChild(masterContainer);
 
-setupCounter(document.querySelector("#counter"));
+    const resize = () => {
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        const scaleX = screenWidth / GAME_CONFIG.SCREEN_WIDTH;
+        const scaleY = screenHeight / GAME_CONFIG.SCREEN_HEIGHT;
+        const scale = Math.min(scaleX, scaleY);
+
+        masterContainer.scale.set(scale);
+        masterContainer.x = (screenWidth - GAME_CONFIG.SCREEN_WIDTH * scale) / 2;
+        masterContainer.y = (screenHeight - GAME_CONFIG.SCREEN_HEIGHT * scale) / 2;
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    const loadingScreen = new LoadingScreen();
+    masterContainer.addChild(loadingScreen.container);
+    loadingScreen.show();
+
+    await loadGameAssets((progress) => {loadingScreen.updateProgress(progress)});
+    loadingScreen.hide();
+
+    sound.play("sound_background", {loop: true, volume: 0.6});
+    const leaderBoardPopup =new LeaderBoardPopup();
+
+    let game = null;
+    const gameScreen = new GameScreen({
+        onSetting: () => {
+            settingPopup.show();
+        },
+    });
+
+    const mainMenuScreen = new MainMenuScreen({
+        onPlay: () => {
+            mainMenuScreen.hide();
+            gameScreen.show();
+
+            if(game === null){
+                game = new GameManager({
+                    app,
+                    gameContainer:
+                        gameScreen.container,
+                    gameScreen,
+                    leaderBoardPopup,
+
+                    onReturnMainMenu: () => {
+                        gameScreen.hide();
+                        mainMenuScreen.show();
+                    },
+                });
+
+                window.gameTest = game;
+                return;
+            }
+
+            game.start();
+        },
+
+        onLeaderboard: () => {
+            leaderBoardPopup.show();
+        },
+    });
+
+    const settingPopup = new SettingPopup({
+        onRestart: () => {
+            settingPopup.hide();
+            if(game) game.gameOverController.replayGame();
+        },
+        onResume: () => {
+            settingPopup.hide();
+        },
+        onReturnMainMenu: () => {
+            settingPopup.hide();
+            gameScreen.hide();
+            mainMenuScreen.show();
+        },
+    });
+
+    masterContainer.addChild(
+        gameScreen.container,
+        mainMenuScreen.container,
+        leaderBoardPopup,
+        settingPopup
+    );
+
+    gameScreen.hide();
+    mainMenuScreen.show();
+
+    window.addEventListener(
+        "keydown",
+        (event) => {
+            if(event.code === "Space" &&game){
+                event.preventDefault();
+                game.gameOverController.gameOver();
+            }
+
+            if(event.code === "Enter"){
+                event.preventDefault();
+                settingPopup.show();
+            }
+        }
+    );
+}
+
+main()

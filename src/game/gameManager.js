@@ -105,6 +105,7 @@ export class GameManager {
             }
         }
         this.animalPool = [];
+        this.updateMergeTree();
         this.world.animals.length = 0;
         this.score = 0;
         if (this.gameScreen) {
@@ -153,5 +154,22 @@ export class GameManager {
     removeAnimalFromPool(animal) {
         let indexAnimal = this.animalPool.indexOf(animal);
         this.animalPool.splice(indexAnimal, 1);
+    }
+
+    getHighestAnimalLevel(){
+        let maxLevel = 0;
+
+        for (const animal of this.animalPool) {
+            if (animal.level > maxLevel) {
+                maxLevel = animal.level;
+            }
+        }
+
+        return maxLevel;
+    }
+
+    updateMergeTree(){
+        const highestLevel = this.getHighestAnimalLevel();
+        this.gameScreen.updateMergeTreeHighestLevel(highestLevel);
     }
 }

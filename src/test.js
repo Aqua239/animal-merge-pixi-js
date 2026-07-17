@@ -9,6 +9,7 @@ import GameOverPopup from "./overlays/gameOverPopup";
 import { GameManager } from "./game/gameManager";
 import MainMenuScreen from "./screens/mainMenuScreen";
 import LeaderBoardPopup from "./overlays/leaderBoardPopup";
+import SettingPopup from "./overlays/settingPopup";
 
 async function runTest() {
     const app = new Application();
@@ -57,16 +58,32 @@ async function runTest() {
 
     loadingScreen.hide();
 
-
+    sound.play("sound_background", {loop: true, volume: 0.6});
     const leaderBoardPopup = new LeaderBoardPopup();
-
+    const settingPopup = new SettingPopup({
+        onRestart: () => {
+            settingPopup.hide();
+            game.gameOverController.replayGame();
+        },
+        onResume: () => {
+            settingPopup.hide();
+        },
+        onReturnMainMenu: () => {
+            settingPopup.hide();
+            gameScreen.hide();
+            mainMenuScreen.show();
+        }
+    });
 
     let game = null;
-    const gameScreen = new GameScreen();
+    const gameScreen = new GameScreen({
+        onSetting: () => {
+            settingPopup.show()
+        }
+    });
     masterContainer.addChild(gameScreen.container);
     const mainMenuScreen = new MainMenuScreen({
         onPlay: () => {
-            sound.play("sound_background", {loop: true});
             mainMenuScreen.hide();
             gameScreen.show();
             if(game === null){
@@ -101,9 +118,13 @@ async function runTest() {
 
             // Ví dụ: gameScreen.pause();
         }
+        if(event.code === "Enter") {
+            event.preventDefault();
+            settingPopup.show();
+        }
     });
 
-    masterContainer.addChild(leaderBoardPopup);
+    masterContainer.addChild(leaderBoardPopup, settingPopup);
 }
 
 runTest();

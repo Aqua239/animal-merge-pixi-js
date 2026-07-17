@@ -13,12 +13,17 @@ export async function loadGameAssets(onProgressCallback) {
         // Buttons
         { alias: "button_setting", src: "/assets/images/buttons/setting.svg" },
         { alias: "button_base", src: "/assets/images/buttons/base.svg" },
+        { alias: "button_base_red", src: "/assets/images/buttons/base_red.svg" },
+        { alias: "button_base_green", src: "/assets/images/buttons/base_green.svg" },
+        { alias: "button_base_blue", src: "/assets/images/buttons/base_blue.svg" },
         { alias: "button_large", src: "/assets/images/buttons/large.svg" },
+        { alias: "button_large_green", src: "/assets/images/buttons/large_green.svg" },
         { alias: "button_circle", src: "/assets/images/buttons/circle.svg" },
         { alias: "button_exit", src: "/assets/images/buttons/exit.svg" },
 
         // Icons
         { alias: "icon_return", src: "/assets/images/icons/return.svg" },
+        { alias: "icon_return_white", src: "/assets/images/icons/return_white.svg" },
         { alias: "icon_x", src: "/assets/images/icons/x.svg" },
         { alias: "icon_coin", src: "/assets/images/icons/coin.svg" },
         { alias: "icon_audio", src: "/assets/images/icons/audio.svg" },
@@ -26,7 +31,10 @@ export async function loadGameAssets(onProgressCallback) {
         { alias: "icon_music", src: "/assets/images/icons/music.svg" },
         { alias: "icon_music_off", src: "/assets/images/icons/music_off.svg" },
         { alias: "icon_home", src: "/assets/images/icons/home.svg" },
+        { alias: "icon_home_white", src: "/assets/images/icons/home_white.svg" },
         { alias: "icon_star", src: "/assets/images/icons/star.svg" },
+        { alias: "icon_resume", src: "/assets/images/icons/resume.png" },
+        { alias: "icon_resume_white", src: "/assets/images/icons/resume_white.png" },
 
         // Sounds
         { alias: "sound_background", src: "/assets/sounds/sound_background.ogg" },
