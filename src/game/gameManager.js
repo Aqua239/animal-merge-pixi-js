@@ -5,9 +5,8 @@ import { RemoveItemController } from "./controller/removeItemController";
 import { GameOverController } from "./controller/gameOverController";
 import { World } from "./system/world";
 import { gameStore } from "./store/gameStore";
+import { MixItemController } from "./controller/mixItemController";
 
-import { RemoveItem } from "./entities/items/removeItem";
-import GameOverPopup from "../overlays/gameOverPopup";
 export class GameManager {
     constructor({ app, gameContainer, gameScreen, leaderBoardPopup, onReturnMainMenu = null }) {
         this.app = app;
@@ -49,6 +48,7 @@ export class GameManager {
                 return this.animalSystem.mergeAnimals(animal1, animal2, mergedCollider);
             }
         );
+        this.mixItemController = new MixItemController(this, gameScreen, this.mixAnimalSystem);
 
         // window._world = this.world; //for debug
 
@@ -129,6 +129,7 @@ export class GameManager {
         this.isGamePause = false;
         this.isGameRunning = false;
 
+        this.mixItemController.reset();
         this.removeItemController.removeItem.cancel();
 
         if (this.itemFlyTimer) {
