@@ -287,8 +287,8 @@ export default class GameScreen extends BaseScreen {
                 this.mergeTreeArrows.push(arrow);
                 animalTree.addChild(arrow);
 
-                currentX += arrowWidth;
-                currentX += fixedGap;
+                currentX += layout.arrowWidth;
+                currentX += layout.fixedGap;
             }
         }
 

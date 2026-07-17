@@ -62,7 +62,8 @@ async function runTest() {
     const leaderBoardPopup = new LeaderBoardPopup();
     const settingPopup = new SettingPopup({
         onRestart: () => {
-
+            settingPopup.hide();
+            game.gameOverController.replayGame();
         },
         onResume: () => {
             settingPopup.hide();
