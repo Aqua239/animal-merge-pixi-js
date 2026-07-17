@@ -11,12 +11,9 @@ export class CircleCollider extends Collider {
         this.prevVx = 0;
         this.prevVy = 0;
         this.stableTime = 0;
-        this.isSleeping = false;
     }
 
     update(timestep) {
-
-        if (this.isSleeping) return;
 
         if (this._debugTag) {
             console.log(
@@ -51,7 +48,7 @@ export class CircleCollider extends Collider {
     }
 
     computeMass() {
-        return Math.pow(this.radius / 30, 3);
+        return Math.pow(this.radius / 30, 3.5); // Level 1 is 1.0, Level 10 is 907.5, Level 11 is 1558.0
     }
 
     getLevel() {
@@ -112,6 +109,7 @@ export class CircleCollider extends Collider {
     }
 
     checkCollisionCircleOverTop(y) {
+        // if (this.y <= 0) console.log(this.y);
         return this.y - this.radius <= y;
     }
 

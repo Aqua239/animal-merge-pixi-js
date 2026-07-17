@@ -120,7 +120,7 @@ export const PhysicsConfig = {
     initialVelocityY: 1000,
 
     // --- Linear motion ---
-    gravity: 10 * PixelPerMeter,
+    gravity: 15 * PixelPerMeter,
     linearDamping: 0.6,     // velocity decay per second: vx *= exp(-damping * dt)
     stopVthreshold: 0.5,      // zero out velocity below this threshold
     vChanged: 1,
@@ -128,21 +128,17 @@ export const PhysicsConfig = {
     restitution: 0.25,       // bounciness (0 = no bounce, 1 = full bounce)
 
     // --- Rotation ---
-    angularDamping: 8.0,         // angular velocity decay per second
+    angularDamping: 1.5,         // angular velocity decay per second
     angularStopThreshold: 0.5,  // zero out angular velocity below this threshold
     maxAngularVelocity: 5,       // max spin speed (rad/s)
 
     // --- Friction & Spin ---
-    FRICTION: 0.3,          // tangential friction coefficient for circle-circle contact
+    FRICTION: 0.6,          // tangential friction coefficient for circle-circle contact
     rollingStaticDamping: 0.98,        // strong damping for static/resting stack contacts
     rollingMovingDamping: 0.999,       // very gentle damping for moving/rolling contacts
     rollingStaticSpeedThreshold: 10,   // speed threshold (px/s) to classify resting stack
-    baumgarteSlop: 0.05,               // penetration tolerance (pixels)
-    baumgartePercent: 0.6,             // penetration correction factor
-
-    //sleep thresholds for resting contacts
-    sleepTimeThreshold: 0.2,
-    sleepPosEpsilon: 0.05,
+    baumgarteSlop: 0.15,               // penetration tolerance (pixels)
+    baumgartePercent: 0.35,             // penetration correction factor
 
     // --- Impulse Limits ---
     maxImpulse: 5000, // Small limit for scaled mass to ensure proper collision resolution

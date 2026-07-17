@@ -29,6 +29,7 @@ export class GameManager {
         this.currentAnimal = null;
         this.nextAnimal = null;
         this.animalPool = [];
+        this.itemFlyTimer = null;
 
         // this.physics = new Physics();
         // this.physics.box = {
@@ -74,6 +75,14 @@ export class GameManager {
             GAME_CONFIG.GAME_AREA_WIDTH / 2,
             GAME_CONFIG.ANIMAL_SPAWN_Y
         );
+
+        // Test item fly function every 5 seconds
+        // this.itemFlyTimer = setInterval(() => {
+        //     if (this.isGameRunning && !this.isGamePause && !this.isGameOver) {
+        //         console.log("Kích hoạt Item Fly (mỗi 5 giây)!");
+        //         this.world.activateItemFly();
+        //     }
+        // }, 5000);
     }
 
     pause() {
@@ -121,10 +130,15 @@ export class GameManager {
         this.isGameRunning = false;
 
         this.removeItemController.removeItem.cancel();
+
+        if (this.itemFlyTimer) {
+            clearInterval(this.itemFlyTimer);
+            this.itemFlyTimer = null;
+        }
     }
 
     update(ticker) {
-        console.log(ticker.deltaMS);
+        // console.log(ticker.deltaMS);
         if (!this.isGameRunning || this.isGameOver || this.isGamePause) return;
 
         const timestep = PhysicsConfig.timeStep * ticker.deltaMS;
@@ -159,7 +173,7 @@ export class GameManager {
         this.animalPool.splice(indexAnimal, 1);
     }
 
-    getHighestAnimalLevel(){
+    getHighestAnimalLevel() {
         let maxLevel = 0;
 
         for (const animal of this.animalPool) {
@@ -171,7 +185,7 @@ export class GameManager {
         return maxLevel;
     }
 
-    updateMergeTree(){
+    updateMergeTree() {
         const highestLevel = this.getHighestAnimalLevel();
         this.gameScreen.updateMergeTreeHighestLevel(highestLevel);
     }
