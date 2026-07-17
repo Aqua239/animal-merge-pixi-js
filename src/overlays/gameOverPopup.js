@@ -8,38 +8,38 @@ export default class GameOverPopup extends BasePopup {
 
         const titleText = new Text({
             text: "GAME OVER",
-            style: {fontSize: 160, fill: 0xC4BCB0, fontWeight: 'bold'}
+            style: {fontSize: 80, fill: 0xC4BCB0, fontWeight: 'bold'}
         });
         titleText.anchor.set(0.5);
-        titleText.y =-350;
+        titleText.y =-200;
 
         const scoreText = new Text({
             text: `Score: ${score}`,
-            style: {fontSize: 120, fill: 0xC4BCB0}
+            style: {fontSize: 60, fill: 0xC4BCB0}
         })
         scoreText.anchor.set(0.5);
-        scoreText.y = -100;
+        scoreText.y = -75;
 
         const replayButton = new IconButton({
-            textureName: "button_base",
-            x: -250,
-            y: 250,
-            width: 300,
-            height: 300,
+            textureName: "button_base_green",
+            x: -125,
+            y: 125,
+            width: 150,
+            height: 150,
             onClick: onReplay,
-            iconName: "icon_return"
+            iconName: "icon_return_white"
         });
 
         const returnMainMenuButton = new IconButton({
-            textureName: "button_base",
-            x: 250,
-            y: 250,
-            width: 300,
-            height: 300,
+            textureName: "button_base_blue",
+            x: 125,
+            y: 125,
+            width: 150,
+            height: 150,
             onClick: onReturnMainMenu,
-            iconName: "icon_home"
+            iconName: "icon_home_white"
         });
 
-        this.boardSprite.addChild(titleText, scoreText, replayButton, returnMainMenuButton);
+        this.boardContainer.addChild(titleText, scoreText, replayButton, returnMainMenuButton);
     }
 }

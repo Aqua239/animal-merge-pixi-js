@@ -5,12 +5,13 @@ import { BaseButton } from "../UI/baseButton";
 import { IconButton, IconCircleButton } from "../UI/button";
 
 export default class GameScreen extends BaseScreen {
-    constructor() {
+    constructor({onSetting}) {
         super(GAME_CONFIG.BACKGROUND_COLOR);
 
         this.currentScoreText = null;
         this.highScoreText = null;
         this.coinText = null;
+        this.onSetting = onSetting;
 
         this.removeItemButton = null;
         this.onRemoveItemClick = null;
@@ -58,7 +59,8 @@ export default class GameScreen extends BaseScreen {
             GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
             GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
             radius
-        ).fill(GAME_CONFIG.FOREGROUND_COLOR);
+        // ).fill(GAME_CONFIG.FOREGROUND_COLOR);
+        );
         backgroundCircle.stroke({width: 10, color: 0xC4BCB0});
 
         this.container.addChild(backgroundCircle);
@@ -123,9 +125,7 @@ export default class GameScreen extends BaseScreen {
             y: 150,
             width: 100,
             height: 100,
-            onClick: () => {
-                //Show Overlay Setting
-            }
+            onClick: this.onSetting
         })
         this.container.addChild(settingButton);
     };
