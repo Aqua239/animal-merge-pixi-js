@@ -6,6 +6,9 @@ export class GameOverController {
     constructor(gameManager){
         this.gameManager = gameManager;
         this.gameOverPopup = null;
+
+        this.previousCountdown = null;
+        this.isCountdownVisible = false;
     }
 
     gameOver(){
@@ -37,6 +40,8 @@ export class GameOverController {
             });
             this.gameOverPopup = null;
         }
+
+        this.resetCountdown();
         this.gameManager.reset();
         this.gameManager.start();
     }
@@ -57,18 +62,31 @@ export class GameOverController {
     }
 
     checkAnimalToTop(deltaMS){
-        if(this.gameManager.world.checkCollisionCircleToTop(GAME_CONFIG.CEILING_Y)){
-            if (this.gameManager.removeItemController.removeItem.isActive) return;
-
-            this.gameManager.topCollisionTime += deltaMS;
-            console.log(this.gameManager.topCollisionTime);
-
-            if (this.gameManager.topCollisionTime >= 5000) {
-                this.gameOver();
-            }
-        }else {
+        const isAnimalTouchingTop = this.gameManager.world.checkCollisionCircleToTop(GAME_CONFIG.CEILING_Y);
+        if(!isAnimalTouchingTop) {
             this.gameManager.topCollisionTime = 0;
+            this.hideCountdown();
+            return;
         }
+
+        const isRemoveItemActive = this.gameManager.removeItemController.removeItem.isActive;
+        if(isRemoveItemActive) return;
+
+        this.gameManager.topCollisionTime += deltaMS;
+        const countdownText = Math.floor((5000 - this.gameManager.topCollisionTime) / 1000) + 1;
+        if(countdownText < 5){
+            this.showCountdown();
+            if(this.previousCountdown !== countdownText){
+                this.gameManager.gameScreen.updateCountdown(countdownText);
+                this.previousCountdown = countdownText;
+            }
+        }
+
+        if(this.gameManager.topCollisionTime >= 5000){
+            this.gameOver();
+        }
+    }
+
     showCountdown(){
         if(this.isCountdownVisible) return;
 
