@@ -257,14 +257,7 @@ export default class GameScreen extends BaseScreen {
         const boxWidth = GAME_CONFIG.GAME_AREA_WIDTH;
         const boxHeight = 1920 - GAME_CONFIG.FLOOR_Y;
         const totalLevel = Object.keys(ANIMAL_LEVEL).length;
-
-        const boxContainer = new Container();
-        boxContainer.x = 0;
-        boxContainer.y = GAME_CONFIG.FLOOR_Y;
-
-        const box = new Graphics();
-        box.rect(0, 0, boxWidth, boxHeight).fill(GAME_CONFIG.FOREGROUND_COLOR);
-        boxContainer.addChild(box);
+        const boxContainer = this.createMergeTreeBox(boxWidth,boxHeight);
 
         const animalTree = new Container();
         const paddingX = 20;
@@ -275,72 +268,21 @@ export default class GameScreen extends BaseScreen {
 
         this.mergeTreeAnimals = [];
         this.mergeTreeArrows = [];
-        const animalSizes = [];
-
-        for(let i = 0; i < totalLevel; i++){
-            const desiredSize = 38 + i * 5;
-            animalSizes.push(desiredSize);
-        }
-
-        const totalAnimalWidth = animalSizes.reduce((total, size) => total + size, 0);
-        const arrowWidth = 20;
-        const totalArrowWidth = arrowWidth * (totalLevel - 1);
-
-        const fixedGap = Math.max(
-            4,
-            (availableWidth - totalAnimalWidth - totalArrowWidth) / ((totalLevel - 1) * 2)
-        );
+        const layout = this.calculateMergeTreeLayout(totalLevel, availableWidth);
         let currentX = 0;
 
         for(let i = 0; i < totalLevel; i++){
             const level = i + 1;
-            const config = ANIMAL_LEVEL[level];
-
-            const baseTexture = Assets.get(config.textureName);
-            const frame = new Rectangle(
-                config.xSprite,
-                config.ySprite,
-                config.widthSprite,
-                config.heightSprite
-            );
-            const texture = new Texture({
-                source: baseTexture.source,
-                frame: frame,
-            });
-
-            const animal = new Sprite(texture);
-            const displaySize = animalSizes[i];
-
-            animal.anchor.set(0.5);
-            animal.width = displaySize;
-            animal.height = displaySize;
-            animal.x = currentX + displaySize / 2;
-            animal.y = 0;
-            animal.level = level;
-            animal.alpha = 0.5;
+            const displaySize = layout.animalSizes[i];
+            const animal = this.createMergeTreeAnimal(level, displaySize, currentX);
 
             this.mergeTreeAnimals.push(animal);
             animalTree.addChild(animal);
             currentX += displaySize;
 
             if(i < totalLevel - 1){
-                currentX += fixedGap;
-                const arrow = new Text({
-                    text: ">",
-                    style: {
-                        fontFamily: GAME_CONFIG.FONT_FAMILY,
-                        fontSize: 22,
-                        fill: 0xffffff,
-                        fontWeight: "bold",
-                    },
-                });
-
-                arrow.anchor.set(0.5);
-                arrow.x = currentX + arrowWidth / 2;
-                arrow.y = 0;
-                arrow.fromLevel = level;
-                arrow.toLevel = level + 1;
-                arrow.alpha = 0.5;
+                currentX += layout.fixedGap;
+                const arrow = this.createMergeTreeArrow(level, currentX, layout.arrowWidth);
 
                 this.mergeTreeArrows.push(arrow);
                 animalTree.addChild(arrow);
@@ -366,6 +308,88 @@ export default class GameScreen extends BaseScreen {
             console.log(arrow.toLevel);
         }
     }
+
+    createMergeTreeBox(boxWidth, boxHeight){
+        const boxContainer = new Container();
+        boxContainer.x = 0;
+        boxContainer.y = GAME_CONFIG.FLOOR_Y;
+
+        const box = new Graphics();
+        box.rect(0, 0, boxWidth, boxHeight).fill(GAME_CONFIG.FOREGROUND_COLOR);
+        boxContainer.addChild(box);
+
+        return boxContainer;
+    }
+
+    calculateMergeTreeLayout(totalLevel, availableWidth){
+        const animalSizes = [];
+
+        for(let i = 0; i < totalLevel; i++){
+            const desiredSize = 38 + i * 5;
+            animalSizes.push(desiredSize);
+        }
+
+        const totalAnimalWidth = animalSizes.reduce((total, size) => total + size, 0);
+        const arrowWidth = 20;
+        const totalArrowWidth = arrowWidth * (totalLevel - 1);
+
+        const fixedGap = Math.max(
+            4,
+            (availableWidth - totalAnimalWidth - totalArrowWidth) / ((totalLevel - 1) * 2)
+        );
+
+        return {animalSizes, arrowWidth, fixedGap};
+    }
+
+    createMergeTreeAnimal(level, displaySize, currentX){
+        const config = ANIMAL_LEVEL[level];
+        const baseTexture = Assets.get(config.textureName);
+
+        const frame = new Rectangle(
+            config.xSprite,
+            config.ySprite,
+            config.widthSprite,
+            config.heightSprite
+        );
+
+        const texture = new Texture({
+            source: baseTexture.source,
+            frame: frame,
+        });
+
+        const animal = new Sprite(texture);
+        animal.anchor.set(0.5);
+        animal.width = displaySize;
+        animal.height = displaySize;
+        animal.x = currentX + displaySize / 2;
+        animal.y = 0;
+        animal.level = level;
+        animal.alpha = 0.5;
+
+        return animal;
+    }
+
+    createMergeTreeArrow(level, currentX, arrowWidth){
+        const arrow = new Text({
+            text: ">",
+            style: {
+                fontFamily: GAME_CONFIG.FONT_FAMILY,
+                fontSize: 22,
+                fill: 0xffffff,
+                fontWeight: "bold",
+            },
+        });
+
+        arrow.anchor.set(0.5);
+        arrow.x = currentX + arrowWidth / 2;
+        arrow.y = 0;
+        arrow.fromLevel = level;
+        arrow.toLevel = level + 1;
+        arrow.alpha = 0.5;
+
+        return arrow;
+    }
+
     setRemoveItemClickHandler(callback) {
         this.onRemoveItemClick = callback;
     }
