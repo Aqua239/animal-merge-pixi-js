@@ -1,6 +1,6 @@
-import { Container, Graphics, Sprite, Text } from "pixi.js";
+import { Assets, Container, Graphics, Rectangle, Sprite, Text, Texture } from "pixi.js";
 import BaseScreen from "./baseScreen";
-import { GAME_CONFIG } from "../constant";
+import { ANIMAL_LEVEL, GAME_CONFIG } from "../constant";
 import { BaseButton } from "../UI/baseButton";
 import { IconButton, IconCircleButton } from "../UI/button";
 
@@ -15,6 +15,8 @@ export default class GameScreen extends BaseScreen {
         this.removeItemButton = null;
         this.onRemoveItemClick = null;
 
+        this.mergeTreeAnimals = [];
+        this.mergeTreeArrows = [];
 
         this.drawBoundaries();
         this.drawNextAnimalBackground();
@@ -251,7 +253,106 @@ export default class GameScreen extends BaseScreen {
         }
     }
 
-    drawMergeTree(){};
+    drawMergeTree(){
+        const boxWidth = GAME_CONFIG.GAME_AREA_WIDTH;
+        const boxHeight = 1920 - GAME_CONFIG.FLOOR_Y;
+        const totalLevel = Object.keys(ANIMAL_LEVEL).length;
+
+        const boxContainer = new Container();
+        boxContainer.x = 0;
+        boxContainer.y = GAME_CONFIG.FLOOR_Y;
+
+        const box = new Graphics();
+        box.rect(0, 0, boxWidth, boxHeight).fill(GAME_CONFIG.FOREGROUND_COLOR);
+        boxContainer.addChild(box);
+
+        const animalTree = new Container();
+        const paddingX = 20;
+        const availableWidth = boxWidth - paddingX * 2;
+
+        animalTree.x = paddingX;
+        animalTree.y = boxHeight / 2;
+
+        this.mergeTreeAnimals = [];
+        this.mergeTreeArrows = [];
+        const animalSizes = [];
+
+        for(let i = 0; i < totalLevel; i++){
+            const desiredSize = 38 + i * 5;
+            animalSizes.push(desiredSize);
+        }
+
+        const totalAnimalWidth = animalSizes.reduce((total, size) => total + size, 0);
+        const arrowWidth = 20;
+        const totalArrowWidth = arrowWidth * (totalLevel - 1);
+
+        const fixedGap = Math.max(
+            4,
+            (availableWidth - totalAnimalWidth - totalArrowWidth) / ((totalLevel - 1) * 2)
+        );
+        let currentX = 0;
+
+        for(let i = 0; i < totalLevel; i++){
+            const level = i + 1;
+            const config = ANIMAL_LEVEL[level];
+
+            const baseTexture = Assets.get(config.textureName);
+            const frame = new Rectangle(
+                config.xSprite,
+                config.ySprite,
+                config.widthSprite,
+                config.heightSprite
+            );
+            const texture = new Texture({
+                source: baseTexture.source,
+                frame: frame,
+            });
+
+            const animal = new Sprite(texture);
+            const displaySize = animalSizes[i];
+
+            animal.anchor.set(0.5);
+            animal.width = displaySize;
+            animal.height = displaySize;
+            animal.x = currentX + displaySize / 2;
+            animal.y = 0;
+            animal.level = level;
+            animal.alpha = 0.5;
+
+            this.mergeTreeAnimals.push(animal);
+            animalTree.addChild(animal);
+            currentX += displaySize;
+
+            if(i < totalLevel - 1){
+                currentX += fixedGap;
+                const arrow = new Text({
+                    text: ">",
+                    style: {
+                        fontFamily: GAME_CONFIG.FONT_FAMILY,
+                        fontSize: 22,
+                        fill: 0xffffff,
+                        fontWeight: "bold",
+                    },
+                });
+
+                arrow.anchor.set(0.5);
+                arrow.x = currentX + arrowWidth / 2;
+                arrow.y = 0;
+                arrow.fromLevel = level;
+                arrow.toLevel = level + 1;
+                arrow.alpha = 0.5;
+
+                this.mergeTreeArrows.push(arrow);
+                animalTree.addChild(arrow);
+
+                currentX += arrowWidth;
+                currentX += fixedGap;
+            }
+        }
+
+        boxContainer.addChild(animalTree);
+        this.container.addChild(boxContainer);
+    }
 
     setRemoveItemClickHandler(callback) {
         this.onRemoveItemClick = callback;
