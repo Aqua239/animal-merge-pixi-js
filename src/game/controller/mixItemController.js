@@ -1,4 +1,5 @@
 import { Texture } from "pixi.js";
+import { gameStore } from "../store/gameStore";
 import { MixItem } from "../entities/items/mixItem";
 
 export class MixItemController {
@@ -26,4 +27,19 @@ export class MixItemController {
         });
 
         this.gameScreen.updateItemPrice("mix", this.mixItem.cost);
+        this.gameScreen.setMixItemClickHandler(() => {
+            this.handleUseMixItem();
+        });
+    }
+
+    handleUseMixItem() {
+
+        const activated = this.mixItem.activate();
+        if (!activated) return;
+
+        //handle the physics logic here
+
+        this.mixItem.use();
+        this.gameScreen.updateCoin(gameStore.getCoin());
+    }
     }
