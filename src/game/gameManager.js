@@ -123,6 +123,7 @@ export class GameManager {
     }
 
     update(ticker) {
+        console.log(ticker.deltaMS);
         if (!this.isGameRunning || this.isGameOver || this.isGamePause) return;
 
         const timestep = PhysicsConfig.timeStep * ticker.deltaMS;

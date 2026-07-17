@@ -120,7 +120,7 @@ export const PhysicsConfig = {
     initialVelocityY: 0,
 
     // --- Linear motion ---
-    gravity: 50 * PixelPerMeter,
+    gravity: 20 * PixelPerMeter,
     linearDamping: 0.6,     // velocity decay per second: vx *= exp(-damping * dt)
     stopVthreshold: 1,      // zero out velocity below this threshold
     vChanged: 1,
@@ -133,7 +133,7 @@ export const PhysicsConfig = {
     maxAngularVelocity: 5,       // max spin speed (rad/s)
 
     // --- Friction & Spin ---
-    FRICTION: 0.2,          // tangential friction coefficient for circle-circle contact
+    FRICTION: 0.3,          // tangential friction coefficient for circle-circle contact
     rollingStaticDamping: 0.75,        // strong damping for static/resting stack contacts
     rollingMovingDamping: 0.999,       // very gentle damping for moving/rolling contacts
     rollingStaticSpeedThreshold: 35,   // speed threshold (px/s) to classify resting stack
