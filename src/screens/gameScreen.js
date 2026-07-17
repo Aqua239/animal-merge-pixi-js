@@ -14,7 +14,9 @@ export default class GameScreen extends BaseScreen {
         this.onSetting = onSetting;
 
         this.removeItemButton = null;
+        this.mixItemButton = null;
         this.onRemoveItemClick = null;
+        this.onMixItemClick = null;
 
         this.mergeTreeAnimals = [];
         this.mergeTreeArrows = [];
@@ -456,5 +458,10 @@ export default class GameScreen extends BaseScreen {
     setRemoveItemClickHandler(callback) {
         this.onRemoveItemClick = callback;
     }
+
+    setMixItemClickHandler(callback){
+        this.onMixItemClick = callback;
+    }
+
 }
 

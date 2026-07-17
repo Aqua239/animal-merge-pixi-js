@@ -38,6 +38,7 @@ export async function loadGameAssets(onProgressCallback) {
         { alias: "icon_star", src: "/assets/images/icons/star.svg" },
         { alias: "icon_resume", src: "/assets/images/icons/resume.png" },
         { alias: "icon_resume_white", src: "/assets/images/icons/resume_white.png" },
+        { alias: "icon_mix", src: "/assets/images/icons/arrows.png"},
 
         // Sounds
         { alias: "sound_background", src: "/assets/sounds/sound_background.ogg" },
