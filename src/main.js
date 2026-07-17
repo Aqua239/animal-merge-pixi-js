@@ -10,7 +10,7 @@ import GameScreen from "./screens/gameScreen";
 import LeaderBoardPopup from "./overlays/leaderBoardPopup";
 import SettingPopup from "./overlays/settingPopup";
 
-async function main(){
+async function main() {
     const app = new Application();
 
     await app.init({
@@ -48,11 +48,11 @@ async function main(){
     masterContainer.addChild(loadingScreen.container);
     loadingScreen.show();
 
-    await loadGameAssets((progress) => {loadingScreen.updateProgress(progress)});
+    await loadGameAssets((progress) => { loadingScreen.updateProgress(progress) });
     loadingScreen.hide();
 
-    sound.play("sound_background", {loop: true, volume: 0.6});
-    const leaderBoardPopup =new LeaderBoardPopup();
+    sound.play("sound_background", { loop: true, volume: 0.6 });
+    const leaderBoardPopup = new LeaderBoardPopup();
 
     let game = null;
     const gameScreen = new GameScreen({
@@ -66,7 +66,7 @@ async function main(){
             mainMenuScreen.hide();
             gameScreen.show();
 
-            if(game === null){
+            if (game === null) {
                 game = new GameManager({
                     app,
                     gameContainer:
@@ -95,7 +95,7 @@ async function main(){
     const settingPopup = new SettingPopup({
         onRestart: () => {
             settingPopup.hide();
-            if(game) game.gameOverController.replayGame();
+            if (game) game.gameOverController.replayGame();
         },
         onResume: () => {
             settingPopup.hide();
@@ -120,12 +120,12 @@ async function main(){
     window.addEventListener(
         "keydown",
         (event) => {
-            if(event.code === "Space" &&game){
+            if (event.code === "Space" && game) {
                 event.preventDefault();
                 game.gameOverController.gameOver();
             }
 
-            if(event.code === "Enter"){
+            if (event.code === "Enter") {
                 event.preventDefault();
                 settingPopup.show();
             }

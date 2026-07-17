@@ -74,7 +74,7 @@ export class Physics {
         let j = (-(1 + restitution) * speed) / (invMassA + invMassB);
 
         //limit impluse
-        const maxImpulse = 1000;
+        const maxImpulse = PhysicsConfig.maxImpulse;
         j = Math.max(-maxImpulse, Math.min(maxImpulse, j));
 
         const impulse = {
@@ -108,9 +108,11 @@ export class Physics {
     }
 
     static applyRollingFrictionCircleToCircle(colliderA, colliderB, normal, normalImpulse = 0) {
-        const speedThreshold = PhysicsConfig.stopVthreshold;
-        const isStaticA = Math.abs(colliderA.prevVx) < speedThreshold && Math.abs(colliderA.prevVy) < speedThreshold;
-        const isStaticB = Math.abs(colliderB.prevVx) < speedThreshold && Math.abs(colliderB.prevVy) < speedThreshold;
+        const baseThreshold = PhysicsConfig.rollingStaticSpeedThreshold;
+        const speedThresholdA = baseThreshold * (245 / colliderA.radius);
+        const speedThresholdB = baseThreshold * (245 / colliderB.radius);
+        const isStaticA = Math.abs(colliderA.prevVx) < speedThresholdA && Math.abs(colliderA.prevVy) < speedThresholdA;
+        const isStaticB = Math.abs(colliderB.prevVx) < speedThresholdB && Math.abs(colliderB.prevVy) < speedThresholdB;
 
         // Keep rolling resistance active to drain spin when touching/resting
         colliderA.angularVelocity *= isStaticA ? PhysicsConfig.rollingStaticDamping : PhysicsConfig.rollingMovingDamping;
@@ -132,7 +134,7 @@ export class Physics {
         const { invMass: invMassA, invI: invIA } = this.computeColliderInertia(colliderA);
         const { invMass: invMassB, invI: invIB } = this.computeColliderInertia(colliderB);
 
-        const effectiveMass = invMassA + invMassB + colliderA.radius * invIA + colliderB.radius * invIB;
+        const effectiveMass = invMassA + invMassB + colliderA.radius * colliderA.radius * invIA + colliderB.radius * colliderB.radius * invIB;
 
         const frictionImpulse = this.computeClampedFrictionImpulse(slip, effectiveMass, normalImpulse);
 
@@ -141,8 +143,18 @@ export class Physics {
         colliderB.vx -= frictionImpulse * invMassB * tangent.x;
         colliderB.vy -= frictionImpulse * invMassB * tangent.y;
 
-        colliderA.angularVelocity += frictionImpulse * invIA;
-        colliderB.angularVelocity += frictionImpulse * invIB;
+        let deltaWA = frictionImpulse * colliderA.radius * invIA;
+        let deltaWB = frictionImpulse * colliderB.radius * invIB;
+
+        // Prevent angular velocity overshoot by clamping it to the required change to make slip 0
+        const maxDeltaWA = Math.abs(slip) / colliderA.radius;
+        const maxDeltaWB = Math.abs(slip) / colliderB.radius;
+
+        if (Math.abs(deltaWA) > maxDeltaWA) deltaWA = Math.sign(deltaWA) * maxDeltaWA;
+        if (Math.abs(deltaWB) > maxDeltaWB) deltaWB = Math.sign(deltaWB) * maxDeltaWB;
+
+        colliderA.angularVelocity += deltaWA;
+        colliderB.angularVelocity += deltaWB;
 
         colliderA.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderA.angularVelocity));
         colliderB.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, colliderB.angularVelocity));
@@ -150,8 +162,9 @@ export class Physics {
 
     // Impulse-based floor rolling friction
     static applyRollingFrictionCircleToGround(collider, normalImpulse = 0) {
-        const isStatic = Math.abs(collider.prevVx) < PhysicsConfig.rollingStaticSpeedThreshold
-            && Math.abs(collider.prevVy) < PhysicsConfig.rollingStaticSpeedThreshold;
+        const speedThreshold = PhysicsConfig.rollingStaticSpeedThreshold * (245 / collider.radius);
+        const isStatic = Math.abs(collider.prevVx) < speedThreshold
+            && Math.abs(collider.prevVy) < speedThreshold;
 
         const slip = collider.vx - collider.angularVelocity * collider.radius;
         if (Math.abs(slip) < 0.5) {
@@ -161,13 +174,18 @@ export class Physics {
 
         const { invMass, invI } = this.computeColliderInertia(collider);
 
-        //effectiveMass = invMass + radius * invI
-        const effectiveMass = invMass + collider.radius * invI;
+        //effectiveMass = invMass + radius * radius * invI
+        const effectiveMass = invMass + collider.radius * collider.radius * invI;
 
         const frictionImpulse = this.computeClampedFrictionImpulse(-slip, effectiveMass, normalImpulse);
 
         collider.vx -= frictionImpulse * invMass;
-        collider.angularVelocity += frictionImpulse * invI;
+        
+        let deltaW = frictionImpulse * collider.radius * invI;
+        const maxDeltaW = Math.abs(slip) / collider.radius;
+        if (Math.abs(deltaW) > maxDeltaW) deltaW = Math.sign(deltaW) * maxDeltaW;
+        
+        collider.angularVelocity += deltaW;
         collider.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, collider.angularVelocity));
     }
 
@@ -190,11 +208,9 @@ export class Physics {
 
     static computeColliderInertia(collider) {
         const invMass = 1 / collider.computeMass();
-
-        // reduce inertia so it's easier to spin
-        const invMassRotational = 1 / collider.radius;
-        const invI = 2 * invMassRotational / collider.radius;
-
+        // Use 300 * invMass / r^2 to balance highly responsive angular rotation
+        // while avoiding clamping overshoot oscillation for small circles (first 4 levels)
+        const invI = (300 * invMass) / (collider.radius * collider.radius);
         return { invMass, invI };
     }
 

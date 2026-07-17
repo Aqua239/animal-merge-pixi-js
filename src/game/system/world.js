@@ -27,10 +27,8 @@ export class World {
     }
 
     update(dt) {
-        this.collisionSystem.beginFrame();
 
-        const preX = this.animals.map(a => a.collider.x);
-        const preY = this.animals.map(a => a.collider.y);
+        this.collisionSystem.beginFrame();
 
         this.updatePositions(dt);
         this.animals.sort((a, b) => b.collider.y - a.collider.y);
@@ -40,6 +38,8 @@ export class World {
         const circleContactMap = new Map();
 
         for (let i = 0; i < maxloop; i++) {
+
+            this.handleCollisionsCirclesToTop(-300);
             const groundContacts = this.handleCollisionsCirclesToBoxes();
             const circleContacts = this.handleCollisionsCirclesToCircles();
 
@@ -67,35 +67,9 @@ export class World {
 
         this.syncAnimalPositions();
         this.collisionSystem.endFrame();
-        this.processRestingContacts(preX, preY, dt);
     }
 
-    // Stop if the animal is resting on the ground for a while, to prevent jittering and sliding
-    processRestingContacts(preX, preY, dt) {
-        this.animals.forEach((animal, i) => {
-            if (!animal.isPhysicsActive) return;
-            const c = animal.collider;
-            if (c.isSleeping) return;
 
-            const dx = Math.abs(c.x - preX[i]);
-            const dy = Math.abs(c.y - preY[i]);
-
-            const posEpsilon = PhysicsConfig.sleepPosEpsilon * (c.radius / ANIMAL_LEVEL[1].radius);
-            const isResting = dx < posEpsilon && dy < posEpsilon;
-
-            if (isResting) {
-                c.stableTime += dt;
-                if (c.stableTime > PhysicsConfig.sleepTimeThreshold) {
-                    c.vx = 0;
-                    c.vy = 0;
-                    c.angularVelocity = 0;
-                    c.isSleeping = true;
-                }
-            } else {
-                c.stableTime = 0;
-            }
-        });
-    }
 
     updatePositions(dt) {
         for (const animal of this.animals) {
@@ -117,7 +91,7 @@ export class World {
     handleCollisionsCirclesToBoxes() {
         const touching = [];
         for (const animal of this.animals) {
-            if (animal.isPhysicsActive && !animal.collider.isSleeping) {
+            if (animal.isPhysicsActive) {
                 if (animal.collider.checkCollisionCircleToBox(this.box)) {
                     touching.push(animal);
                 }
@@ -143,11 +117,7 @@ export class World {
                 const cB = animalB.collider;
                 if (!cA.checkCollisionWithCircle(cB)) continue;
 
-                // 1 sleeping --> wake up another
-                if (cA.isSleeping && !cB.isSleeping) cA.wake();
-                if (cB.isSleeping && !cA.isSleeping) cB.wake();
 
-                if (cA.isSleeping && cB.isSleeping) continue; // 2 sleeping, ignore
 
                 const keys = Object.keys(ANIMAL_LEVEL);
                 const maxLevel = Math.max(...keys);
@@ -176,6 +146,16 @@ export class World {
         return contacts.filter(c => !toRemove.has(c.animalA) && !toRemove.has(c.animalB));
     }
 
+    handleCollisionsCirclesToTop(y) {
+        for (const animal of this.animals) {
+            if (animal.collider.checkCollisionCircleOverTop(y)) {
+                console.log("detect top");
+                animal.collider.y = y + animal.collider.radius;
+                animal.collider.vy = 0;
+            }
+        }
+    }
+
     checkCollisionCircleToTop(y) {
         for (const animal of this.animals) {
             if (animal.isPhysicsActive) {
@@ -185,5 +165,18 @@ export class World {
             }
         }
         return false;
+    }
+
+    activateItemFly() {
+        this.animals.sort((a, b) => a.collider.y - b.collider.y);
+        for (const animal of this.animals) {
+            if (animal.isPhysicsActive) {
+                // Heavier animals (higher level) fly less
+                const levelFactor = Math.max(0.15, 1 - (animal.level - 1) * 0.05);
+                animal.collider.vy = -1800 * levelFactor;
+                animal.collider.vx = (Math.random() - 0.5) * 5000 * levelFactor;
+                animal.collider.wake();
+            }
+        }
     }
 }
