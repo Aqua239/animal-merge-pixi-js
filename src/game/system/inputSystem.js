@@ -89,6 +89,7 @@ export class InputSystem {
         this.gameManager.animalPool.push(this.gameManager.currentAnimal);
         this.gameManager.addAnimalToPhysicState(this.gameManager.currentAnimal);
         this.gameManager.removeItemController.handleAnimalEvent(this.gameManager.currentAnimal);
+        this.gameManager.updateMergeTree();
         this.gameManager.currentAnimal = null;
 
         setTimeout(() => {

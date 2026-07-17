@@ -112,6 +112,7 @@ export class AnimalSystem {
         this.gameManager.gameContainer.addChild(mergedAnimal);
         this.gameManager.animalPool.push(mergedAnimal);
         this.gameManager.removeItemController.handleAnimalEvent(mergedAnimal);
+        this.gameManager.updateMergeTree();
         animal1.destroy();
         animal2.destroy();
 

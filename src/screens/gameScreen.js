@@ -354,6 +354,18 @@ export default class GameScreen extends BaseScreen {
         this.container.addChild(boxContainer);
     }
 
+    updateMergeTreeHighestLevel(highestLevel){
+        for(const animal of this.mergeTreeAnimals){
+            animal.alpha = animal.level <= highestLevel ? 1 : 0.5;
+        }
+        console.log(this.mergeTreeArrows);
+
+
+        for(const arrow of this.mergeTreeArrows){
+            arrow.alpha = arrow.toLevel <= highestLevel ? 1 : 0.5;
+            console.log(arrow.toLevel);
+        }
+    }
     setRemoveItemClickHandler(callback) {
         this.onRemoveItemClick = callback;
     }
