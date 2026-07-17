@@ -10,6 +10,7 @@ import { GameManager } from "./game/gameManager";
 import MainMenuScreen from "./screens/mainMenuScreen";
 import LeaderBoardPopup from "./overlays/leaderBoardPopup";
 import SettingPopup from "./overlays/settingPopup";
+import { playMergeEffect } from "./effects";
 
 async function runTest() {
     const app = new Application();
@@ -58,7 +59,7 @@ async function runTest() {
 
     loadingScreen.hide();
 
-    sound.play("sound_background", {loop: true, volume: 0.6});
+    sound.play("sound_background", {loop: true, volume: 0.1});
     const leaderBoardPopup = new LeaderBoardPopup();
     const settingPopup = new SettingPopup({
         onRestart: () => {

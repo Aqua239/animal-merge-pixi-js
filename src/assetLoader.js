@@ -10,6 +10,9 @@ export async function loadGameAssets(onProgressCallback) {
         // Panels
         { alias: "panel_rounded", src: "/assets/images/panels/rounded.svg" },
 
+        // VFX
+        { alias: "effect_merge", src: "/assets/vfx/merge_effect.json" },
+
         // Buttons
         { alias: "button_setting", src: "/assets/images/buttons/setting.svg" },
         { alias: "button_base", src: "/assets/images/buttons/base.svg" },

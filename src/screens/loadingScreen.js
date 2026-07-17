@@ -24,7 +24,7 @@ export default class LoadingScreen extends BaseScreen {
             dropShadowDistance: 5,
         };
 
-        const title = new Text("Animal Merge", style);
+        const title = new Text({text: "Animal Merge", style});
 
         title.anchor.set(0.5);
         title.x = GAME_CONFIG.SCREEN_WIDTH / 2;

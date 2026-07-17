@@ -1,0 +1,75 @@
+{
+  "frames": {
+    "merge_01": {
+      "frame": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "merge_02": {
+      "frame": { "x": 171, "y": 0, "w": 170, "h": 170 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "merge_03": {
+      "frame": { "x": 342, "y": 0, "w": 170, "h": 170 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "merge_04": {
+      "frame": { "x": 0, "y": 171, "w": 170, "h": 170 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "merge_05": {
+      "frame": { "x": 171, "y": 171, "w": 170, "h": 170 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "merge_06": {
+      "frame": { "x": 342, "y": 171, "w": 170, "h": 170 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "merge_07": {
+      "frame": { "x": 0, "y": 342, "w": 170, "h": 170 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "merge_08": {
+      "frame": { "x": 171, "y": 342, "w": 170, "h": 170 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "merge_09": {
+      "frame": { "x": 342, "y": 342, "w": 170, "h": 170 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    }
+  },
+  "meta": {
+    "app": "PixiJS Sprite Sheet Editor",
+    "version": "1.0",
+    "image": "animation_merge.png",
+    "format": "RGBA8888",
+    "size": { "w": 512, "h": 512 },
+    "scale": "1"
+  }
+}
