@@ -71,7 +71,11 @@ export class Physics {
 
         if (speed > 0) return;
 
-        const j = (-(1 + restitution) * speed) / (invMassA + invMassB);
+        let j = (-(1 + restitution) * speed) / (invMassA + invMassB);
+
+        //limit impluse
+        const maxImpulse = 1000;
+        j = Math.max(-maxImpulse, Math.min(maxImpulse, j));
 
         const impulse = {
             x: j * normal.x,

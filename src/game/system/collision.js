@@ -37,7 +37,7 @@ export class Collision {
         const newVy = (m1 * colliderA.vy + m2 * colliderB.vy) / (m1 + m2);
 
         newCircle.vx = newVx;
-        newCircle.vy = newVy + 50;
+        newCircle.vy = newVy;
 
         return newCircle;
 
@@ -54,7 +54,10 @@ export class Collision {
         const rv = Physics.getRelativeVelocity(colliderA, colliderB);
         const relativeSpeed = rv.x * vCollisionNorm.x + rv.y * vCollisionNorm.y;
 
-        const restitution = (isNewContact && Math.abs(relativeSpeed) > 100) ? PhysicsConfig.restitution : 0;
+        // const restitution = (isNewContact && Math.abs(relativeSpeed) > 100) ? PhysicsConfig.restitution : 0;
+        // const restitution = PhysicsConfig.restitution;
+        const isVerticalHit = Math.abs(vCollisionNorm.y) > 0.5;
+        const restitution = (isNewContact && isVerticalHit && Math.abs(relativeSpeed) > 100) ? PhysicsConfig.restitution : 0;
         const impulseResult = Physics.computeImpulseVelocity(colliderA, colliderB, vCollisionNorm, restitution);
 
         let normalImpulse = 0;
