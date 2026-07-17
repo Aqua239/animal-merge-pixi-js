@@ -37,7 +37,7 @@ export class Collision {
         const newVy = (m1 * colliderA.vy + m2 * colliderB.vy) / (m1 + m2);
 
         newCircle.vx = newVx;
-        newCircle.vy = newVy + 50;
+        newCircle.vy = newVy;
 
         return newCircle;
 

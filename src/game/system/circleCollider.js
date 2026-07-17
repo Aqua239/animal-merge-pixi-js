@@ -51,7 +51,7 @@ export class CircleCollider extends Collider {
     }
 
     computeMass() {
-        return Math.PI * this.radius * this.radius * 2;
+        return Math.PI * Math.pow(this.radius * 10, 3);
     }
 
     getLevel() {
@@ -68,23 +68,24 @@ export class CircleCollider extends Collider {
         const dx = this.x - colliderOther.x;
         const dy = this.y - colliderOther.y;
         const radiusSum = this.radius + colliderOther.radius;
-        return dx * dx + dy * dy < radiusSum * radiusSum;
+        return dx * dx + dy * dy <= radiusSum * radiusSum;
     }
 
     checkCollisionCircleOnLeftRight(x, width) {
-        if (this.x - this.radius < x) {
+        if (this.x - this.radius <= x) {
             this.vx = Math.abs(this.vx) * PhysicsConfig.restitution;
             this.x = x + this.radius;
         }
-        if (this.x + this.radius > x + width) {
+        if (this.x + this.radius >= x + width) {
             this.vx = -Math.abs(this.vx) * PhysicsConfig.restitution;
             this.x = x + width - this.radius;
         }
     }
 
     checkCollisionCircleInBottom(y, height) {
-        if (this.y + this.radius > y + height) {
-            this.vy = -Math.abs(this.vy) * PhysicsConfig.restitution;
+        if (this.y + this.radius >= y + height) {
+            if (this.vy < 0) this.vy = 0;
+            else this.vy = -Math.abs(this.vy) * PhysicsConfig.restitution;
             this.y = y + height - this.radius;
 
             if (Math.abs(this.vy) < PhysicsConfig.stopVthreshold) this.vy = 0;

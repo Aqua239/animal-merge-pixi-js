@@ -29,28 +29,45 @@ export class World {
     update(dt) {
         this.collisionSystem.beginFrame();
 
-        // Save pre-update positions
         const preX = this.animals.map(a => a.collider.x);
         const preY = this.animals.map(a => a.collider.y);
 
         this.updatePositions(dt);
-        const maxloop = 200;
+        this.animals.sort((a, b) => b.collider.y - a.collider.y);
+
+        const maxloop = 20;
+        const groundContactSet = new Set();
+        const circleContactMap = new Map();
+
         for (let i = 0; i < maxloop; i++) {
             const groundContacts = this.handleCollisionsCirclesToBoxes();
             const circleContacts = this.handleCollisionsCirclesToCircles();
 
-            for (const animal of groundContacts) {
-                animal.collider.applyGroundFriction();
-            }
+            for (const a of groundContacts) groundContactSet.add(a);
             for (const c of circleContacts) {
-                this.collisionSystem.resolveFrictionCircleToCircle(c.animalA.collider, c.animalB.collider, c.normal, c.normalImpulse);
+                const key = this.collisionSystem.getPairKey(c.animalA.collider, c.animalB.collider);
+                if (circleContactMap.has(key)) {
+                    const existing = circleContactMap.get(key);
+                    existing.normalImpulse += c.normalImpulse;
+                    existing.normal = c.normal; //total impluse
+                } else {
+                    circleContactMap.set(key, { ...c });
+                }
             }
         }
+
+        for (const animal of groundContactSet) {
+            animal.collider.applyGroundFriction();
+        }
+        for (const c of circleContactMap.values()) {
+            this.collisionSystem.resolveFrictionCircleToCircle(
+                c.animalA.collider, c.animalB.collider, c.normal, c.normalImpulse
+            );
+        }
+
         this.syncAnimalPositions();
         this.collisionSystem.endFrame();
-
         this.processRestingContacts(preX, preY, dt);
-
     }
 
     // Stop if the animal is resting on the ground for a while, to prevent jittering and sliding
@@ -137,6 +154,8 @@ export class World {
                 if (animalA.level === animalB.level && animalA.level < maxLevel) {
                     const newCollider = this.collisionSystem.resolveCollisionCircleToCircleByMerge(cA, cB);
                     let newAnimal = this.onMerge ? this.onMerge(animalA, animalB, newCollider) : null;
+                    newAnimal.collider.vx = 0;
+                    newAnimal.collider.vy = 0;
                     if (!newAnimal) {
                         newAnimal = { collider: newCollider, level: animalA.level + 1, isPhysicsActive: true, x: newCollider.x, y: newCollider.y };
                     }
