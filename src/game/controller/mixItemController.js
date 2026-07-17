@@ -42,4 +42,9 @@ export class MixItemController {
         this.mixItem.use();
         this.gameScreen.updateCoin(gameStore.getCoin());
     }
+    updateButtonState(isActive) {
+        const button = this.gameScreen.mixItemButton;
+        if (!button) return;
+        button.alpha =isActive ? 0.7 : 1;
+    }
     }
