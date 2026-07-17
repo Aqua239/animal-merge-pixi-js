@@ -9,5 +9,12 @@ export class MixItem extends SupportItem{
         this.sprite.height = height;
     }
 
-    
+    use(){
+        if (!this.isActive) return;
+        const isUsed = this.reduceQuantity();
+        if (!isUsed) return;
+        this.hasPendingPurchase = false;
+
+        this.deactivate();
+    }
 }
