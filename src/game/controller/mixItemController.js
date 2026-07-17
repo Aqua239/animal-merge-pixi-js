@@ -47,4 +47,9 @@ export class MixItemController {
         if (!button) return;
         button.alpha =isActive ? 0.7 : 1;
     }
+
+    reset() {
+        if (this.mixItem.isActive) this.mixItem.cancel();
+        this.updateButtonState(false);
     }
+}
