@@ -74,7 +74,7 @@ export class Physics {
         let j = (-(1 + restitution) * speed) / (invMassA + invMassB);
 
         //limit impluse
-        const maxImpulse = 1000;
+        const maxImpulse = PhysicsConfig.maxImpulse;
         j = Math.max(-maxImpulse, Math.min(maxImpulse, j));
 
         const impulse = {
@@ -191,9 +191,8 @@ export class Physics {
     static computeColliderInertia(collider) {
         const invMass = 1 / collider.computeMass();
 
-        // reduce inertia so it's easier to spin
-        const invMassRotational = 1 / collider.radius;
-        const invI = 2 * invMassRotational / collider.radius;
+        // scale invI down to 30000 to increase rotational inertia (preventing slight spinning in place)
+        const invI = (2 / (collider.radius * collider.radius)) * 30000;
 
         return { invMass, invI };
     }

@@ -128,21 +128,24 @@ export const PhysicsConfig = {
     restitution: 0.25,       // bounciness (0 = no bounce, 1 = full bounce)
 
     // --- Rotation ---
-    angularDamping: 4.0,         // angular velocity decay per second
-    angularStopThreshold: 0.2,  // zero out angular velocity below this threshold
+    angularDamping: 8.0,         // angular velocity decay per second
+    angularStopThreshold: 0.5,  // zero out angular velocity below this threshold
     maxAngularVelocity: 5,       // max spin speed (rad/s)
 
     // --- Friction & Spin ---
     FRICTION: 0.3,          // tangential friction coefficient for circle-circle contact
-    rollingStaticDamping: 0.75,        // strong damping for static/resting stack contacts
+    rollingStaticDamping: 0.98,        // strong damping for static/resting stack contacts
     rollingMovingDamping: 0.999,       // very gentle damping for moving/rolling contacts
-    rollingStaticSpeedThreshold: 35,   // speed threshold (px/s) to classify resting stack
+    rollingStaticSpeedThreshold: 10,   // speed threshold (px/s) to classify resting stack
     baumgarteSlop: 0.05,               // penetration tolerance (pixels)
     baumgartePercent: 0.6,             // penetration correction factor
 
     //sleep thresholds for resting contacts
     sleepTimeThreshold: 0.2,
     sleepPosEpsilon: 0.05,
+
+    // --- Impulse Limits ---
+    maxImpulse: 5000, // Small limit for scaled mass to ensure proper collision resolution
 
     timeStep: 1 / 1000,
     maxRadius: ANIMAL_LEVEL[maxLevelKey].radius,
