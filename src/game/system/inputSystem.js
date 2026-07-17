@@ -1,3 +1,4 @@
+import { sound } from "@pixi/sound";
 import { GAME_CONFIG } from "../../constant";
 
 export class InputSystem {
@@ -82,6 +83,9 @@ export class InputSystem {
 
     dropAnimal(){
         if(!this.canInteractWithCurrentAnimal()) return;
+
+        //SFX
+        sound.play('sound_sfx_atlas', {sprite: "drop", volume: 0.3});
 
         this.gameManager.isDrop = false;
         this.gameManager.currentAnimal.convertPhysicMode();

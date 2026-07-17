@@ -134,6 +134,9 @@ export class GameManager {
 
         for (let animal of this.animalPool) {
             animal.setSpriteFollowCollider();
+            if (animal.updateScale) {
+                animal.updateScale();
+            }
         }
     }
 
