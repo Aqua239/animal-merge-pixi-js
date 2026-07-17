@@ -22,6 +22,8 @@ export class RemoveItemController {
             },
         });
 
+        this.gameScreen.updateItemPrice("remove", this.removeItem.cost);
+
         this.gameScreen.setRemoveItemClickHandler(() => {
             this.removeItem.toggle();
             this.gameScreen.updateCoin(gameStore.getCoin());
