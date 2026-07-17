@@ -51,7 +51,7 @@ export class CircleCollider extends Collider {
     }
 
     computeMass() {
-        return Math.PI * Math.pow(this.radius * 10, 3);
+        return Math.PI * Math.pow(this.radius, 3);
     }
 
     getLevel() {
