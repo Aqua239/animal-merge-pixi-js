@@ -19,9 +19,12 @@ export default class GameScreen extends BaseScreen {
         this.drawBoundaries();
         this.drawNextAnimalBackground();
         this.drawScores();
+        this.drawCountdown();
         this.drawSettingsButton();
         this.drawShopPanel()
         this.drawMergeTree();
+
+        this.hideCountdown();
     }
 
     drawBoundaries() {
@@ -114,6 +117,32 @@ export default class GameScreen extends BaseScreen {
 
         const screenCenterX = GAME_CONFIG.SCREEN_WIDTH / 2;
         this.highScoreContainer.x = screenCenterX - (this.highScoreContainer.width / 2);
+    }
+
+    drawCountdown(){
+        const countdownStyle = {fontFamily: GAME_CONFIG.FONT_FAMILY, fontSize: 250, fill: GAME_CONFIG.TEXT_COLOR, fontWeight: 'bold'};
+        this.countdownContainer = new Container();
+
+        this.countdownText = new Text({text: '5', style: countdownStyle});
+        this.countdownText.x = 0;
+        this.countdownText.y = 0;
+
+        this.countdownContainer.addChild(this.countdownText);
+        this.countdownContainer.x = (GAME_CONFIG.SCREEN_WIDTH / 2) - (this.countdownContainer.width / 2);
+        this.countdownContainer.y = 190;
+        this.container.addChild(this.countdownContainer);
+    }
+
+    updateCountdown(countdown){
+        this.countdownText.text = countdown.toString();
+    }
+
+    showCountdown(){
+        this.countdownText.visible = true;
+    }
+
+    hideCountdown(){
+        this.countdownText.visible = false;
     }
 
     drawSettingsButton() {
