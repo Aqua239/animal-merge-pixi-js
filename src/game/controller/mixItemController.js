@@ -5,12 +5,10 @@ import { MixItem } from "../entities/items/mixItem";
 export class MixItemController {
     constructor(
         gameManager,
-        gameScreen,
-        mixAnimalSystem
+        gameScreen
     ) {
         this.gameManager = gameManager;
         this.gameScreen = gameScreen;
-        this.mixAnimalSystem = mixAnimalSystem;
 
         this.mixItem = new MixItem({
             texture: Texture.WHITE,
@@ -19,7 +17,7 @@ export class MixItemController {
             y: 200,
             width: 50,
             height: 50,
-            cost: 1,
+            cost: 350,
 
             onUse: (item) => {
                 this.updateButtonState(item.isActive);
@@ -33,17 +31,27 @@ export class MixItemController {
     }
 
     handleUseMixItem() {
+        if (!this.canUseMixItem()) return;
 
         const activated = this.mixItem.activate();
         if (!activated) return;
 
-        //handle the physics logic here
-
+        this.gameManager.world.activateItemFly();
         setTimeout(() => {
             this.mixItem.use();
         }, 3000)
+
         this.gameScreen.updateCoin(gameStore.getCoin());
     }
+
+    canUseMixItem() {
+        if (!this.gameManager.isGameRunning) return false;
+        if (this.gameManager.isGamePause) return false;
+        if (this.gameManager.isGameOver) return false;
+        if (this.gameManager.world.animals.length === 0) return false;
+        return true;
+    }
+
     updateButtonState(isActive) {
         const button = this.gameScreen.mixItemButton;
         if (!button) return;

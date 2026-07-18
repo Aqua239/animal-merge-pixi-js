@@ -32,6 +32,10 @@ export class GameManager {
 
         // this.physics = new Physics();
         // this.physics.box = {
+
+        this.animalSystem = new AnimalSystem(this);
+        this.inputSystem = new InputSystem(this);
+
         this.box = {
             x: 0,
             y: GAME_CONFIG.CEILING_Y,
@@ -39,15 +43,14 @@ export class GameManager {
             height: GAME_CONFIG.FLOOR_Y - GAME_CONFIG.CEILING_Y
         };
 
-        this.animalSystem = new AnimalSystem(this);
-        this.inputSystem = new InputSystem(this);
-        this.removeItemController = new RemoveItemController(this, gameScreen);
-        this.gameOverController = new GameOverController(this);
         this.world = new World(this.box,
             (animal1, animal2, mergedCollider) => {
                 return this.animalSystem.mergeAnimals(animal1, animal2, mergedCollider);
             }
         );
+
+        this.removeItemController = new RemoveItemController(this, gameScreen);
+        this.gameOverController = new GameOverController(this);
         this.mixItemController = new MixItemController(this, gameScreen, this.mixAnimalSystem);
 
         // window._world = this.world; //for debug
@@ -144,7 +147,6 @@ export class GameManager {
 
         const timestep = PhysicsConfig.timeStep * ticker.deltaMS;
         this.world.update(timestep);
-
         this.gameOverController.checkAnimalToTop(ticker.deltaMS);
 
         for (let animal of this.animalPool) {
