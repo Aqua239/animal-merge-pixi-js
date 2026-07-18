@@ -22,7 +22,12 @@ export class RemoveItemController {
             },
         });
 
+        this.gameScreen.updateItemPrice("remove", this.removeItem.cost);
+
         this.gameScreen.setRemoveItemClickHandler(() => {
+            const isMixActive = this.gameManager.mixItemController.mixItem.isActive ?? false;
+            if (isMixActive) return;
+            
             this.removeItem.toggle();
             this.gameScreen.updateCoin(gameStore.getCoin());
         });

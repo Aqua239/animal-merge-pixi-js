@@ -56,7 +56,7 @@ export class AnimalSystem {
             this.gameManager.currentAnimal
         ){
             this.gameManager.isSpawner = true;
-            let randomLevel = Math.floor(Math.random() * 10) + 1;
+            let randomLevel = Math.floor(Math.random() * 5) + 1;
             this.gameManager.nextAnimal = this.spawnAnimal(xSpawn, ySpawn, randomLevel, true);
         }
     }

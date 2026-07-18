@@ -14,7 +14,9 @@ export default class GameScreen extends BaseScreen {
         this.onSetting = onSetting;
 
         this.removeItemButton = null;
+        this.mixItemButton = null;
         this.onRemoveItemClick = null;
+        this.onMixItemClick = null;
 
         this.mergeTreeAnimals = [];
         this.mergeTreeArrows = [];
@@ -200,9 +202,13 @@ export default class GameScreen extends BaseScreen {
     }
 
     drawItemDisplay(parentContainer) {
-        const itemContainer = new Container();
-        itemContainer.x = 50;
-        itemContainer.y = 125;
+        const boxItemContainer = new Container();
+        boxItemContainer.x = 50;
+        boxItemContainer.y = 125;
+
+        const removeItemContainer = new Container();
+        removeItemContainer.x = 0;
+        removeItemContainer.y = 0;
 
         this.removeItemButton = new IconCircleButton({
             textureName: "button_circle",
@@ -217,34 +223,93 @@ export default class GameScreen extends BaseScreen {
             }
         });
 
-        const itemPriceContainer = new Container();
+        const removePriceDisplay =this.createItemPriceDisplay(0);
+        this.removeItemPriceText = removePriceDisplay.priceText;
+        this.removeItemPriceIcon = removePriceDisplay.priceIcon;
+        removePriceDisplay.container.x = -removePriceDisplay.container.width / 2;
+        removePriceDisplay.container.y = this.removeItemButton.height / 2 + 25;
+        removeItemContainer.addChild(this.removeItemButton, removePriceDisplay.container);
 
-        const itemPriceText = new Text({
-            text: '100',
+
+        const mixItemContainer = new Container();
+        mixItemContainer.x = 130;
+        mixItemContainer.y = 0;
+
+        this.mixItemButton = new IconCircleButton({
+            textureName: "button_circle",
+            x: 0, y: 0,
+            width: 100, height: 100,
+            radius: 50,
+            iconName: "icon_mix",
+            onClick: () => {
+                if(this.onMixItemClick){
+                    this.onMixItemClick();
+                }
+            }
+        })
+
+        const mixPriceDisplay = this.createItemPriceDisplay(0);
+        this.mixItemPriceText = mixPriceDisplay.priceText;
+        this.mixItemPriceIcon = mixPriceDisplay.priceIcon;
+        mixPriceDisplay.container.x = -mixPriceDisplay.container.width / 2;
+        mixPriceDisplay.container.y = this.mixItemButton.height / 2 + 25;
+        mixItemContainer.addChild(this.mixItemButton, mixPriceDisplay.container)
+
+        boxItemContainer.addChild(removeItemContainer, mixItemContainer);
+        parentContainer.addChild(boxItemContainer);
+    }
+
+    createItemPriceDisplay(price) {
+        const priceContainer = new Container();
+        const priceText = new Text({
+            text: price.toString(),
             style: {
                 fontFamily: GAME_CONFIG.FONT_FAMILY,
                 fontSize: 30,
                 fill: GAME_CONFIG.TEXT_COLOR,
-                fontWeight: 'bold'
+                fontWeight: "bold"
             }
         });
-        itemPriceText.anchor.set(0, 0.5);
-        itemPriceText.x = 0;
-        itemPriceText.y = 0;
 
-        const itemPriceIcon = Sprite.from("icon_coin");
-        itemPriceIcon.anchor.set(0, 0.5);
-        itemPriceIcon.x = itemPriceText.width + 5;
-        itemPriceIcon.y = 0;
-        itemPriceIcon.width = 30;
-        itemPriceIcon.height = 30;
+        priceText.anchor.set(0, 0.5);
+        priceText.x = 0;
+        priceText.y = 0;
 
-        itemPriceContainer.addChild(itemPriceText, itemPriceIcon);
-        itemPriceContainer.x = -itemPriceContainer.width / 2;
-        itemPriceContainer.y = (this.removeItemButton.height / 2) + 25;
+        const priceIcon = Sprite.from("icon_coin");
+        priceIcon.anchor.set(0, 0.5);
+        priceIcon.x = priceText.width + 5;
+        priceIcon.y = 0;
+        priceIcon.width = 30;
+        priceIcon.height = 30;
 
-        itemContainer.addChild(this.removeItemButton, itemPriceContainer);
-        parentContainer.addChild(itemContainer);
+        priceContainer.addChild(priceText, priceIcon);
+
+        return {container: priceContainer, priceText, priceIcon};
+    }
+
+    updateItemPrice(itemType, price) {
+        let priceText = null;
+        let priceIcon = null;
+
+        switch (itemType) {
+            case "remove":
+                priceText = this.removeItemPriceText;
+                priceIcon = this.removeItemPriceIcon;
+                break;
+
+            case "mix":
+                priceText = this.mixItemPriceText;
+                priceIcon = this.mixItemPriceIcon;
+                break;
+
+            default:
+                return;
+        }
+
+        if (!priceText || !priceIcon) return;
+
+        priceText.text = price.toString();
+        priceIcon.x = priceText.width + 5;
     }
 
     updateCoin(newCoinAmount) {
@@ -393,5 +458,10 @@ export default class GameScreen extends BaseScreen {
     setRemoveItemClickHandler(callback) {
         this.onRemoveItemClick = callback;
     }
+
+    setMixItemClickHandler(callback){
+        this.onMixItemClick = callback;
+    }
+
 }
 

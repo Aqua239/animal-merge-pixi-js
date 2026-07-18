@@ -70,7 +70,9 @@ export class GameOverController {
         }
 
         const isRemoveItemActive = this.gameManager.removeItemController.removeItem.isActive;
-        if(isRemoveItemActive) return;
+        const isMixItemActive = this.gameManager.mixItemController.mixItem.isActive;
+
+        if(isRemoveItemActive || isMixItemActive) return;
 
         this.gameManager.topCollisionTime += deltaMS;
         const countdownText = Math.floor((5000 - this.gameManager.topCollisionTime) / 1000) + 1;
