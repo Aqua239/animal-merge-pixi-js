@@ -20,6 +20,7 @@ export class MixItemController {
             cost: 350,
 
             onUse: (item) => {
+                this.setMixMode(item.isActive);
                 this.updateButtonState(item.isActive);
             },
         });
@@ -38,7 +39,8 @@ export class MixItemController {
 
         this.gameManager.world.activateItemFly();
         setTimeout(() => {
-            this.mixItem.use();
+            this.mixTimer = null;
+            if (this.mixItem.isActive) this.mixItem.use();
         }, 3000)
 
         this.gameScreen.updateCoin(gameStore.getCoin());
@@ -48,6 +50,8 @@ export class MixItemController {
         if (!this.gameManager.isGameRunning) return false;
         if (this.gameManager.isGamePause) return false;
         if (this.gameManager.isGameOver) return false;
+        if (this.mixItem.isActive) return false;
+        if (this.gameManager.removeItemController.removeItem.isActive) return false;
         if (this.gameManager.world.animals.length === 0) return false;
         return true;
     }
@@ -59,7 +63,18 @@ export class MixItemController {
     }
 
     reset() {
+        if (this.mixTimer) {
+            clearTimeout(this.mixTimer);
+            this.mixTimer = null;
+        }
+
         if (this.mixItem.isActive) this.mixItem.cancel();
         this.updateButtonState(false);
+    }
+
+    setMixMode(isActive) {
+        const currentAnimal = this.gameManager.currentAnimal;
+
+        if (currentAnimal && !currentAnimal.destroyed) currentAnimal.visible = !isActive;
     }
 }

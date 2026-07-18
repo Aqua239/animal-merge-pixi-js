@@ -30,7 +30,8 @@ export class InputSystem {
 
             if(
                 this.detectCursorInBox(pointerPosition, box) &&
-                !this.gameManager.removeItemController.removeItem.isActive
+                !this.gameManager.removeItemController.removeItem.isActive &&
+                !this.gameManager.mixItemController.mixItem.isActive
             ){
                 let animalPosition = this.getAnimalPositionX(
                     box, this.gameManager.currentAnimal.radius,
@@ -47,7 +48,8 @@ export class InputSystem {
             if(!this.canInteractWithCurrentAnimal()) return;
             if(
                 this.detectCursorInBox(pointerPosition, box) &&
-                !this.gameManager.removeItemController.removeItem.isActive
+                !this.gameManager.removeItemController.removeItem.isActive &&
+                !this.gameManager.mixItemController.mixItem.isActive
             ){
                 this.dropAnimal();
             }
