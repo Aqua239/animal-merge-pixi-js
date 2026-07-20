@@ -56,9 +56,6 @@ export class BaseButton extends Container {
 
     onPointerDown() {
         this.setVisualPressedState(true);
-        if (this.clickSound) {
-            sound.play('sound_sfx_atlas', {sprite: this.clickSound});
-        }
     }
 
     onPointerUp() {
@@ -66,6 +63,13 @@ export class BaseButton extends Container {
         this.onPointerOver();
         if(this.onClickCallback) {
             this.onClickCallback();
+        }
+
+        const sfxAudio = sound.find('sound_sfx_atlas');
+        const isSfxMuted = sfxAudio ? sfxAudio.muted : false;
+
+        if (this.clickSound && !isSfxMuted) {
+            sound.play('sound_sfx_atlas', {sprite: this.clickSound});
         }
     }
 
