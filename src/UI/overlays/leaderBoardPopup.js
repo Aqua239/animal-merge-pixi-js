@@ -1,9 +1,9 @@
 import { Text } from "pixi.js";
-import { GAME_CONFIG } from "../constant";
-import { IconCircleButton } from "../UI/button";
+import { GAME_CONFIG } from "../../constant";
+import { IconCircleButton } from "../buttons/button";
 import BasePopup from "./basePopup";
-import { BaseButton } from "../UI/baseButton";
-import { gameStore } from "../game/store/gameStore";
+import { BaseButton } from "../buttons/baseButton";
+import { gameStore } from "../../game/store/gameStore";
 
 export default class LeaderBoardPopup extends BasePopup{
     constructor() {

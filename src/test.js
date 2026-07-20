@@ -1,16 +1,16 @@
 import { Application, Texture, Container } from "pixi.js"; // Nhớ import Container
 import { GAME_CONFIG } from "./constant";
-import LoadingScreen from "./screens/loadingScreen";
-import GameScreen from "./screens/gameScreen";
+import LoadingScreen from "./UI/screens/loadingScreen";
+import GameScreen from "./UI/screens/gameScreen";
 import { loadGameAssets } from "./assetLoader";
 import { sound } from "@pixi/sound";
 //import BasePopup from "./overlays/basePopup";
-import GameOverPopup from "./overlays/gameOverPopup";
+import GameOverPopup from "./UI/overlays/gameOverPopup";
 import { GameManager } from "./game/gameManager";
-import MainMenuScreen from "./screens/mainMenuScreen";
-import LeaderBoardPopup from "./overlays/leaderBoardPopup";
-import SettingPopup from "./overlays/settingPopup";
-import { playMergeEffect } from "./effects";
+import MainMenuScreen from "./UI/screens/mainMenuScreen";
+import LeaderBoardPopup from "./UI/overlays/leaderBoardPopup";
+import SettingPopup from "./UI/overlays/settingPopup";
+import { playMergeEffect } from "./UI/effects/effects";
 
 async function runTest() {
     const app = new Application();

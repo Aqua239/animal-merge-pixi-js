@@ -1,14 +1,13 @@
-import "./style.css";
 import { Application, Container } from "pixi.js";
 import { sound } from "@pixi/sound";
 import { GAME_CONFIG } from "./constant";
 import { loadGameAssets } from "./assetLoader";
 import { GameManager } from "./game/gameManager";
-import LoadingScreen from "./screens/loadingScreen";
-import MainMenuScreen from "./screens/mainMenuScreen";
-import GameScreen from "./screens/gameScreen";
-import LeaderBoardPopup from "./overlays/leaderBoardPopup";
-import SettingPopup from "./overlays/settingPopup";
+import LoadingScreen from "./UI/screens/loadingScreen";
+import MainMenuScreen from "./UI/screens/mainMenuScreen";
+import GameScreen from "./UI/screens/gameScreen";
+import LeaderBoardPopup from "./UI/overlays/leaderBoardPopup";
+import SettingPopup from "./UI/overlays/settingPopup";
 
 async function main() {
     const app = new Application();
@@ -51,7 +50,7 @@ async function main() {
     await loadGameAssets((progress) => { loadingScreen.updateProgress(progress) });
     loadingScreen.hide();
 
-    sound.play("sound_background", { loop: true, volume: 0.6 });
+    sound.play("sound_background", { loop: true, volume: 0.3 });
     const leaderBoardPopup = new LeaderBoardPopup();
 
     let game = null;
