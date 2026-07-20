@@ -10,7 +10,7 @@ import { GameManager } from "./game/gameManager";
 import MainMenuScreen from "./UI/screens/mainMenuScreen";
 import LeaderBoardPopup from "./UI/overlays/leaderBoardPopup";
 import SettingPopup from "./UI/overlays/settingPopup";
-import { playMergeEffect } from "./effects";
+import { playMergeEffect } from "./UI/effects/effects";
 
 async function runTest() {
     const app = new Application();
