@@ -51,9 +51,29 @@ export class InputSystem {
                 !this.gameManager.removeItemController.removeItem.isActive &&
                 !this.gameManager.mixItemController.mixItem.isActive
             ){
-                this.dropAnimal();
+                let animalPosition = this.getAnimalPositionX(
+                    box, this.gameManager.currentAnimal.radius,
+                );
+                this.gameManager.currentAnimal.x = animalPosition;
             }
         });
+
+        const handlePointerUp = (event) => {
+            const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
+
+            if(!this.canInteractWithCurrentAnimal()) return;
+
+            if(
+                this.detectCursorInBox(pointerPosition, box) &&
+                !this.gameManager.removeItemController.removeItem.isActive &&
+                !this.gameManager.mixItemController.mixItem.isActive
+            ){
+                this.dropAnimal();
+            }
+        };
+
+        this.gameManager.gameContainer.on("pointerup", handlePointerUp);
+        this.gameManager.gameContainer.on("pointerupoutside", handlePointerUp);
     }
 
     getAnimalPositionX(box, radius, positionX = this.pointerX){
