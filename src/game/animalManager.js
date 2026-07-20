@@ -1,10 +1,9 @@
 import { sound } from "@pixi/sound";
-
 import { ANIMAL_LEVEL, GAME_CONFIG } from "../constant";
-
 import { Animal } from "./entities/animal";
 import { gameStore } from "./store/gameStore";
 import { playMergeEffect } from "../UI/effects/effects";
+import { animateToPosition } from "../UI/animations/animateToPosition";
 
 export class AnimalManager {
     constructor(gameManager){
@@ -43,17 +42,26 @@ export class AnimalManager {
             if(this.gameManager.currentAnimal){
                 this.gameManager.currentAnimal.convertFromNextToCurrent();
 
-                const randomOffset = Math.floor(Math.random() * 11) - 5;
-                this.gameManager.currentAnimal.spawnOffset = randomOffset;
-                const spawnPositionX = this.gameManager.inputSystem.pointerX + randomOffset;
-                this.gameManager.currentAnimal.x = this.gameManager.inputSystem.getAnimalPositionX(
-                    this.gameManager.world.box,
-                    this.gameManager.currentAnimal.radius,
-                    spawnPositionX
-                );
+                const startX = this.gameManager.currentAnimal.x;
+                const startY = this.gameManager.currentAnimal.y;
+                const startScale = this.gameManager.currentAnimal.scale.x;
 
-                this.gameManager.currentAnimal.y = GAME_CONFIG.ANIMAL_SPAWN_Y;
-                this.gameManager.isDrop = true;
+                const targetY = GAME_CONFIG.ANIMAL_SPAWN_Y;
+                const targetScale = 1;
+
+                this.gameManager.isDrop = false;
+                const centerTargetX = GAME_CONFIG.GAME_AREA_WIDTH / 2;
+
+                animateToPosition(
+                    this.gameManager.currentAnimal,
+                    startX, startY, startScale,
+                    centerTargetX,
+                    targetY, targetScale,
+                    250,
+                    () => {
+                        this.gameManager.isDrop = true;
+                    }
+                );
             }
         }
 
@@ -62,7 +70,7 @@ export class AnimalManager {
             this.gameManager.nextAnimal === this.gameManager.currentAnimal
         ){
             this.gameManager.isSpawner = true;
-            let randomLevel = Math.floor(Math.random() * 10) + 1;
+            let randomLevel = Math.floor(Math.random() * 5) + 1;
             this.gameManager.nextAnimal = this.spawnAnimal(xSpawn, ySpawn, randomLevel, true);
         }
     }
