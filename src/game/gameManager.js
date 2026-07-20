@@ -1,11 +1,9 @@
 import { GAME_CONFIG, PhysicsConfig } from "../constant";
 import { InputSystem } from "./system/inputSystem";
-import { AnimalSystem } from "./system/animalSystem";
-import { RemoveItemController } from "./controller/removeItemController";
-import { GameOverController } from "./controller/gameOverController";
+import { AnimalManager } from "./animalManager";
+import { GameController } from "./controller/gameController";
 import { World } from "./system/world";
-import { gameStore } from "./store/gameStore";
-import { MixItemController } from "./controller/mixItemController";
+import { ButtonController } from "./controller/buttonController";
 
 export class GameManager {
     constructor({ app, gameContainer, gameScreen, leaderBoardPopup, onReturnMainMenu = null }) {
@@ -31,7 +29,7 @@ export class GameManager {
         this.itemFlyTimer = null;
 
 
-        this.animalSystem = new AnimalSystem(this);
+        this.animalManager = new AnimalManager(this);
         this.inputSystem = new InputSystem(this);
 
         this.box = {
@@ -43,92 +41,17 @@ export class GameManager {
 
         this.world = new World(this.box,
             (animal1, animal2, mergedCollider) => {
-                return this.animalSystem.mergeAnimals(animal1, animal2, mergedCollider);
+                return this.animalManager.mergeAnimals(animal1, animal2, mergedCollider);
             }
         );
 
-        this.removeItemController = new RemoveItemController(this, gameScreen);
-        this.gameOverController = new GameOverController(this);
-        this.mixItemController = new MixItemController(this, gameScreen, this.mixAnimalSystem);
+        this.buttonController = new ButtonController(this, gameScreen);
+        this.gameController = new GameController(this);
 
         // window._world = this.world; //for debug
 
-        this.gameOverPopup = null;
-
         this.inputSystem.listenEvent();
-        this.start();
-    }
-
-    start() {
-        if (this.isGameRunning) return;
-        this.isGameRunning = true;
-        this.isGamePause = false;
-        this.isGameOver = false;
-
-        this.app.ticker.remove(this.updateHandler);
-        this.app.ticker.add(this.updateHandler);
-
-        this.gameScreen.updateHighScore(gameStore.showHighestScore());
-        this.gameScreen.updateCoin(gameStore.getCoin());
-        this.animalSystem.initSpawn(
-            GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
-            GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
-            GAME_CONFIG.GAME_AREA_WIDTH / 2,
-            GAME_CONFIG.ANIMAL_SPAWN_Y
-        );
-    }
-
-    pause() {
-        if (this.isGamePause) return;
-        this.isGamePause = true;
-        this.isGameOver = false;
-        this.isGameRunning = false;
-    }
-
-    resume() {
-        if (!this.isGamePause) return;
-        this.isGamePause = false;
-    }
-
-    reset() {
-        if (this.currentAnimal) {
-            this.currentAnimal.destroy();
-            this.currentAnimal = null;
-        }
-
-        if (this.nextAnimal) {
-            this.nextAnimal.destroy();
-            this.nextAnimal = null;
-        }
-
-        for (const animal of this.animalPool) {
-            if (!animal.destroyed) {
-                animal.destroy();
-            }
-        }
-        this.animalPool = [];
-        this.updateMergeTree();
-        this.world.animals.length = 0;
-        this.score = 0;
-        if (this.gameScreen) {
-            this.gameScreen.updateCurrentScore(0);
-        }
-
-        this.topCollisionTime = 0;
-        this.isSpawner = false;
-        this.isDrop = false;
-
-        this.isGameOver = false;
-        this.isGamePause = false;
-        this.isGameRunning = false;
-
-        this.mixItemController.reset();
-        this.removeItemController.removeItem.cancel();
-
-        if (this.itemFlyTimer) {
-            clearInterval(this.itemFlyTimer);
-            this.itemFlyTimer = null;
-        }
+        this.gameController.start();
     }
 
     update(ticker) {
@@ -137,7 +60,7 @@ export class GameManager {
 
         const timestep = PhysicsConfig.timeStep * ticker.deltaMS;
         this.world.update(timestep);
-        this.gameOverController.checkAnimalToTop(ticker.deltaMS);
+        this.gameController.checkAnimalToTop(ticker.deltaMS);
 
         for (let animal of this.animalPool) {
             animal.setSpriteFollowCollider();

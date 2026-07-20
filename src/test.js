@@ -64,7 +64,7 @@ async function runTest() {
     const settingPopup = new SettingPopup({
         onRestart: () => {
             settingPopup.hide();
-            game.gameOverController.replayGame();
+            game.gameController.replayGame();
         },
         onResume: () => {
             settingPopup.hide();
@@ -115,7 +115,7 @@ async function runTest() {
     window.addEventListener("keydown", (event) => {
         if (event.code === "Space") {
             event.preventDefault();
-            game.gameOverController.gameOver();
+            game.gameController.gameOver();
 
             // Ví dụ: gameScreen.pause();
         }
