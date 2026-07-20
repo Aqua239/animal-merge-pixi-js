@@ -5,6 +5,7 @@ export default class BasePopup extends Container {
     constructor({textureName, boardWidth = 800, boardHeight = 800}) {
         super();
         this.visible = false;
+        this.baseY = 0;
 
         const overlayBackground = new Graphics();
         overlayBackground.rect(
@@ -33,12 +34,55 @@ export default class BasePopup extends Container {
     }
 
     show() {
+        if (this.visible === true) return;
+
         this.visible = true;
-        // add animation
+        this.alpha = 0; // Làm mờ toàn bộ popup (bao gồm cả nền đen)
+
+        // Lấy vị trí tâm màn hình của bảng làm đích đến
+        const targetBoardY = GAME_CONFIG.SCREEN_HEIGHT / 2;
+
+        // Kéo cái bảng lên trên 50 pixel
+        this.boardContainer.y = targetBoardY - 50;
+
+        const animate = () => {
+            if (this.isHiding) return;
+            const easeSpeed = 0.05;
+
+            this.alpha += (1 - this.alpha) * easeSpeed;
+            this.boardContainer.y += (targetBoardY - this.boardContainer.y) * easeSpeed;
+
+            if (Math.abs(targetBoardY - this.boardContainer.y) > 0.5) {
+                requestAnimationFrame(animate);
+            }
+            else {
+                this.alpha = 1;
+                this.boardContainer.y = targetBoardY;
+            }
+        };
+        requestAnimationFrame(animate);
     }
 
     hide() {
-        this.destroy();
-        // add animation
+        if (this.visible === false || this.isHiding) return;
+
+        const targetBoardY = GAME_CONFIG.SCREEN_HEIGHT / 2;
+
+        const animate = () => {
+            const easeSpeed = 0.05;
+            this.alpha += (0 - this.alpha) * easeSpeed;
+            this.boardContainer.y += ((targetBoardY + 50) - this.boardContainer.y) * easeSpeed;
+
+            if (this.alpha > 0.05) {
+                requestAnimationFrame(animate);
+            }
+            else {
+                this.alpha = 0;
+                this.visible = false;
+                this.isHiding = false;
+                this.boardContainer.y = targetBoardY;
+            }
+        };
+        requestAnimationFrame(animate);
     }
 }
