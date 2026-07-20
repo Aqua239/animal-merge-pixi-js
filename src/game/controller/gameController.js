@@ -12,27 +12,110 @@ export class GameController {
         this.isCountdownVisible = false;
     }
 
+    start() {
+        const game = this.gameManager
+        if (game.isGameRunning) return;
+        game.isGameRunning = true;
+        game.isGamePause = false;
+        game.isGameOver = false;
+
+        game.app.ticker.remove(game.updateHandler);
+        game.app.ticker.add(game.updateHandler);
+
+        game.gameScreen.updateHighScore(gameStore.showHighestScore());
+        game.gameScreen.updateCoin(gameStore.getCoin());
+        game.animalManager.initSpawn(
+            GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
+            GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
+            GAME_CONFIG.GAME_AREA_WIDTH / 2,
+            GAME_CONFIG.ANIMAL_SPAWN_Y
+        );
+    }
+
+    pause() {
+        const game = this.gameManager;
+
+        if(!game.isGameRunning) return;
+        if(game.isGamePause || game.isGameOver) return;
+
+        game.isGamePause = true;
+        game.isGameRunning = false;
+    }
+
+    resume() {
+        const game = this.gameManager;
+
+        if(!game.isGamePause || game.isGameOver) return;
+        game.isGamePause = false;
+        game.isGameRunning = true;
+    }
+
+    reset() {
+        const game = this.gameManager;
+
+        if (game.currentAnimal) {
+            game.currentAnimal.destroy();
+            game.currentAnimal = null;
+        }
+
+        if (game.nextAnimal) {
+            game.nextAnimal.destroy();
+            game.nextAnimal = null;
+        }
+
+        for (const animal of game.animalPool) {
+            if (!animal.destroyed) {
+                animal.destroy();
+            }
+        }
+        game.animalPool = [];
+        game.updateMergeTree();
+        game.world.animals.length = 0;
+        game.score = 0;
+        if (game.gameScreen) {
+            game.gameScreen.updateCurrentScore(0);
+        }
+
+        game.topCollisionTime = 0;
+        game.isSpawner = false;
+        game.isDrop = false;
+
+        game.isGameOver = false;
+        game.isGamePause = false;
+        game.isGameRunning = false;
+
+        game.mixItemController.reset();
+        game.removeItemController.removeItem.cancel();
+
+        if (game.itemFlyTimer) {
+            clearInterval(game.itemFlyTimer);
+            game.itemFlyTimer = null;
+        }
+
+        this.resetCountdown();
+    }
+
     gameOver(){
-        if(this.gameManager.isGameOver) return;
+        const game = this.gameManager;
+        if(game.isGameOver) return;
 
         //SFX
         sound.play('sound_sfx_atlas', {sprite: "gameover", volume: 0.8});
+        game.isGameOver = true;
+        game.isGamePause = false;
+        game.isGameRunning = false;
 
-        this.gameManager.isGameOver = true;
-        this.gameManager.isGamePause = false;
-        this.gameManager.isGameRunning = false;
-
-        this.gameManager.removeItemController.removeItem.cancel();
+        game.removeItemController.removeItem.cancel();
 
         this.gameOverPopup = new GameOverPopup({
-            score: this.gameManager.score,
+            score: game.score,
             onReplay: () => {this.replayGame();},
             onReturnMainMenu: () => {this.backHomeScreen();},
         });
 
-        gameStore.updateScores(this.gameManager.score);
-        this.gameManager.leaderBoardPopup.updateScores(gameStore.showListScore());
-        this.gameManager.gameContainer.addChild(this.gameOverPopup);
+        gameStore.updateScores(game.score);
+        game.leaderBoardPopup.updateScores(gameStore.showListScore());
+        game.gameContainer.addChild(this.gameOverPopup);
         this.gameOverPopup.show();
     }
 
@@ -45,9 +128,8 @@ export class GameController {
             this.gameOverPopup = null;
         }
 
-        this.resetCountdown();
-        this.gameManager.reset();
-        this.gameManager.start();
+        this.reset();
+        this.start();
     }
 
     backHomeScreen(){
@@ -59,7 +141,7 @@ export class GameController {
             this.gameOverPopup = null;
         }
 
-        this.gameManager.reset();
+        this.reset();
         if(this.gameManager.onReturnMainMenu){
             this.gameManager.onReturnMainMenu();
         }

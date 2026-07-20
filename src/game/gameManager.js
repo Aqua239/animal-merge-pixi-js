@@ -4,7 +4,6 @@ import { AnimalManager } from "./animalManager";
 import { RemoveItemController } from "./controller/removeItemController";
 import { GameController } from "./controller/gameController";
 import { World } from "./system/world";
-import { gameStore } from "./store/gameStore";
 import { MixItemController } from "./controller/mixItemController";
 
 export class GameManager {
@@ -48,87 +47,13 @@ export class GameManager {
         );
 
         this.removeItemController = new RemoveItemController(this, gameScreen);
-        this.gameController = new GameController(this);
         this.mixItemController = new MixItemController(this, gameScreen);
+        this.gameController = new GameController(this);
 
         // window._world = this.world; //for debug
 
-        this.gameOverPopup = null;
-
         this.inputSystem.listenEvent();
-        this.start();
-    }
-
-    start() {
-        if (this.isGameRunning) return;
-        this.isGameRunning = true;
-        this.isGamePause = false;
-        this.isGameOver = false;
-
-        this.app.ticker.remove(this.updateHandler);
-        this.app.ticker.add(this.updateHandler);
-
-        this.gameScreen.updateHighScore(gameStore.showHighestScore());
-        this.gameScreen.updateCoin(gameStore.getCoin());
-        this.animalManager.initSpawn(
-            GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
-            GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
-            GAME_CONFIG.GAME_AREA_WIDTH / 2,
-            GAME_CONFIG.ANIMAL_SPAWN_Y
-        );
-    }
-
-    pause() {
-        if (this.isGamePause) return;
-        this.isGamePause = true;
-        this.isGameOver = false;
-        this.isGameRunning = false;
-    }
-
-    resume() {
-        if (!this.isGamePause) return;
-        this.isGamePause = false;
-    }
-
-    reset() {
-        if (this.currentAnimal) {
-            this.currentAnimal.destroy();
-            this.currentAnimal = null;
-        }
-
-        if (this.nextAnimal) {
-            this.nextAnimal.destroy();
-            this.nextAnimal = null;
-        }
-
-        for (const animal of this.animalPool) {
-            if (!animal.destroyed) {
-                animal.destroy();
-            }
-        }
-        this.animalPool = [];
-        this.updateMergeTree();
-        this.world.animals.length = 0;
-        this.score = 0;
-        if (this.gameScreen) {
-            this.gameScreen.updateCurrentScore(0);
-        }
-
-        this.topCollisionTime = 0;
-        this.isSpawner = false;
-        this.isDrop = false;
-
-        this.isGameOver = false;
-        this.isGamePause = false;
-        this.isGameRunning = false;
-
-        this.mixItemController.reset();
-        this.removeItemController.removeItem.cancel();
-
-        if (this.itemFlyTimer) {
-            clearInterval(this.itemFlyTimer);
-            this.itemFlyTimer = null;
-        }
+        this.gameController.start();
     }
 
     update(ticker) {
