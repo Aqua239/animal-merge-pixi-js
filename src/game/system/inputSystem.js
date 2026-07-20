@@ -6,7 +6,6 @@ export class InputSystem {
         this.gameManager = gameManager;
         this.pointerX = GAME_CONFIG.GAME_AREA_WIDTH / 2;
 
-        this.canDropOnPointerUp = false;
         this.pointerState = "idle";
     }
 
@@ -16,8 +15,7 @@ export class InputSystem {
 
     isUsingItem(){
         return (
-            this.gameManager.removeItemController.removeItem.isActive ||
-            this.gameManager.mixItemController.mixItem.isActive
+            this.gameManager.buttonController.isUsingItem()
         );
     }
 
@@ -26,10 +24,11 @@ export class InputSystem {
         if(!this.detectCursorInBox(pointerPosition, box)) return;
 
         this.pointerX = pointerPosition.x;
+        const offset = this.gameManager.currentAnimal.spawnOffset || 0;
         this.gameManager.currentAnimal.x = this.getAnimalPositionX(
             box,
             this.gameManager.currentAnimal.radius,
-            pointerPosition.x
+            pointerPosition.x + offset
         );
     }
 
@@ -49,6 +48,8 @@ export class InputSystem {
         const box = this.gameManager.world.box;
 
         this.gameManager.gameContainer.on("pointermove", (event) => {
+            if (!event.isPrimary) return;
+
             if(this.isUsingItem()) return;
             if(this.pointerState === "useItem" || this.pointerState === "blocked") return;
             const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
@@ -56,6 +57,8 @@ export class InputSystem {
         });
 
         this.gameManager.gameContainer.on("pointerdown", (event) => {
+            if (!event.isPrimary) return;
+
             const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
             this.pointerState = "blocked";
 
@@ -72,6 +75,8 @@ export class InputSystem {
         });
 
         this.gameManager.gameContainer.on("pointerup", (event) => {
+            if (!event.isPrimary) return;
+
             const previousPointerState = this.pointerState;
             this.pointerState = "idle";
             if(previousPointerState !== "drop") return;
@@ -85,7 +90,8 @@ export class InputSystem {
             this.dropAnimal();
         });
 
-        this.gameManager.gameContainer.on("pointerupoutside", () => {
+        this.gameManager.gameContainer.on("pointerupoutside", (event) => {
+            if (!event.isPrimary) return;
             this.pointerState = "idle";
         });
     }

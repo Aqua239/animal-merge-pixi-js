@@ -1,9 +1,10 @@
 import { sound } from "@pixi/sound";
 
 import { ANIMAL_LEVEL, GAME_CONFIG } from "../constant";
-import { playMergeEffect } from "../effects";
+
 import { Animal } from "./entities/animal";
 import { gameStore } from "./store/gameStore";
+import { playMergeEffect } from "../UI/effects/effects";
 
 export class AnimalManager {
     constructor(gameManager){
@@ -43,6 +44,7 @@ export class AnimalManager {
                 this.gameManager.currentAnimal.convertFromNextToCurrent();
 
                 const randomOffset = Math.floor(Math.random() * 11) - 5;
+                this.gameManager.currentAnimal.spawnOffset = randomOffset;
                 const spawnPositionX = this.gameManager.inputSystem.pointerX + randomOffset;
                 this.gameManager.currentAnimal.x = this.gameManager.inputSystem.getAnimalPositionX(
                     this.gameManager.world.box,
