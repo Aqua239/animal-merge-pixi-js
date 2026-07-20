@@ -70,7 +70,7 @@ export class InputSystem {
 
             this.updateCurrentAnimalPosition(pointerPosition, box);
         });
-        
+
         this.gameManager.gameContainer.on("pointerup", (event) => {
             const previousPointerState = this.pointerState;
             this.pointerState = "idle";
@@ -128,7 +128,7 @@ export class InputSystem {
 
         this.gameManager.animalPool.push(this.gameManager.currentAnimal);
         this.gameManager.addAnimalToPhysicState(this.gameManager.currentAnimal);
-        this.gameManager.removeItemController.handleAnimalEvent(this.gameManager.currentAnimal);
+        this.gameManager.buttonController.handleAnimalEvent(this.gameManager.currentAnimal);
         this.gameManager.updateMergeTree();
         this.gameManager.currentAnimal = null;
 

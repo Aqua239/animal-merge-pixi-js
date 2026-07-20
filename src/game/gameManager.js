@@ -1,10 +1,9 @@
 import { GAME_CONFIG, PhysicsConfig } from "../constant";
 import { InputSystem } from "./system/inputSystem";
 import { AnimalManager } from "./animalManager";
-import { RemoveItemController } from "./controller/removeItemController";
 import { GameController } from "./controller/gameController";
 import { World } from "./system/world";
-import { MixItemController } from "./controller/mixItemController";
+import { ButtonController } from "./controller/buttonController";
 
 export class GameManager {
     constructor({ app, gameContainer, gameScreen, leaderBoardPopup, onReturnMainMenu = null }) {
@@ -46,8 +45,7 @@ export class GameManager {
             }
         );
 
-        this.removeItemController = new RemoveItemController(this, gameScreen);
-        this.mixItemController = new MixItemController(this, gameScreen);
+        this.buttonController = new ButtonController(this, gameScreen);
         this.gameController = new GameController(this);
 
         // window._world = this.world; //for debug

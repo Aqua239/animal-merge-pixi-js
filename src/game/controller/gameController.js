@@ -84,8 +84,7 @@ export class GameController {
         game.isGamePause = false;
         game.isGameRunning = false;
 
-        game.mixItemController.reset();
-        game.removeItemController.removeItem.cancel();
+        game.buttonController.reset();
 
         if (game.itemFlyTimer) {
             clearInterval(game.itemFlyTimer);
@@ -105,7 +104,7 @@ export class GameController {
         game.isGamePause = false;
         game.isGameRunning = false;
 
-        game.removeItemController.removeItem.cancel();
+        game.buttonController.removeItem.cancel();
 
         this.gameOverPopup = new GameOverPopup({
             score: game.score,
@@ -155,10 +154,7 @@ export class GameController {
             return;
         }
 
-        const isRemoveItemActive = this.gameManager.removeItemController.removeItem.isActive;
-        const isMixItemActive = this.gameManager.mixItemController.mixItem.isActive;
-
-        if(isRemoveItemActive || isMixItemActive) return;
+        if(this.gameManager.buttonController.isUsingItem()) return;
 
         this.gameManager.topCollisionTime += deltaMS;
         const countdownText = Math.floor((5000 - this.gameManager.topCollisionTime) / 1000) + 1;
