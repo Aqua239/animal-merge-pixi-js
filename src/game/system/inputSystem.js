@@ -5,6 +5,32 @@ export class InputSystem {
     constructor(gameManager){
         this.gameManager = gameManager;
         this.pointerX = GAME_CONFIG.GAME_AREA_WIDTH / 2;
+
+        this.canDropOnPointerUp = false;
+        this.pointerState = "idle";
+    }
+
+    blockDropAnimal(){
+        this.pointerState = "useItem";
+    }
+
+    isUsingItem(){
+        return (
+            this.gameManager.removeItemController.removeItem.isActive ||
+            this.gameManager.mixItemController.mixItem.isActive
+        );
+    }
+
+    updateCurrentAnimalPosition(pointerPosition, box){
+        if(!this.canInteractWithCurrentAnimal()) return;
+        if(!this.detectCursorInBox(pointerPosition, box)) return;
+
+        this.pointerX = pointerPosition.x;
+        this.gameManager.currentAnimal.x = this.getAnimalPositionX(
+            box,
+            this.gameManager.currentAnimal.radius,
+            pointerPosition.x
+        );
     }
 
     listenEvent(){
@@ -23,57 +49,45 @@ export class InputSystem {
         const box = this.gameManager.world.box;
 
         this.gameManager.gameContainer.on("pointermove", (event) => {
+            if(this.isUsingItem()) return;
+            if(this.pointerState === "useItem" || this.pointerState === "blocked") return;
             const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
-            this.pointerX = pointerPosition.x;
-
-            if(!this.canInteractWithCurrentAnimal()) return;
-
-            if(
-                this.detectCursorInBox(pointerPosition, box) &&
-                !this.gameManager.removeItemController.removeItem.isActive &&
-                !this.gameManager.mixItemController.mixItem.isActive
-            ){
-                let animalPosition = this.getAnimalPositionX(
-                    box, this.gameManager.currentAnimal.radius,
-                );
-
-                this.gameManager.currentAnimal.x = animalPosition;
-            }
+            this.updateCurrentAnimalPosition(pointerPosition, box);
         });
 
         this.gameManager.gameContainer.on("pointerdown", (event) => {
             const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
-            this.pointerX = pointerPosition.x;
+            this.pointerState = "blocked";
+
+            if(this.isUsingItem()){
+                this.pointerState = "useItem";
+                return;
+            }
 
             if(!this.canInteractWithCurrentAnimal()) return;
-            if(
-                this.detectCursorInBox(pointerPosition, box) &&
-                !this.gameManager.removeItemController.removeItem.isActive &&
-                !this.gameManager.mixItemController.mixItem.isActive
-            ){
-                let animalPosition = this.getAnimalPositionX(
-                    box, this.gameManager.currentAnimal.radius,
-                );
-                this.gameManager.currentAnimal.x = animalPosition;
-            }
+            if(!this.detectCursorInBox(pointerPosition, box)) return;
+            this.pointerState = "drop";
+
+            this.updateCurrentAnimalPosition(pointerPosition, box);
+        });
+        
+        this.gameManager.gameContainer.on("pointerup", (event) => {
+            const previousPointerState = this.pointerState;
+            this.pointerState = "idle";
+            if(previousPointerState !== "drop") return;
+
+            if(this.isUsingItem()) return;
+            if(!this.canInteractWithCurrentAnimal()) return;
+
+            const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
+            if(!this.detectCursorInBox(pointerPosition, box)) return;
+
+            this.dropAnimal();
         });
 
-        const handlePointerUp = (event) => {
-            const pointerPosition = event.getLocalPosition(this.gameManager.gameContainer);
-
-            if(!this.canInteractWithCurrentAnimal()) return;
-
-            if(
-                this.detectCursorInBox(pointerPosition, box) &&
-                !this.gameManager.removeItemController.removeItem.isActive &&
-                !this.gameManager.mixItemController.mixItem.isActive
-            ){
-                this.dropAnimal();
-            }
-        };
-
-        this.gameManager.gameContainer.on("pointerup", handlePointerUp);
-        this.gameManager.gameContainer.on("pointerupoutside", handlePointerUp);
+        this.gameManager.gameContainer.on("pointerupoutside", () => {
+            this.pointerState = "idle";
+        });
     }
 
     getAnimalPositionX(box, radius, positionX = this.pointerX){
