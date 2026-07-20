@@ -39,6 +39,9 @@ export class AnimalManager {
         if(this.gameManager.currentAnimal === null){
             this.gameManager.currentAnimal = this.gameManager.nextAnimal;
 
+            const randomOffset = Math.floor(Math.random() * 11) - 5;
+            this.gameManager.currentAnimal.spawnOffset = randomOffset;
+
             if(this.gameManager.currentAnimal){
                 this.gameManager.currentAnimal.convertFromNextToCurrent();
 
