@@ -43,7 +43,15 @@ export class AudioToggleButton extends IconButton {
         this.iconOff = iconOff;
         this.targetAlias = targetAlias;
 
+        AudioToggleButton.allInstances = AudioToggleButton.allInstances.filter(b => b.content && !b.content.destroyed);
         AudioToggleButton.allInstances.push(this);
+
+        const targetAudio = sound.find(this.targetAlias);
+        const savedState = localStorage.getItem(`audio_${this.targetAlias}`);
+
+        if (targetAudio && savedState !== null) {
+            targetAudio.muted = (savedState === 'true');
+        }
 
         this.synchronizeIcon();
 
@@ -54,6 +62,8 @@ export class AudioToggleButton extends IconButton {
 
             if(targetAudio) {
                 targetAudio.muted = this.isMuted;
+                // Save new state to browser storage
+                localStorage.setItem(`audio_${this.targetAlias}`, this.isMuted);
             }
 
             AudioToggleButton.synchronizeAllButtons();
