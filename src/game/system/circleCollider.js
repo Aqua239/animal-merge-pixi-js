@@ -48,7 +48,7 @@ export class CircleCollider extends Collider {
     }
 
     computeMass() {
-        return Math.pow(this.radius / 30, 3.5); // Level 1 is 1.0, Level 10 is 907.5, Level 11 is 1558.0
+        return Math.pow(this.radius / 30, 2); // Level 1 is 1.0, Level 10 is 907.5, Level 11 is 1558.0
     }
 
     getLevel() {
@@ -96,9 +96,21 @@ export class CircleCollider extends Collider {
         return false;
     }
 
-    applyGroundFriction() {
+    clampPositionToBox(box) {
+        if (this.x - this.radius < box.x) {
+            this.x = box.x + this.radius;
+        }
+        if (this.x + this.radius > box.x + box.width) {
+            this.x = box.x + box.width - this.radius;
+        }
+        if (this.y + this.radius > box.y + box.height) {
+            this.y = box.y + box.height - this.radius;
+        }
+    }
+
+    applyGroundFriction(dt) {
         if (Math.abs(this.vx) >= PhysicsConfig.stopVthreshold) {
-            const normalImpulse = this.computeMass() * PhysicsConfig.gravity * 0.016 / 10;
+            const normalImpulse = this.computeMass() * PhysicsConfig.gravity * dt
             Physics.applyRollingFrictionCircleToGround(this, normalImpulse);
         }
     }

@@ -1,5 +1,6 @@
 import { Collision } from "../system/collision.js";
 import { PhysicsConfig, ANIMAL_LEVEL } from "../../constant.js";
+import { Physics } from "../system/physics.js";
 
 export class World {
     /**
@@ -27,49 +28,129 @@ export class World {
     }
 
     update(dt) {
-
         this.collisionSystem.beginFrame();
 
-        this.updatePositions(dt);
-        this.animals.sort((a, b) => b.collider.y - a.collider.y);
+        const subSteps = 4;
+        const velocityIterations = 4;
+        const positionIterations = 3;
+        const subDt = dt / subSteps;
 
-        const maxloop = 20;
-        const groundContactSet = new Set();
-        const circleContactMap = new Map();
+        for (let step = 0; step < subSteps; step++) {
+            this.updatePositions(subDt);
+            this.animals.sort((a, b) => b.collider.y - a.collider.y);
 
-        for (let i = 0; i < maxloop; i++) {
+            const collisions = this.detectAndMergeCircleCollisions();
 
-            this.handleCollisionsCirclesToTop(-300);
-            const groundContacts = this.handleCollisionsCirclesToBoxes();
-            const circleContacts = this.handleCollisionsCirclesToCircles();
+            const groundCollisionSet = new Set();
+            const circleCollisionMap = new Map();
 
-            for (const a of groundContacts) groundContactSet.add(a);
-            for (const c of circleContacts) {
-                const key = this.collisionSystem.getPairKey(c.animalA.collider, c.animalB.collider);
-                if (circleContactMap.has(key)) {
-                    const existing = circleContactMap.get(key);
-                    existing.normalImpulse += c.normalImpulse;
-                    existing.normal = c.normal; //total impluse
-                } else {
-                    circleContactMap.set(key, { ...c });
+            for (let i = 0; i < velocityIterations; i++) {
+                this.handleCollisionsCirclesToTop(-300);
+
+                for (const animal of this.handleCollisionsCirclesToBoxes()) {
+                    groundCollisionSet.add(animal);
+                }
+
+                for (const { animalA, animalB } of collisions) {
+                    const { normal, normalImpulse } =
+                        this.collisionSystem.resolveVelocityCircleToCircle(animalA.collider, animalB.collider);
+
+                    const key = this.collisionSystem.getPairKey(animalA.collider, animalB.collider);
+                    if (circleCollisionMap.has(key)) {
+                        const existing = circleCollisionMap.get(key);
+                        existing.normalImpulse += normalImpulse;
+                        existing.normal = normal;
+                    } else {
+                        circleCollisionMap.set(key, { animalA, animalB, normal, normalImpulse });
+                    }
                 }
             }
-        }
 
-        for (const animal of groundContactSet) {
-            animal.collider.applyGroundFriction();
-        }
-        for (const c of circleContactMap.values()) {
-            this.collisionSystem.resolveFrictionCircleToCircle(
-                c.animalA.collider, c.animalB.collider, c.normal, c.normalImpulse
-            );
+            for (let i = 0; i < positionIterations; i++) {
+                for (const { animalA, animalB } of collisions) {
+                    const cA = animalA.collider;
+                    const cB = animalB.collider;
+                    const { normal, distance } = Physics.computeCollisionNormalAndDistance(cA, cB);
+                    Physics.resolvePenetration(cA, cB, normal, distance);
+                }
+                for (const animal of this.animals) {
+                    if (animal.isPhysicsActive) {
+                        animal.collider.clampPositionToBox(this.box);
+                    }
+                }
+                this.handleCollisionsCirclesToTop(-300);
+            }
+
+            for (const animal of groundCollisionSet) {
+                animal.collider.applyGroundFriction(subDt);
+            }
+
+            for (const c of circleCollisionMap.values()) {
+                this.collisionSystem.resolveFrictionCircleToCircle(
+                    c.animalA.collider,
+                    c.animalB.collider,
+                    c.normal,
+                    c.normalImpulse
+                );
+            }
         }
 
         this.syncAnimalPositions();
         this.collisionSystem.endFrame();
     }
 
+    detectAndMergeCircleCollisions() {
+        const collisions = [];
+        const toAdd = [];
+        const toRemove = new Set();
 
+        const keys = Object.keys(ANIMAL_LEVEL);
+        const maxLevel = Math.max(...keys);
+
+        for (let i = 0; i < this.animals.length; i++) {
+            const animalA = this.animals[i];
+            if (toRemove.has(animalA) || !animalA.isPhysicsActive) continue;
+
+            for (let j = i + 1; j < this.animals.length; j++) {
+                const animalB = this.animals[j];
+                if (toRemove.has(animalB) || !animalB.isPhysicsActive) continue;
+
+                const cA = animalA.collider;
+                const cB = animalB.collider;
+
+                if (!cA.checkCollisionWithCircle(cB)) continue;
+
+                if (animalA.level === animalB.level && animalA.level < maxLevel) {
+                    const newCollider = this.collisionSystem.resolveCollisionCircleToCircleByMerge(cA, cB);
+                    let newAnimal = this.onMerge ? this.onMerge(animalA, animalB, newCollider) : null;
+                    if (newAnimal && newAnimal.collider) {
+                        newAnimal.collider.vx = 0;
+                        newAnimal.collider.vy = 0;
+                    }
+                    if (!newAnimal) {
+                        newAnimal = {
+                            collider: newCollider,
+                            level: animalA.level + 1,
+                            isPhysicsActive: true,
+                            x: newCollider.x,
+                            y: newCollider.y
+                        };
+                    }
+                    toAdd.push(newAnimal);
+                    toRemove.add(animalA);
+                    toRemove.add(animalB);
+                    break;
+                } else {
+                    collisions.push({ animalA, animalB });
+                }
+            }
+        }
+
+        toRemove.forEach(a => this.removeAnimal(a));
+        toAdd.forEach(a => this.addAnimal(a));
+
+        return collisions.filter(c => !toRemove.has(c.animalA) && !toRemove.has(c.animalB));
+    }
 
     updatePositions(dt) {
         for (const animal of this.animals) {
@@ -117,8 +198,6 @@ export class World {
                 const cB = animalB.collider;
                 if (!cA.checkCollisionWithCircle(cB)) continue;
 
-
-
                 const keys = Object.keys(ANIMAL_LEVEL);
                 const maxLevel = Math.max(...keys);
                 if (animalA.level === animalB.level && animalA.level < maxLevel) {
@@ -149,7 +228,6 @@ export class World {
     handleCollisionsCirclesToTop(y) {
         for (const animal of this.animals) {
             if (animal.collider.checkCollisionCircleOverTop(y)) {
-                console.log("detect top");
                 animal.collider.y = y + animal.collider.radius;
                 animal.collider.vy = 0;
             }

@@ -13,7 +13,7 @@ export class Physics {
         const percent = PhysicsConfig.baumgartePercent;
 
         const penetrationCorrection = Math.max(0, penetration - slop);
-        if (penetrationCorrection <= 0) return;
+        if (penetrationCorrection <= 0) return 0;
 
         const invMassA = 1 / colliderA.computeMass();
         const invMassB = 1 / colliderB.computeMass();
@@ -25,6 +25,8 @@ export class Physics {
 
         colliderB.x += correction * invMassB * normal.x;
         colliderB.y += correction * invMassB * normal.y;
+
+        return penetrationCorrection;
     }
 
     //Compute vector
@@ -180,11 +182,11 @@ export class Physics {
         const frictionImpulse = this.computeClampedFrictionImpulse(-slip, effectiveMass, normalImpulse);
 
         collider.vx -= frictionImpulse * invMass;
-        
+
         let deltaW = frictionImpulse * collider.radius * invI;
         const maxDeltaW = Math.abs(slip) / collider.radius;
         if (Math.abs(deltaW) > maxDeltaW) deltaW = Math.sign(deltaW) * maxDeltaW;
-        
+
         collider.angularVelocity += deltaW;
         collider.angularVelocity = Math.max(-PhysicsConfig.maxAngularVelocity, Math.min(PhysicsConfig.maxAngularVelocity, collider.angularVelocity));
     }
@@ -210,7 +212,7 @@ export class Physics {
         const invMass = 1 / collider.computeMass();
         // Use 300 * invMass / r^2 to balance highly responsive angular rotation
         // while avoiding clamping overshoot oscillation for small circles (first 4 levels)
-        const invI = (300 * invMass) / (collider.radius * collider.radius);
+        const invI = 300 * invMass / (collider.radius * collider.radius);
         return { invMass, invI };
     }
 
