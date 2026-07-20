@@ -1,4 +1,4 @@
-import "./style.css";
+//import "./style.css";
 import { Application, Container } from "pixi.js";
 import { sound } from "@pixi/sound";
 import { GAME_CONFIG } from "./constant";
@@ -51,7 +51,7 @@ async function main() {
     await loadGameAssets((progress) => { loadingScreen.updateProgress(progress) });
     loadingScreen.hide();
 
-    sound.play("sound_background", { loop: true, volume: 0.6 });
+    sound.play("sound_background", { loop: true, volume: 0.3 });
     const leaderBoardPopup = new LeaderBoardPopup();
 
     let game = null;
