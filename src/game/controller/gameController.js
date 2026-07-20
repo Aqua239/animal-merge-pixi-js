@@ -3,7 +3,7 @@ import { GAME_CONFIG } from "../../constant";
 import GameOverPopup from "../../UI/overlays/gameOverPopup";
 import { gameStore } from "../store/gameStore";
 
-export class GameOverController {
+export class GameController {
     constructor(gameManager){
         this.gameManager = gameManager;
         this.gameOverPopup = null;

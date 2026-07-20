@@ -94,7 +94,7 @@ async function main() {
     const settingPopup = new SettingPopup({
         onRestart: () => {
             settingPopup.hide();
-            if (game) game.gameOverController.replayGame();
+            if (game) game.gameController.replayGame();
         },
         onResume: () => {
             settingPopup.hide();
@@ -121,7 +121,7 @@ async function main() {
         (event) => {
             if (event.code === "Space" && game) {
                 event.preventDefault();
-                game.gameOverController.gameOver();
+                game.gameController.gameOver();
             }
 
             if (event.code === "Enter") {

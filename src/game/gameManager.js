@@ -2,7 +2,7 @@ import { GAME_CONFIG, PhysicsConfig } from "../constant";
 import { InputSystem } from "./system/inputSystem";
 import { AnimalManager } from "./animalManager";
 import { RemoveItemController } from "./controller/removeItemController";
-import { GameOverController } from "./controller/gameOverController";
+import { GameController } from "./controller/gameController";
 import { World } from "./system/world";
 import { gameStore } from "./store/gameStore";
 import { MixItemController } from "./controller/mixItemController";
@@ -48,8 +48,8 @@ export class GameManager {
         );
 
         this.removeItemController = new RemoveItemController(this, gameScreen);
-        this.gameOverController = new GameOverController(this);
-        this.mixItemController = new MixItemController(this, gameScreen, this.mixAnimalSystem);
+        this.gameController = new GameController(this);
+        this.mixItemController = new MixItemController(this, gameScreen);
 
         // window._world = this.world; //for debug
 
@@ -137,7 +137,7 @@ export class GameManager {
 
         const timestep = PhysicsConfig.timeStep * ticker.deltaMS;
         this.world.update(timestep);
-        this.gameOverController.checkAnimalToTop(ticker.deltaMS);
+        this.gameController.checkAnimalToTop(ticker.deltaMS);
 
         for (let animal of this.animalPool) {
             animal.setSpriteFollowCollider();
