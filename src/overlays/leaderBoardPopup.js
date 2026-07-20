@@ -31,7 +31,7 @@ export default class LeaderBoardPopup extends BasePopup{
         });
 
         titleText.anchor.set(0.5);
-        titleText.y = -230;
+        titleText.y = -220;
 
         this.boardContainer.addChild(titleText);
     }
@@ -46,15 +46,15 @@ export default class LeaderBoardPopup extends BasePopup{
 
         this.top1Text = new Text({ text: '1. ---', style: textStyle });
         this.top1Text.anchor.set(0, 0.5);
-        this.top1Text.position.set(-250, -100);
+        this.top1Text.position.set(-250, -75);
 
         this.top2Text = new Text({ text: '2. ---', style: textStyle });
         this.top2Text.anchor.set(0, 0.5);
-        this.top2Text.position.set(-250, 25);
+        this.top2Text.position.set(-250, 75);
 
         this.top3Text = new Text({ text: '3. ---', style: textStyle });
         this.top3Text.anchor.set(0, 0.5);
-        this.top3Text.position.set(-250, 150);
+        this.top3Text.position.set(-250, 225);
 
         this.boardContainer.addChild(this.top1Text, this.top2Text, this.top3Text);
     }
@@ -88,7 +88,7 @@ export default class LeaderBoardPopup extends BasePopup{
         }
     }
 
-    hide() {
-        this.visible = false;
-    }
+    // hide() {
+    //     this.visible = false;
+    // }
 }

@@ -75,7 +75,7 @@ export default class SettingPopup extends BasePopup {
         );
     }
 
-    hide() {
-        this.visible = false;
-    }
+    // hide() {
+    //     this.visible = false;
+    // }
 }
