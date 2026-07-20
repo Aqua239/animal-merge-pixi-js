@@ -1,8 +1,8 @@
 import { Assets, Container, Graphics, Rectangle, Sprite, Text, Texture } from "pixi.js";
 import BaseScreen from "./baseScreen";
-import { ANIMAL_LEVEL, GAME_CONFIG } from "../constant";
-import { BaseButton } from "../UI/baseButton";
-import { IconButton, IconCircleButton } from "../UI/button";
+import { ANIMAL_LEVEL, GAME_CONFIG } from "../../constant";
+import { BaseButton } from "../buttons/baseButton";
+import { IconButton, IconCircleButton } from "../buttons/button";
 
 export default class GameScreen extends BaseScreen {
     constructor({onSetting}) {

@@ -1,7 +1,7 @@
 import { fontStringFromTextStyle, Graphics, Text, TextStyle } from "pixi.js";
 import BaseScreen from "./baseScreen";
-import { GAME_CONFIG } from "../constant";
-import { AudioToggleButton, TextButton } from "../UI/button";
+import { GAME_CONFIG } from "../../constant";
+import { AudioToggleButton, TextButton } from "../buttons/button";
 
 export default class MainMenuScreen extends BaseScreen {
     constructor({onPlay, onLeaderboard}) {

@@ -1,5 +1,5 @@
 import { Container, Graphics } from "pixi.js";
-import { GAME_CONFIG } from "../constant";
+import { GAME_CONFIG } from "../../constant";
 
 export default class BaseScreen {
     constructor(backgroundColor = GAME_CONFIG.BACKGROUND_COLOR) {

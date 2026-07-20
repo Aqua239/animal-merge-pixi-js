@@ -1,6 +1,6 @@
 import { sound } from "@pixi/sound";
 import { GAME_CONFIG } from "../../constant";
-import GameOverPopup from "../../overlays/gameOverPopup";
+import GameOverPopup from "../../UI/overlays/gameOverPopup";
 import { gameStore } from "../store/gameStore";
 
 export class GameOverController {

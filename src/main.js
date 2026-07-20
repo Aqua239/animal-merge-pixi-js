@@ -1,14 +1,13 @@
-//import "./style.css";
 import { Application, Container } from "pixi.js";
 import { sound } from "@pixi/sound";
 import { GAME_CONFIG } from "./constant";
 import { loadGameAssets } from "./assetLoader";
 import { GameManager } from "./game/gameManager";
-import LoadingScreen from "./screens/loadingScreen";
-import MainMenuScreen from "./screens/mainMenuScreen";
-import GameScreen from "./screens/gameScreen";
-import LeaderBoardPopup from "./overlays/leaderBoardPopup";
-import SettingPopup from "./overlays/settingPopup";
+import LoadingScreen from "./UI/screens/loadingScreen";
+import MainMenuScreen from "./UI/screens/mainMenuScreen";
+import GameScreen from "./UI/screens/gameScreen";
+import LeaderBoardPopup from "./UI/overlays/leaderBoardPopup";
+import SettingPopup from "./UI/overlays/settingPopup";
 
 async function main() {
     const app = new Application();

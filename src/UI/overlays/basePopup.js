@@ -1,5 +1,5 @@
 import { Graphics, Container, Sprite } from "pixi.js";
-import { GAME_CONFIG } from "../constant";
+import { GAME_CONFIG } from "../../constant";
 
 export default class BasePopup extends Container {
     constructor({textureName, boardWidth = 800, boardHeight = 800}) {

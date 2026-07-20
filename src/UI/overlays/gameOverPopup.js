@@ -1,6 +1,6 @@
 import { Text } from "pixi.js"
 import BasePopup from "./basePopup"
-import { IconButton } from "../UI/button";
+import { IconButton } from "../buttons/button";
 
 export default class GameOverPopup extends BasePopup {
     constructor({score = 0, onReplay, onReturnMainMenu}) {

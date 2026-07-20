@@ -1,5 +1,5 @@
 import { Text } from "pixi.js";
-import { AudioToggleButton, IconButton } from "../UI/button";
+import { AudioToggleButton, IconButton } from "../buttons/button";
 import BasePopup from "./basePopup";
 
 
