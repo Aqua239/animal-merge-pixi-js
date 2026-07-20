@@ -30,8 +30,6 @@ export class GameManager {
         this.animalPool = [];
         this.itemFlyTimer = null;
 
-        // this.physics = new Physics();
-        // this.physics.box = {
 
         this.animalSystem = new AnimalSystem(this);
         this.inputSystem = new InputSystem(this);
@@ -78,14 +76,6 @@ export class GameManager {
             GAME_CONFIG.GAME_AREA_WIDTH / 2,
             GAME_CONFIG.ANIMAL_SPAWN_Y
         );
-
-        // Test item fly function every 5 seconds
-        // this.itemFlyTimer = setInterval(() => {
-        //     if (this.isGameRunning && !this.isGamePause && !this.isGameOver) {
-        //         console.log("Kích hoạt Item Fly (mỗi 5 giây)!");
-        //         this.world.activateItemFly();
-        //     }
-        // }, 5000);
     }
 
     pause() {
