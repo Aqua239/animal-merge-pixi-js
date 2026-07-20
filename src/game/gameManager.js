@@ -1,6 +1,6 @@
 import { GAME_CONFIG, PhysicsConfig } from "../constant";
 import { InputSystem } from "./system/inputSystem";
-import { AnimalSystem } from "./system/animalSystem";
+import { AnimalManager } from "./animalManager";
 import { RemoveItemController } from "./controller/removeItemController";
 import { GameOverController } from "./controller/gameOverController";
 import { World } from "./system/world";
@@ -31,7 +31,7 @@ export class GameManager {
         this.itemFlyTimer = null;
 
 
-        this.animalSystem = new AnimalSystem(this);
+        this.animalManager = new AnimalManager(this);
         this.inputSystem = new InputSystem(this);
 
         this.box = {
@@ -43,7 +43,7 @@ export class GameManager {
 
         this.world = new World(this.box,
             (animal1, animal2, mergedCollider) => {
-                return this.animalSystem.mergeAnimals(animal1, animal2, mergedCollider);
+                return this.animalManager.mergeAnimals(animal1, animal2, mergedCollider);
             }
         );
 
@@ -70,7 +70,7 @@ export class GameManager {
 
         this.gameScreen.updateHighScore(gameStore.showHighestScore());
         this.gameScreen.updateCoin(gameStore.getCoin());
-        this.animalSystem.initSpawn(
+        this.animalManager.initSpawn(
             GAME_CONFIG.NEXT_ANIMAL_POSITION_X,
             GAME_CONFIG.NEXT_ANIMAL_POSITION_Y,
             GAME_CONFIG.GAME_AREA_WIDTH / 2,
