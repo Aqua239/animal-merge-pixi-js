@@ -1,6 +1,6 @@
 import { sound } from "@pixi/sound";
 import {ANIMAL_LEVEL, GAME_CONFIG} from "../../constant";
-import { playMergeEffect } from "../../effects";
+import { playMergeEffect } from "../../UI/effects/effects";
 import { Animal } from "../entities/animal";
 import { gameStore } from "../store/gameStore";
 
