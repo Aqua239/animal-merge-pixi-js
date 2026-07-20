@@ -36,24 +36,27 @@ export default class BasePopup extends Container {
     show() {
         if (this.visible === true) return;
 
-        this.visible = true;
-        this.alpha = 0; // Làm mờ toàn bộ popup (bao gồm cả nền đen)
+        if (this.animFrame) {
+            cancelAnimationFrame(this.animFrame);
+        };
 
-        // Lấy vị trí tâm màn hình của bảng làm đích đến
+        this.visible = true;
+        this.isHiding = false;
+        this.alpha = 0;
+
         const targetBoardY = GAME_CONFIG.SCREEN_HEIGHT / 2;
 
-        // Kéo cái bảng lên trên 50 pixel
         this.boardContainer.y = targetBoardY - 50;
 
         const animate = () => {
             if (this.isHiding) return;
-            const easeSpeed = 0.05;
+            const easeSpeed = 0.1;
 
             this.alpha += (1 - this.alpha) * easeSpeed;
             this.boardContainer.y += (targetBoardY - this.boardContainer.y) * easeSpeed;
 
             if (Math.abs(targetBoardY - this.boardContainer.y) > 0.5) {
-                requestAnimationFrame(animate);
+                this.animFrame = requestAnimationFrame(animate);
             }
             else {
                 this.alpha = 1;
@@ -66,15 +69,19 @@ export default class BasePopup extends Container {
     hide() {
         if (this.visible === false || this.isHiding) return;
 
+        if (this.animFrame) {
+            cancelAnimationFrame(this.animFrame);
+        }
+        this.isHiding = true;
         const targetBoardY = GAME_CONFIG.SCREEN_HEIGHT / 2;
 
         const animate = () => {
-            const easeSpeed = 0.05;
+            const easeSpeed = 0.15;
             this.alpha += (0 - this.alpha) * easeSpeed;
             this.boardContainer.y += ((targetBoardY + 50) - this.boardContainer.y) * easeSpeed;
 
             if (this.alpha > 0.05) {
-                requestAnimationFrame(animate);
+                this.animFrame = requestAnimationFrame(animate);
             }
             else {
                 this.alpha = 0;
