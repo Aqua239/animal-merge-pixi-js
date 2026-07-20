@@ -1,6 +1,6 @@
 import { Graphics, Text } from "pixi.js";
 import BaseScreen from "./baseScreen";
-import { GAME_CONFIG } from "../constant";
+import { GAME_CONFIG } from "../../constant";
 
 export default class LoadingScreen extends BaseScreen {
     constructor() {
