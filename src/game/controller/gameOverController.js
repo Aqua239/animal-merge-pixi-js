@@ -1,3 +1,4 @@
+import { sound } from "@pixi/sound";
 import { GAME_CONFIG } from "../../constant";
 import GameOverPopup from "../../overlays/gameOverPopup";
 import { gameStore } from "../store/gameStore";
@@ -13,6 +14,9 @@ export class GameOverController {
 
     gameOver(){
         if(this.gameManager.isGameOver) return;
+
+        //SFX
+        sound.play('sound_sfx_atlas', {sprite: "gameover", volume: 0.8});
 
         this.gameManager.isGameOver = true;
         this.gameManager.isGamePause = false;
